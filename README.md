@@ -1,4 +1,4 @@
-# FRC2025
+# FRC2026
 
 [![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ultime5528/FRC2025/python-coverage-comment-action-data/endpoint.json)](https://htmlpreview.github.io/?https://github.com/Ultime5528/FRC2025/blob/python-coverage-comment-action-data/htmlcov/index.html) ![LoC Badge](https://raw.githubusercontent.com/ultime5528/FRC2025/image-data/badge.svg)
 
@@ -26,9 +26,9 @@
   conda update conda
   conda update python
 ```
-* Run the following command to create an environment named "frc2025":
+* Run the following command to create an environment named "frc2026":
 ```commandline
-  conda create -n frc2025 python=3.13.1
+  conda create -n frc2026 python=3.14.2
 ```
 * Add the environment to the interpreter on PyCharm
 * Run the following commands on the PyCharm terminal to install the requirements
