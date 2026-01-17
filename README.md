@@ -1,6 +1,6 @@
 # FRC2026
 
-[![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ultime5528/FRC2025/python-coverage-comment-action-data/endpoint.json)](https://htmlpreview.github.io/?https://github.com/Ultime5528/FRC2025/blob/python-coverage-comment-action-data/htmlcov/index.html) ![LoC Badge](https://raw.githubusercontent.com/ultime5528/FRC2025/image-data/badge.svg)
+[![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ultime5528/FRC2026/python-coverage-comment-action-data/endpoint.json)](https://htmlpreview.github.io/?https://github.com/Ultime5528/FRC2026/blob/python-coverage-comment-action-data/htmlcov/index.html) ![LoC Badge](https://raw.githubusercontent.com/ultime5528/FRC2026/image-data/badge.svg)
 
 ## Execution
 
