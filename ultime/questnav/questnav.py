@@ -118,7 +118,7 @@ class QuestNav:
         # Queues for unread frames
         self._unread_frames: List[PoseFrame] = []
 
-    def get_all_unread_pose_frames(self) -> List[PoseFrame]:
+    def getAllUnreadPoseFrames(self) -> List[PoseFrame]:
         """
         Retrieves all new pose frames received since the last call.
 

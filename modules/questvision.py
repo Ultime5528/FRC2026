@@ -5,6 +5,7 @@ from subsystems.drivetrain import Drivetrain
 from ultime.module import Module
 from ultime.questnav import questnav
 from ultime.timethis import tt
+from ultime.autoproperty import autoproperty
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_quest_offset = wpimath.geometry.Transform3d(
@@ -13,7 +14,10 @@ robot_to_quest_offset = wpimath.geometry.Transform3d(
 )
 
 
-class QuestVisionModule(Module):
+class QuestTagVisionModule(Module):
+
+    std_translation = autoproperty(0.03)
+    std_rotation = autoproperty(0.1)
 
     def __init__(self, drivetrain: Drivetrain):
         super().__init__()
@@ -23,10 +27,8 @@ class QuestVisionModule(Module):
 
     def robotPeriodic(self) -> None:
         super().robotPeriodic()
-        poseFrames = self.questnav.get_all_unread_pose_frames()
+        poseFrames = self.questnav.getAllUnreadPoseFrames()
 
-        # Documentation of get_all_unread_pose_frames uses all poseFrames
-        # Here we choose to use only the last one.... should we???
         for poseFrame in poseFrames:
             self.estimated_pose = poseFrame.quest_pose_3d
             self.estimated_pose = self.estimated_pose.transformBy(
@@ -34,29 +36,16 @@ class QuestVisionModule(Module):
             )
             time_stamp = poseFrame.data_timestamp
             self.drivetrain.addVisionMeasurement(
-                self.estimated_pose.toPose2d(), time_stamp, [0.03, 0.03, 0.1]
+                self.estimated_pose.toPose2d(),
+                time_stamp,
+                [self.std_translation, self.std_translation, self.std_rotation],
             )
 
-    def X(self):
-        return self.estimated_pose.x
-
-    def Y(self):
-        return self.estimated_pose.y
-
-    def Z(self):
-        return self.estimated_pose.z
-
-    def Roll(self):
-        return self.estimated_pose.rotation().x
-
-    def Pitch(self):
-        return self.estimated_pose.rotation().y
-
-    def Yaw(self):
-        return self.estimated_pose.rotation().z
+    def getEstimatedPose(self):
+        return self.estimated_pose
 
     def reset(self, pose: Pose3d):
-        self.questnav.set_pose(pose)
+        self.questnav.setPose(pose)
 
     def initSendable(self, builder):
         super().initSendable(builder)
@@ -64,9 +53,15 @@ class QuestVisionModule(Module):
         def noop(x):
             pass
 
-        builder.addFloatProperty("X", tt(self.X), noop)
-        builder.addFloatProperty("Y", tt(self.Y), noop)
-        builder.addFloatProperty("Z", tt(self.Z), noop)
-        builder.addFloatProperty("roll", tt(self.Roll), noop)
-        builder.addFloatProperty("pitch", tt(self.Pitch), noop)
-        builder.addFloatProperty("yaw", tt(self.Yaw), noop)
+        builder.addFloatProperty("X", tt(lambda: self.getEstimatedPose().x), noop)
+        builder.addFloatProperty("Y", tt(lambda: self.getEstimatedPose().y), noop)
+        builder.addFloatProperty("Z", tt(lambda: self.getEstimatedPose().z), noop)
+        builder.addFloatProperty(
+            "roll", tt(lambda: self.getEstimatedPose().rotation().x), noop
+        )
+        builder.addFloatProperty(
+            "pitch", tt(lambda: self.getEstimatedPose().rotation().y), noop
+        )
+        builder.addFloatProperty(
+            "yaw", tt(lambda: self.getEstimatedPose().rotation().z), noop
+        )

@@ -45,6 +45,8 @@ class DriveField(Command):
         self.rot = self.drivetrain.getPose().rotation()
 
     def execute(self):
+        is_red = DriverStation.getAlliance() == DriverStation.Alliance.kRed
+
         x_speed, y_speed, _ = apply_center_distance_deadzone(
             self.xbox_remote.getLeftY() * -1,
             self.xbox_remote.getLeftX() * -1,
@@ -59,7 +61,7 @@ class DriveField(Command):
 
         if not (rot_x == 0 and rot_y == 0):
             self.rot = Rotation2d(math.atan2(rot_x, rot_y) * -1)
-            if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            if is_red:
                 self.rot = Rotation2d.fromDegrees(180 + self.rot.degrees())
 
         if self.xbox_remote.leftBumper():
@@ -73,7 +75,7 @@ class DriveField(Command):
             * rot_hyp
         )
 
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+        if is_red == DriverStation.Alliance.kRed:
             x_speed *= -1
             y_speed *= -1
 

@@ -41,7 +41,6 @@ class AutonomousModule(Module):
         )
 
         self.auto_chooser = AutoBuilder.buildAutoChooser()
-        SmartDashboard.putData("AutoChooser", self.auto_chooser)
 
     def shouldFlipPath(self):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed

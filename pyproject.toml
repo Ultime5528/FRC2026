@@ -7,15 +7,6 @@ components = [
     "apriltag",
     "cscore",
     "sim",
-    # "commands2",
-    # "rev",
-    # "navx"
-    #"pathplannerlib",
-    # "phoenix5"
-    # "phoenix6"
-    # "playingwithfusion"
-    # "romi"
-    # "xrp"
 ]
 
 # Other pip packages to install
@@ -23,6 +14,7 @@ requires = [
      "robotpy-commands-v2==2026.2.1",
      "robotpy-rev==2026.0.1",
      "numpy",
+     "robotpy-pathplannerlib==2026.1.1",
      #"photonlibpy==2026.0.1",
      "robotpy-urcl==2026.0.0.1",
      "pyfrc==2026.0.1",

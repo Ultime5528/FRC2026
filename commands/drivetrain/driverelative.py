@@ -6,7 +6,6 @@ from ultime.command import Command
 
 
 class DriveRelative(Command):
-
     @classmethod
     def right(cls, drivetrain: Drivetrain):
         cmd = cls(drivetrain, Translation2d(0, -1) * drive_relative_properties.speed)

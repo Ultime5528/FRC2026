@@ -1,9 +1,11 @@
 import commands2
 import wpilib
 from commands2 import CommandScheduler
+from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
 from ultime.module import Module, ModuleList
@@ -13,8 +15,9 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        module_list: ModuleList,
         quest: QuestVisionModule,
+        autonomous: AutonomousModule,
+        module_list: ModuleList,
     ):
         super().__init__()
         self._hardware = hardware
@@ -22,6 +25,8 @@ class DashboardModule(Module):
         self.setupCopilotCommands(hardware)
         # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
+
+        SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
 
     def setupCopilotCommands(self, hardware: HardwareModule):
         pass

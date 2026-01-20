@@ -25,4 +25,4 @@ def test_inheritance():
     for obj in get_subsystems():
         assert issubclass(
             obj, ultime.subsystem.Subsystem
-        ), f"{obj.__name__} is not a subclass of SafeSubsystem"
+        ), f"{obj.__name__} is not a subclass of ultime.subsystem.Subsystem"
