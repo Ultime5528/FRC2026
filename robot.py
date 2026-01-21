@@ -28,7 +28,9 @@ class Robot(ModuleRobot):
 
         self.quest_vision = QuestVisionModule(self.hardware.drivetrain)
 
-        self.dashboard = DashboardModule(self.hardware, self.quest_vision, self.autonomous, self.modules)
+        self.dashboard = DashboardModule(
+            self.hardware, self.quest_vision, self.autonomous, self.modules
+        )
         self.logging = LoggingModule()
         self.property_save_checker = PropertySaveCheckerModule()
 
