@@ -14,7 +14,11 @@
 * Save autoproperties : `python properties.py saveonce`
 * Save loop autoproperties : `python properties.py saveloop`
 * PyNetConsole : `python -m netconsole 10.55.28.2`
+* Convert protos to python ¹ : `python -m grpc_tools.protoc -I=ultime/questnav/protos --python_out=ultime/questnav/generated ultime/questnav/protos/*.proto`
 
+
+¹If running into import problems, change the lines responsible for importing geometry3d/2d in
+ data_pb2.py and command_pb2.py to use "from . import ..." instead of "import ...".
 
 ## Environment setup
 * Download the latest Miniconda version on your computer with the following link (https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe)
@@ -34,14 +38,7 @@
 * Run the following commands on the PyCharm terminal to install the requirements
 ```commandline
   pip install robotpy
-  conda install libprotobuf 
   python -m robotpy sync
-```
-
-* Run the following command to convert the proto to python files
-```commandline
-  python -m grpc_tools.protoc -I=ultime/questnav/protos --python_out=ultime/questnav/generated ultime/questnav/protos/*.proto
-
 ```
 
 (In a new project, execute `python -m robotpy init` instead.)

@@ -37,7 +37,7 @@ class DriveRelative(Command):
         self.speed = speed
 
     def execute(self):
-        self.drivetrain.drive(self.speed.x, self.speed.y, 0, False)
+        self.drivetrain.driveFromStickInputs(self.speed.x, self.speed.y, 0, False)
 
     def end(self, interrupted: bool):
         self.drivetrain.stop()

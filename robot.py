@@ -7,7 +7,7 @@ from modules.dashboard import DashboardModule
 from modules.hardware import HardwareModule
 from modules.logging import LoggingModule
 from modules.propertysavechecker import PropertySaveCheckerModule
-from modules.questvision import QuestVisionModule
+from modules.questtagvision import QuestTagVisionModule
 from ultime.modulerobot import ModuleRobot
 
 
@@ -26,7 +26,7 @@ class Robot(ModuleRobot):
 
         self.autonomous = AutonomousModule(self.hardware)
 
-        self.quest_vision = QuestVisionModule(self.hardware.drivetrain)
+        self.quest_vision = QuestTagVisionModule(self.hardware.drivetrain)
 
         self.dashboard = DashboardModule(
             self.hardware, self.quest_vision, self.autonomous, self.modules
