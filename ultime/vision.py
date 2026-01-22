@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import List
 from typing import Optional
 
-from photonlibpy import PhotonPoseEstimator, PoseStrategy, EstimatedRobotPose
+from photonlibpy import PhotonPoseEstimator, EstimatedRobotPose
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.targeting import PhotonTrackedTarget, PhotonPipelineResult
 from robotpy_apriltag import AprilTagFieldLayout, AprilTagField
@@ -66,19 +66,16 @@ class AbsoluteVision(Vision):
 
         self.camera_pose_estimator = PhotonPoseEstimator(
             april_tag_field_layout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            self._cam,
             camera_offset,
         )
         self.estimated_pose: EstimatedRobotPose = None
         self.std_devs = [4, 4, 8]
-        self.camera_pose_estimator.multiTagFallbackStrategy = (
-            PoseStrategy.LOWEST_AMBIGUITY
-        )
 
     def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose:
         self.estimated_pose = None
-        self.estimated_pose = self.camera_pose_estimator.update(frame)
+        self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(frame)
+        if self.estimated_pose is None:
+            self.estimated_pose = self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
         self.updateEstimationStdDevs(self.estimated_pose, frame.getTargets())
         return self.estimated_pose
 
