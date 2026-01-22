@@ -17,7 +17,7 @@ from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.system.plant import DCMotor
 from wpiutil import Sendable, SendableBuilder
 
-from ultime import swerveconfig
+from ultime.swerve import swerveconfig
 from ultime.timethis import tt
 
 
@@ -28,33 +28,8 @@ class SwerveModule:
         turning_motor_port,
         chassis_angular_offset: float,
     ):
-        self._driving_motor = SparkMax(drive_motor_port, SparkMax.MotorType.kBrushless)
-        self._turning_motor = SparkMax(
-            turning_motor_port, SparkMax.MotorType.kBrushless
-        )
+
         self.desired_state = SwerveModuleState(0.0, Rotation2d())
-
-        self._driving_encoder = self._driving_motor.getEncoder()
-        self._turning_encoder = self._turning_motor.getAbsoluteEncoder()
-
-        self._driving_motor.configure(
-            swerveconfig.driving_config,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters,
-        )
-
-        self._turning_motor.configure(
-            swerveconfig.turning_config,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters,
-        )
-
-        self._driving_closed_loop_controller = (
-            self._driving_motor.getClosedLoopController()
-        )
-        self._turning_closed_loop_controller = (
-            self._turning_motor.getClosedLoopController()
-        )
 
         self._chassis_angular_offset = chassis_angular_offset
         self.desired_state.angle = Rotation2d(self._turning_encoder.getPosition())
@@ -68,12 +43,6 @@ class SwerveModule:
 
             self.sim_turning_motor = SparkSim(self._turning_motor, DCMotor.NEO550())
             self.sim_encoder_turn = self.sim_turning_motor.getAbsoluteEncoderSim()
-
-    def setDriveVoltage(self, voltage: float):
-        self._driving_motor.setVoltage(voltage)
-
-    def setTurnVoltage(self, voltage: float):
-        self._turning_motor.setVoltage(voltage)
 
     def setDriveVelocity(
         self, velocity_meters_per_sec: float, accel_meters_per_sec: float
@@ -94,21 +63,6 @@ class SwerveModule:
             swerveconfig.driveKs * direction
             + swerveconfig.driveKv * velocity_meters_per_sec
             + swerveconfig.driveKa * accel_meters_per_sec
-        )
-
-        self._driving_closed_loop_controller.setReference(
-            velocity_meters_per_sec,
-            SparkBase.ControlType.kVelocity,
-            ClosedLoopSlot.kSlot0,
-            ff_volts,
-            SparkClosedLoopController.ArbFFUnits.kVoltage,
-        )
-
-        self.desired_velocity = velocity_meters_per_sec
-
-    def setTurnPosition(self, rotation: Rotation2d):
-        self._turning_closed_loop_controller.setReference(
-            rotation.radians(), SparkBase.ControlType.kPosition
         )
 
     def setDesiredSetpoint(
@@ -139,30 +93,16 @@ class SwerveModule:
         self.setDriveVoltage(0.0)
         self.setTurnVoltage(0.0)
 
-    def getAngleRandians(self):
-        return self._turning_encoder.getPosition()
-
-    def getEncoderPosition(self):
-        return self._driving_encoder.getPosition()
-
-    def getVelocity(self):
-        return self._driving_encoder.getVelocity()
-
     def getPosition(self) -> SwerveModulePosition:
         return SwerveModulePosition(
             self.getEncoderPosition(),
-            Rotation2d(self.getAngleRandians() - self._chassis_angular_offset),
+            Rotation2d(self.getRawAngleRadians() - self._chassis_angular_offset),
         )
 
     def getState(self) -> SwerveModuleState:
         return SwerveModuleState(
             self.getVelocity(),
-            Rotation2d(self.getAngleRandians() - self._chassis_angular_offset),
-        )
-
-    def getDrivingMotorAppliedVoltage(self):
-        return (
-            self._driving_motor.getBusVoltage() * self._driving_motor.getAppliedOutput()
+            Rotation2d(self.getRawAngleRadians() - self._chassis_angular_offset),
         )
 
     def simulationUpdate(self, period: float):

@@ -73,9 +73,13 @@ class AbsoluteVision(Vision):
 
     def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose:
         self.estimated_pose = None
-        self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(frame)
+        self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(
+            frame
+        )
         if self.estimated_pose is None:
-            self.estimated_pose = self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
+            self.estimated_pose = (
+                self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
+            )
         self.updateEstimationStdDevs(self.estimated_pose, frame.getTargets())
         return self.estimated_pose
 
