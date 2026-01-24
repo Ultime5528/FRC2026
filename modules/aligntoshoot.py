@@ -1,7 +1,7 @@
 import math
 
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Translation3d
-from wpimath.
+from wpimath import units
 
 
 def computeRobotRotationToAlign(
@@ -32,4 +32,4 @@ def computeShooterSpeedToShoot(
     target_pose: Translation3d,
     shooter_angle: float
 ) -> float:
-    numerator
+    numerator = units.standard_gravity
