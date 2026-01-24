@@ -1,10 +1,7 @@
 import math
 
-from wpimath.geometry import Pose2d, Translation2d, Rotation2d
-
-
-shooter_offset1 = Translation2d(0.1, 0.1)
-shooter_edge = Translation2d(1, 0)
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Translation3d
+from wpimath.
 
 
 def computeRobotRotationToAlign(
@@ -29,3 +26,10 @@ def computeRobotRotationToAlign(
         return Rotation2d()
     else:
         return Rotation2d(math.atan2(-B, -A) + math.acos(C / denom))
+
+def computeShooterSpeedToShoot(
+    robot_pose: Translation3d,
+    target_pose: Translation3d,
+    shooter_angle: float
+) -> float:
+    numerator
