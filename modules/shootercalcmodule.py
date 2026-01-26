@@ -1,0 +1,87 @@
+import math
+from pickle import REDUCE
+
+from wpilib import DriverStation
+from wpimath.geometry import Rotation2d, Translation3d, Pose3d, Translation2d
+from wpimath import units
+
+from subsystems.drivetrain import Drivetrain
+from ultime.autoproperty import autoproperty
+from ultime.module import Module
+
+long_zone = autoproperty(6.0)
+
+
+def computeRobotRotationToAlign(
+    robot_pose3d: Pose3d,
+    shooter_offset: Translation3d,
+    shooter_extremity: Translation3d,
+    hub_pose: Pose3d,
+) -> Rotation2d:
+
+    delta_hub_and_bot = hub_pose.translation() - robot_pose3d.translation()
+    hub_at_origin = delta_hub_and_bot.rotateBy(-robot_pose3d.rotation())
+    shooter_direction = shooter_extremity - shooter_offset
+
+    A = shooter_direction.cross(hub_at_origin)
+    B = shooter_direction.dot(hub_at_origin)
+    C = shooter_offset.cross(shooter_extremity)
+
+    denominator = (A**2) + (B**2)
+
+    # to avoid domain errors
+    if abs(C / denominator) > 1 or denominator == 0:
+        return Rotation2d()
+    else:
+        return robot_pose3d.toPose2d().rotation() + Rotation2d(
+            math.atan2(-B, -A) + math.acos(C / denominator)
+        )
+
+
+def computeShooterSpeedToShoot(
+    robot_pose: Translation3d, target_pose: Translation3d, long_shoot_zone: float
+) -> float:
+
+    if target_pose.distance(robot_pose) >= long_shoot_zone:
+        shooter_angle = math.radians(60.0)
+    else:
+        shooter_angle = math.radians(70.0)
+
+    gravity = float(units.standard_gravity)
+
+    delta_x = target_pose.x - robot_pose.x
+    delta_y = target_pose.y - robot_pose.y
+
+    numerator = gravity * (delta_x**2)
+    denominator = (2 * (math.cos(shooter_angle)) ** 2) * (
+        delta_x * (math.cos(shooter_angle)) - delta_y
+    )
+
+    if denominator == 0:
+        return -1
+    else:
+        return numerator / denominator
+
+
+def shouldUseGuide(
+    robot_pose: Translation3d, target_pose: Translation3d, long_shoot_zone: float
+) -> bool:
+    if target_pose.distance(robot_pose) >= long_shoot_zone:
+        return True
+    else:
+        return False
+
+
+class ShooterCalcModule(Module):
+    def __init__(self, drivetrain: Drivetrain):
+        super().__init__()
+        self._drivetrain = drivetrain
+
+    def _getTargetPose(self) -> Translation3d:
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            return Translation3d()
+
+    def shouldUseGuide(self) -> bool:
+        return shouldUseGuide(
+            self._drivetrain.getPose().translation(), self._getTargetPose(), long_zone
+        )
