@@ -25,13 +25,13 @@ class DiagnoseOdometry(Command):
 
     def execute(self):
         if self.timer.get() < 1:
-            self.drivetrain.drive(0.1, 0, 0, False)
+            self.drivetrain.driveFromStickInputs(0.1, 0, 0, False)
         elif self.timer.get() < 2:
-            self.drivetrain.drive(0, 0.1, 0, False)
+            self.drivetrain.driveFromStickInputs(0, 0.1, 0, False)
         elif self.timer.get() < 3:
-            self.drivetrain.drive(-0.1, 0, 0, False)
+            self.drivetrain.driveFromStickInputs(-0.1, 0, 0, False)
         elif self.timer.get() < 4:
-            self.drivetrain.drive(0, -0.1, 0, False)
+            self.drivetrain.driveFromStickInputs(0, -0.1, 0, False)
 
     def isFinished(self) -> bool:
         return self.timer.get() > 4

@@ -58,9 +58,12 @@ class AlertGroup(Sendable):
 class Alert:
     _groups: WeakSet[AlertGroup] = WeakSet()
 
-    def __init__(self, text: str, alert_type: AlertType, group: str = "Alerts"):
+    def __init__(
+        self, text: str, alert_type: AlertType, group: str = "Alerts", prefix=""
+    ):
         self._text = text
         self._alert_type = alert_type
+        self._prefix = prefix
         self._active = False
         self._published_alert = None
         # Important to keep ref to group to prevent it from being gc
@@ -73,7 +76,7 @@ class Alert:
 
         if active:
             self._published_alert = PublishedAlert(
-                RobotController.getTime(), self._text
+                RobotController.getTime(), self._prefix + self._text
             )
             bisect.insort(self._active_alerts, self._published_alert)
         else:
@@ -93,7 +96,7 @@ class Alert:
         if self._active:
             timestamp = self._published_alert.timestamp
             self._active_alerts.remove(self._published_alert)
-            self._published_alert = PublishedAlert(timestamp, text)
+            self._published_alert = PublishedAlert(timestamp, self._prefix + text)
             bisect.insort(self._active_alerts, self._published_alert)
 
     def getText(self) -> str:

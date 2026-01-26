@@ -17,9 +17,9 @@ from typing import List, Optional
 import ntcore
 from wpimath.geometry import Pose3d, Translation3d, Rotation3d, Quaternion
 
-from .generated import commands_pb2
 
 # Import generated protobuf classes
+from .generated import commands_pb2
 from .generated import data_pb2
 from .generated import geometry3d_pb2
 
@@ -64,14 +64,14 @@ class QuestNav:
         # Set initial pose
         from wpimath.geometry import Pose2d, Rotation2d
         initial_pose = Pose2d(1.0, 2.0, Rotation2d.fromDegrees(90))
-        questnav.set_pose(Pose3d(initial_pose))
+        questnav.setPose(Pose3d(initial_pose))
 
         # In robotPeriodic():
         questnav.command_periodic()
 
         frames = questnav.get_all_unread_pose_frames()
         for frame in frames:
-            if questnav.is_connected() and questnav.is_tracking():
+            if questnav.isConnected() and questnav.isTracking():
                 # Use frame.quest_pose_3d with pose estimator
                 pass
     """
@@ -138,7 +138,7 @@ class QuestNav:
         Example:
             frames = questnav.get_all_unread_pose_frames()
             for frame in frames:
-                if questnav.is_tracking() and questnav.is_connected():
+                if questnav.is_tracking() and questnav.isConnected():
                     pose_estimator.add_vision_measurement(
                         frame.quest_pose_3d.toPose2d(),
                         frame.data_timestamp,
@@ -227,7 +227,7 @@ class QuestNav:
         self._unread_frames.clear()
         return frames
 
-    def set_pose(self, pose: Pose3d):
+    def setPose(self, pose: Pose3d):
         """
         Sets the field-relative pose of the Quest headset.
 
@@ -249,12 +249,12 @@ class QuestNav:
         Example:
             # If you know Quest pose directly
             quest_pose = Pose3d(1.5, 5.5, 0.0, Rotation3d())
-            questnav.set_pose(quest_pose)
+            questnav.setPose(quest_pose)
 
             # If you know robot pose, apply mounting offset
             robot_pose = pose_estimator.getEstimatedPosition()
             quest_pose = Pose3d(robot_pose).transformBy(mounting_offset)
-            questnav.set_pose(quest_pose)
+            questnav.setPose(quest_pose)
         """
         self._last_command_id += 1
 
@@ -289,7 +289,7 @@ class QuestNav:
         except Exception as e:
             print(f"QuestNav error sending pose reset: {e}")
 
-    def get_battery_percent(self) -> Optional[int]:
+    def getBatteryPercent(self) -> Optional[int]:
         """
         Returns the Quest headset's current battery level as a percentage.
 
@@ -298,7 +298,7 @@ class QuestNav:
         """
         return self._battery_percent if self._battery_percent > 0 else None
 
-    def is_tracking(self) -> bool:
+    def isTracking(self) -> bool:
         """
         Gets the current tracking state of the Quest headset.
 
@@ -314,7 +314,7 @@ class QuestNav:
         """
         return self._tracking
 
-    def is_connected(self) -> bool:
+    def isConnected(self) -> bool:
         """
         Determines if the Quest headset is currently connected.
 
@@ -326,7 +326,7 @@ class QuestNav:
         current_time = time.time()
         return (current_time - self._last_frame_timestamp) < 0.1  # 100ms timeout
 
-    def get_frame_count(self) -> Optional[int]:
+    def getFrameCount(self) -> Optional[int]:
         """
         Gets the current frame count from the Quest headset.
 
@@ -335,7 +335,7 @@ class QuestNav:
         """
         return self._frame_count if self._frame_count > 0 else None
 
-    def get_tracking_lost_counter(self) -> Optional[int]:
+    def getTrackingLostCounter(self) -> Optional[int]:
         """
         Gets the number of tracking lost events since Quest connected.
 
@@ -344,7 +344,7 @@ class QuestNav:
         """
         return self._tracking_lost_counter
 
-    def get_latency(self) -> float:
+    def getLatency(self) -> float:
         """
         Gets the latency of the Quest to Robot connection.
 
@@ -376,7 +376,7 @@ class QuestNav:
         Processes command responses from the Quest headset.
 
         Must be called regularly (typically in robotPeriodic()) to:
-        - Process responses to commands sent via set_pose()
+        - Process responses to commands sent via setPose()
         - Log command failures for debugging
         - Maintain proper command/response synchronization
 
