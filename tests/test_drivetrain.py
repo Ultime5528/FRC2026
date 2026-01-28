@@ -7,7 +7,7 @@ from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.drivetrain.resetpose import ResetPose
 from commands.drivetrain.drive import DriveField
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Translation2d
 from robot import Robot
 from ultime.tests import RobotTestController
 
@@ -55,13 +55,28 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
     right_cmd.schedule()
     robot_controller.wait_until(lambda: drivetrain.getPose().X() <= 0, 5.0)
 
+
 def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     drivetrain = robot.hardware.drivetrain
-    drive = DriveField(drivetrain, wpilib.simulation.XboxControllerSim(robot.hardware.drivetrain))
-    xbox_remote = wpilib.simulation.XboxControllerSim(robot.hardware.controller)
+    xbox_remote = wpilib.simulation.XboxControllerSim(0)
+    drive = DriveField(drivetrain, robot.hardware.controller)
+    reset_pose = ResetPose(drivetrain, Pose2d())
 
     robot_controller.startTeleop()
 
-    slow_cmd = drive.execute()
+    # tests the robot moving plus the slow trigger
+    slow_cmd = drive
+    reset_cmd = reset_pose
     slow_cmd.schedule()
+    xbox_remote.setLeftStickButton(True)
+    robot_controller.wait(0.4)
+    xbox_remote.setLeftStickButton(False)
+    init_pose = drivetrain.getPose().translation()
+    reset_cmd.schedule()
     xbox_remote.setRightBumperButton(True)
+    xbox_remote.setLeftStickButton(True)
+    robot_controller.wait(0.4)
+    xbox_remote.setLeftStickButton(False)
+    fin_pose = drivetrain.getPose().translation()
+    assert 3*fin_pose.x == init_pose.x
+    assert 3*fin_pose.y == init_pose.y
