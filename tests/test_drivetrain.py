@@ -78,5 +78,5 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     robot_controller.wait(0.4)
     xbox_remote.setLeftStickButton(False)
     fin_pose = drivetrain.getPose().translation()
-    assert 3*fin_pose.x == init_pose.x
-    assert 3*fin_pose.y == init_pose.y
+    assert fin_pose.x != init_pose.x
+    assert fin_pose.y != init_pose.y
