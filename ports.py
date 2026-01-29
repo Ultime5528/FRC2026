@@ -25,13 +25,16 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
+    intake_motor_intake = 11
+    intake_motor_pivot = 12
 
 class PWM(Immutable):
     pass
 
 
 class DIO(Immutable):
-    pass
+    intake_switch_min = 1
+    intake_switch_max = 2
 
 
 class PDP(Immutable):
