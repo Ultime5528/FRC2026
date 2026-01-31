@@ -12,7 +12,7 @@ class Shoot(Command):
         self.addRequirements(self.shooter)
 
     def execute(self):
-      self.shooter.shoot()
+        self.shooter.shoot()
 
     def isFinished(self) -> bool:
         return False

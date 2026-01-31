@@ -22,7 +22,5 @@ class HardwareModule(Module):
 
         self.subsystems: list[Subsystem] = [
             self.drivetrain,
-                self.shooter,
+            self.shooter,
         ]
-
-
