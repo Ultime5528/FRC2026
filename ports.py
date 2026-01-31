@@ -28,6 +28,7 @@ class CAN(Immutable):
     intake_motor_intake = 11
     intake_motor_pivot = 12
 
+
 class PWM(Immutable):
     pass
 

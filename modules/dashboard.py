@@ -45,7 +45,6 @@ class DashboardModule(Module):
         )
         putCommandOnDashboard("Intake", Roll(hardware.intake))
 
-
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
             wpilib.SmartDashboard.putData(subsystem.getName(), subsystem)

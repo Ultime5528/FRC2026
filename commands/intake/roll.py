@@ -18,8 +18,3 @@ class Roll(Command):
 
     def end(self, interrupted: bool):
         self.intake.stop_intake()
-
-
-
-
-

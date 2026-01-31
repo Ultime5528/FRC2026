@@ -121,10 +121,16 @@ class LinearSubsystem(Subsystem):
         dt = current_time - self._sim_prev_time
         self._sim_prev_time = current_time
 
-        delta = (self.getMotorOutput() - self._sim_gravity) * self._sim_motor_to_distance_factor * dt
+        delta = (
+            (self.getMotorOutput() - self._sim_gravity)
+            * self._sim_motor_to_distance_factor
+            * dt
+        )
         self._sim_position += delta
 
-        self.setSimulationEncoderPosition((self._sim_position - self._sim_initial_position) / self.getPositionConversionFactor())
-
+        self.setSimulationEncoderPosition(
+            (self._sim_position - self._sim_initial_position)
+            / self.getPositionConversionFactor()
+        )
 
         self.getPositionConversionFactor

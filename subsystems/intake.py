@@ -13,8 +13,6 @@ class Intake(LinearSubsystem):
     min_position = autoproperty(0)
     max_position = autoproperty(0)
 
-
-
     def __init__(self):
         super().__init__()
         self._motor_pivot = rev.SparkMax(
@@ -24,8 +22,12 @@ class Intake(LinearSubsystem):
         self.motor_intake = rev.SparkMax(
             ports.CAN.intake_motor_intake, rev.SparkMax.MotorType.kBrushless
         )
-        self._switch_min = Switch(Switch.Type.NormallyClosed, ports.DIO.intake_switch_min)
-        self._switch_max = Switch(Switch.Type.NormallyClosed, ports.DIO.intake_switch_max)
+        self._switch_min = Switch(
+            Switch.Type.NormallyClosed, ports.DIO.intake_switch_min
+        )
+        self._switch_max = Switch(
+            Switch.Type.NormallyClosed, ports.DIO.intake_switch_max
+        )
 
     def roll(self):
         self.moteur_intake.set(self.speed_intake)
@@ -38,7 +40,6 @@ class Intake(LinearSubsystem):
 
     def stop_pivot(self):
         self.moteur_pivot.stopMotor()
-
 
     def initSimulationComponents(self):
         self._motor_pivot
