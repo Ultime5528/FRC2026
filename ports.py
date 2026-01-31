@@ -25,6 +25,10 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
+    shooter_flywheel = 9
+    shooter_aligner = 10
+    indexer_motor = 13
+
 
 class PWM(Immutable):
     pass
