@@ -3,6 +3,7 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.Shooter.shoot import Shoot
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from modules.autonomous import AutonomousModule
@@ -23,7 +24,7 @@ class DashboardModule(Module):
         self._hardware = hardware
         self._module_list = module_list
         self.setupCopilotCommands(hardware)
-        # self.setupCommands(hardware)
+        self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
@@ -42,6 +43,7 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        putCommandOnDashboard("Shoot", Shoot(hardware.shooter))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

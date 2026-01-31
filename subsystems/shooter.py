@@ -7,7 +7,7 @@ import ports
 
 class Shooter(Subsystem):
     shooting_speed = autoproperty(0.2)
-
+    #Add a function to control the speed of the flywheel automatically while shooting
     def __init__(self):
         super().__init__()
         self.flywheel = self.flywheel = rev.SparkMax(

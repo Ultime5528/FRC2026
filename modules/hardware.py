@@ -17,11 +17,12 @@ class HardwareModule(Module):
 
         self.drivetrain = Drivetrain()
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
-
+        self.shooter = Shooter()
         self.pdp = PowerDistribution()
 
         self.subsystems: list[Subsystem] = [
             self.drivetrain,
+                self.shooter,
         ]
 
-        self.shooter = Shooter()
+
