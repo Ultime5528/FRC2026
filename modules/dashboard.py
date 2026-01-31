@@ -5,6 +5,7 @@ from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.intake.roll import Roll
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questtagvision import QuestTagVisionModule
@@ -42,6 +43,8 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        putCommandOnDashboard("Intake", Roll(hardware.intake))
+
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
