@@ -24,7 +24,8 @@ from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
-from ultime.swerve import SwerveModule, SwerveDriveElasticSendable
+from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
+from ultime.swerve.swerveIO import SwerveIO
 from ultime.timethis import tt
 
 
@@ -41,7 +42,7 @@ class Drivetrain(Subsystem):
 
     swerve_temperature_threshold = autoproperty(55.0)
 
-    def __init__(self) -> None:
+    def __init__(self, io) -> None:
         super().__init__()
         self.period_seconds = 0.02
         # Swerve Module motor positions
@@ -55,27 +56,39 @@ class Drivetrain(Subsystem):
         self.heading_controller = PIDController(10, 0, 0)
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
 
-        self.swerve_module_fl = SwerveModule(
+        self.io_fl = io(
             ports.CAN.drivetrain_motor_driving_fl,
             ports.CAN.drivetrain_motor_turning_fl,
+        )
+        self.swerve_module_fl = SwerveModule(
+            self.io_fl,
             self.angular_offset_fl,
         )
 
-        self.swerve_module_fr = SwerveModule(
+        self.io_fr = io(
             ports.CAN.drivetrain_motor_driving_fr,
             ports.CAN.drivetrain_motor_turning_fr,
+        )
+        self.swerve_module_fr = SwerveModule(
+            self.io_fr,
             self.angular_offset_fr,
         )
 
-        self.swerve_module_bl = SwerveModule(
+        self.io_bl = io(
             ports.CAN.drivetrain_motor_driving_bl,
             ports.CAN.drivetrain_motor_turning_bl,
+        )
+        self.swerve_module_bl = SwerveModule(
+            self.io_bl,
             self.angular_offset_bl,
         )
 
-        self.swerve_module_br = SwerveModule(
+        self.io_br = io(
             ports.CAN.drivetrain_motor_driving_br,
             ports.CAN.drivetrain_motor_turning_br,
+        )
+        self.swerve_module_br = SwerveModule(
+            self.io_br,
             self.angular_offset_br,
         )
 
@@ -371,33 +384,28 @@ class Drivetrain(Subsystem):
         self.odometry_pose.setPose(self.swerve_odometry.getPose())
         self._field.setRobotPose(self.swerve_estimator.getEstimatedPosition())
 
-        for location, swerve_module in self.swerve_modules.items():
-            if (
-                swerve_module._driving_motor.getMotorTemperature()
-                > self.swerve_temperature_threshold
-                or swerve_module._turning_motor.getMotorTemperature()
-                > self.swerve_temperature_threshold
-            ):
-                self.alerts_hot[location].set(True)
-            else:
-                self.alerts_hot[location].set(False)
+    # for location, swerve_module in self.swerve_modules.items():
+    #     if (
+    #         swerve_module._driving_motor.getMotorTemperature()
+    #         > self.swerve_temperature_threshold
+    #         or swerve_module._turning_motor.getMotorTemperature()
+    #         > self.swerve_temperature_threshold
+    #     ):
+    #         self.alerts_hot[location].set(True)
+    #     else:
+    #         self.alerts_hot[location].set(False)
 
-            if (
-                swerve_module._driving_motor.hasActiveFault()
-                or swerve_module._turning_motor.hasActiveFault()
-                or swerve_module._driving_motor.hasActiveWarning()
-                or swerve_module._turning_motor.hasActiveWarning()
-            ):
-                self.alerts_faults[location].set(True)
-            else:
-                self.alerts_faults[location].set(False)
+    #     if (
+    #         swerve_module._driving_motor.hasActiveFault()
+    #         or swerve_module._turning_motor.hasActiveFault()
+    #         or swerve_module._driving_motor.hasActiveWarning()
+    #         or swerve_module._turning_motor.hasActiveWarning()
+    #     ):
+    #         self.alerts_faults[location].set(True)
+    #     else:
+    #         self.alerts_faults[location].set(False)
 
     def simulationPeriodic(self):
-        self.swerve_module_fl.simulationUpdate(self.period_seconds)
-        self.swerve_module_fr.simulationUpdate(self.period_seconds)
-        self.swerve_module_bl.simulationUpdate(self.period_seconds)
-        self.swerve_module_br.simulationUpdate(self.period_seconds)
-
         module_states = (
             self.swerve_module_fl.getState(),
             self.swerve_module_fr.getState(),

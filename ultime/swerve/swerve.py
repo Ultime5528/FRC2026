@@ -1,15 +1,7 @@
 import math
 from typing import Callable
 
-from rev import (
-    SparkMax,
-    SparkBase,
-    SparkSim,
-    ClosedLoopSlot,
-    SparkClosedLoopController,
-    ResetMode,
-    PersistMode,
-)
+from rev import SparkSim
 from wpilib import RobotBase
 from wpilib.simulation import RoboRioSim
 from wpimath.geometry import Rotation2d
@@ -18,41 +10,28 @@ from wpimath.system.plant import DCMotor
 from wpiutil import Sendable, SendableBuilder
 
 from ultime.swerve import swerveconfig
+from ultime.swerve.swerveIO import SwerveIO, SwerveInputs, SwerveOutputs
 from ultime.timethis import tt
 
 
 class SwerveModule:
     def __init__(
         self,
-        drive_motor_port,
-        turning_motor_port,
+        io: SwerveIO,
         chassis_angular_offset: float,
     ):
-
-        self.desired_state = SwerveModuleState(0.0, Rotation2d())
-
         self._chassis_angular_offset = chassis_angular_offset
-        self.desired_state.angle = Rotation2d(self._turning_encoder.getPosition())
-        self._driving_encoder.setPosition(0.0)
 
         self.desired_velocity = 0.0
 
-        if RobotBase.isSimulation():
-            self.sim_driving_motor = SparkSim(self._driving_motor, DCMotor.NEO())
-            self.sim_encoder_drive = self.sim_driving_motor.getRelativeEncoderSim()
-
-            self.sim_turning_motor = SparkSim(self._turning_motor, DCMotor.NEO550())
-            self.sim_encoder_turn = self.sim_turning_motor.getAbsoluteEncoderSim()
+        self._inputs = io.inputs
+        self._outputs = io.outputs
 
     def setDriveVelocity(
         self, velocity_meters_per_sec: float, accel_meters_per_sec: float
     ):
         if abs(velocity_meters_per_sec) < 0.001:
-            self._driving_closed_loop_controller.setReference(
-                0.0, SparkBase.ControlType.kVoltage
-            )
-            self.desired_velocity = 0.0
-            return
+            velocity_meters_per_sec = 0.0
 
         direction = 0
         if velocity_meters_per_sec > 0:
@@ -65,6 +44,9 @@ class SwerveModule:
             + swerveconfig.driveKa * accel_meters_per_sec
         )
 
+        self._outputs.drive_velocity_meters_per_sec = velocity_meters_per_sec
+        self._outputs.drive_ff_volts = ff_volts
+
     def setDesiredSetpoint(
         self, state: SwerveModuleState, accel_meters_per_sec: float = 0.0
     ):
@@ -74,7 +56,7 @@ class SwerveModule:
             Rotation2d(self._chassis_angular_offset)
         )
 
-        current_rotation = Rotation2d(self._turning_encoder.getPosition())
+        current_rotation = Rotation2d(self._inputs.turn_raw_angle_radians)
 
         corrected_desired_state.optimize(current_rotation)
 
@@ -83,53 +65,37 @@ class SwerveModule:
         ).cos()
 
         self.setDriveVelocity(corrected_desired_state.speed, accel_meters_per_sec)
-        self.setTurnPosition(corrected_desired_state.angle)
+        self._outputs.turn_position = corrected_desired_state.angle
 
     def runCharacterization(self, output: float):
-        self.setDriveVoltage(output)
-        self.setTurnPosition(Rotation2d())
+        self._outputs.drive_voltage = output
+        self._outputs.turn_position = Rotation2d()
 
     def stop(self):
-        self.setDriveVoltage(0.0)
-        self.setTurnVoltage(0.0)
+        self._outputs.drive_voltage = 0.0
+        self._outputs.turn_voltage = 0.0
 
     def getPosition(self) -> SwerveModulePosition:
         return SwerveModulePosition(
-            self.getEncoderPosition(),
-            Rotation2d(self.getRawAngleRadians() - self._chassis_angular_offset),
+            self._inputs.drive_position_meters,
+            Rotation2d(
+                self._inputs.turn_raw_angle_radians - self._chassis_angular_offset
+            ),
         )
 
     def getState(self) -> SwerveModuleState:
         return SwerveModuleState(
-            self.getVelocity(),
-            Rotation2d(self.getRawAngleRadians() - self._chassis_angular_offset),
+            self._inputs.drive_velocity_meters_per_sec,
+            Rotation2d(
+                self._inputs.turn_raw_angle_radians - self._chassis_angular_offset
+            ),
         )
 
-    def simulationUpdate(self, period: float):
-        # Drive motor simulation
-        drive_voltage = (
-            self._driving_motor.getAppliedOutput() * RoboRioSim.getVInVoltage()
-        )
-        self.sim_driving_motor.iterate(
-            drive_voltage, RoboRioSim.getVInVoltage(), period
-        )
+    def getDrivingMotorAppliedVoltage(self):
+        return self._inputs.drive_applied_volts
 
-        # Update drive encoder
-        self.sim_encoder_drive.setPosition(self.sim_driving_motor.getPosition())
-        self.sim_encoder_drive.setVelocity(self.sim_driving_motor.getVelocity())
-
-        # Turn motor simulation
-        turn_voltage = (
-            self._turning_motor.getAppliedOutput() * RoboRioSim.getVInVoltage()
-        )
-        self.sim_turning_motor.iterate(turn_voltage, RoboRioSim.getVInVoltage(), period)
-
-        # Update turn encoder
-        current_turn_pos = self.sim_turning_motor.getPosition()
-        # Normalize angle to -π to π
-        normalized_pos = ((current_turn_pos + math.pi) % (2 * math.pi)) - math.pi
-        self.sim_encoder_turn.setPosition(normalized_pos)
-        self.sim_encoder_turn.setVelocity(self.sim_turning_motor.getVelocity())
+    def getVelocity(self):
+        return self._inputs.drive_velocity_meters_per_sec
 
 
 class SwerveDriveElasticSendable(Sendable):

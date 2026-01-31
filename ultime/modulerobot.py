@@ -1,3 +1,4 @@
+import weakref
 from enum import Enum, auto
 from queue import PriorityQueue
 from typing import Final
@@ -5,7 +6,10 @@ from typing import Final
 import commands2
 import hal
 import wpilib
+from commands2 import CommandScheduler
 from ntcore import NetworkTable, NetworkTableInstance
+from robotpy_ext.misc import NotifierDelay
+from robotpy_ext.misc.simple_watchdog import SimpleWatchdog
 from wpilib import RobotBase, DSControlWord, Watchdog, SmartDashboard, RobotController
 
 from ultime.module import ModuleList, Module
@@ -23,12 +27,15 @@ class ModuleRobot(wpilib.RobotBase):
 
     period: Final[float] = 0.02
 
+    ios = weakref.WeakSet()
+
     def __init__(self):
         super().__init__()
         self.modules = ModuleList()
         self._called_ds_connected = False
         self._last_mode = ModuleRobot.Mode.kNone
         self._watchdog = Watchdog(self.period, lambda: None)
+        self.running = True
 
     def _loopFunc(self):
         wpilib.DriverStation.refreshData()
@@ -52,6 +59,7 @@ class ModuleRobot(wpilib.RobotBase):
         #    self.driveStationConnected()
 
         # si le mode change, appeler les fonctions de sortie et d'entrée
+
         if self._last_mode is not mode:
             # fonctions de sortie
             if self._last_mode is ModuleRobot.Mode.kDisable:
@@ -79,7 +87,8 @@ class ModuleRobot(wpilib.RobotBase):
 
             self._last_mode = mode
 
-        # TODO appeler IO update inputs
+        for io in self.ios:
+            io.updateInputs()
 
         # appeler les fonctions correspondantes au mode du robot
         if mode is ModuleRobot.Mode.kDisable:
@@ -102,11 +111,11 @@ class ModuleRobot(wpilib.RobotBase):
         self.robotPeriodic()
         self._watchdog.addEpoch("RobotPeriodic()")
 
-        # TODO Scheduler run
-
+        CommandScheduler.getInstance().run()
         # TODO log everything
 
-        # TODO appeler IO apply outputs
+        for io in self.ios:
+            io.sendOutputs()
 
         SmartDashboard.updateValues()
         self._watchdog.addEpoch("SmartDashboard.updateValues()")
@@ -133,9 +142,13 @@ class ModuleRobot(wpilib.RobotBase):
 
         hal.observeUserProgramStarting()
 
-        while True:
-            pass
+        with NotifierDelay(self.period) as delay:
+            while self.running:
+                self._loopFunc()
+                delay.wait()
 
+    def endCompetition(self):
+        self.running = False
 
     def addModules(self, *modules: Module):
         self.modules.addModules(*modules)
