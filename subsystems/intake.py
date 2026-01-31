@@ -14,11 +14,11 @@ class Intake(LinearSubsystem):
     max_position = autoproperty(0)
 
     def __init__(self):
-        super().__init__()
+        super().__init__(0.0, True, True, True, True, 0.0, 9.81)
         self._motor_pivot = rev.SparkMax(
             ports.CAN.intake_motor_pivot, rev.SparkMax.MotorType.kBrushless
         )
-        self._encoder_pivot = self.motor_pivot.getEncoder()
+        self._encoder_pivot = self._motor_pivot.getEncoder()
         self.motor_intake = rev.SparkMax(
             ports.CAN.intake_motor_intake, rev.SparkMax.MotorType.kBrushless
         )
@@ -30,40 +30,40 @@ class Intake(LinearSubsystem):
         )
 
     def roll(self):
-        self.moteur_intake.set(self.speed_intake)
+        self.motor_intake.set(self.speed_intake)
 
     def maintainer(self):
-        self.moteur_pivot.set(self.maintain)
+        self._motor_pivot.set(self.maintain)
 
     def stop_intake(self):
-        self.moteur_intake.stopMotor()
+        self.motor_intake.stopMotor()
 
     def stop_pivot(self):
-        self.moteur_pivot.stopMotor()
+        self._motor_pivot.stopMotor()
 
     def initSimulationComponents(self):
-        self._motor_pivot
+        return self._motor_pivot
 
     def getMinPosition(self) -> float:
-        return self.min_position
+        self.min_position
 
     def getMaxPosition(self) -> float:
         return self.max_position
 
     def isSwitchMinPressed(self) -> bool:
-        return self.switch_min.get()
+        return self._switch_min.isPressed()
 
     def isSwitchMaxPressed(self) -> bool:
-        return self.switch_max.get()
+        return self._switch_max.isPressed()
 
     def getEncoderPosition(self) -> float:
-        return self.encoder_pivot.getPosition()
+        return self._encoder_pivot.getPosition()
 
     def setSimulationEncoderPosition(self, position: float) -> None:
-        self._sim_encoder_pivot.setEncoderPosition(position)
+        self._encoder_pivot.setPosition(position)
 
     def getPositionConversionFactor(self) -> float:
-        pass
+        return 1.0
 
     def _setMotorOutput(self, speed: float) -> None:
         self._motor_pivot.set(speed)

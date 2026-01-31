@@ -1,18 +1,16 @@
-import wpilib
 from ultime.command import Command
 from subsystems.intake import Intake
-from ultime.autoproperty import autoproperty
 
 
 class Roll(Command):
 
-    def __init__(self, intake):
+    def __init__(self, intake: Intake):
         self.intake = intake
+        self.addRequirements(self.intake)
 
     def execute(self):
         self.intake.roll()
 
-    @staticmethod
     def isFinished(self) -> bool:
         return False
 

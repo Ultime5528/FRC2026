@@ -17,7 +17,7 @@ class HardwareModule(Module):
 
         self.drivetrain = Drivetrain()
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
-        self.intake = Intake
+        self.intake = Intake()
         self.pdp = PowerDistribution()
 
         self.subsystems: list[Subsystem] = [

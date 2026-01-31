@@ -26,6 +26,7 @@ class DashboardModule(Module):
         self.setupCopilotCommands(hardware)
         # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
+        putCommandOnDashboard("Intake", Roll(hardware.intake))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
 
@@ -43,7 +44,6 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
-        putCommandOnDashboard("Intake", Roll(hardware.intake))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
