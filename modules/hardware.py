@@ -3,9 +3,10 @@ from wpilib import PowerDistribution, RobotBase
 
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
+from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from ultime.module import Module
 from ultime.subsystem import Subsystem
-from ultime.swerve.swerveIO import SwerveIOSpark, SwerveIOSim
+from ultime.swerve.swervemoduleio import SwerveModuleIo, SwerveModuleIoSim
 
 
 class HardwareModule(Module):
@@ -16,9 +17,9 @@ class HardwareModule(Module):
         self.panel_2 = commands2.button.CommandJoystick(2)
 
         if RobotBase.isSimulation():
-            self.drivetrain = Drivetrain(SwerveIOSim)
+            self.drivetrain = Drivetrain(DrivetrainIoSim())
         else:
-            self.drivetrain = Drivetrain(SwerveIOSpark)
+            self.drivetrain = Drivetrain(DrivetrainIo())
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.pdp = PowerDistribution()

@@ -25,7 +25,7 @@ from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
-from ultime.swerve.swerveIO import SwerveIO
+from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from ultime.timethis import tt
 
 
@@ -42,7 +42,7 @@ class Drivetrain(Subsystem):
 
     swerve_temperature_threshold = autoproperty(55.0)
 
-    def __init__(self, io) -> None:
+    def __init__(self, drivetrain_io: DrivetrainIo | DrivetrainIoSim) -> None:
         super().__init__()
         self.period_seconds = 0.02
         # Swerve Module motor positions
@@ -56,40 +56,25 @@ class Drivetrain(Subsystem):
         self.heading_controller = PIDController(10, 0, 0)
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
 
-        self.io_fl = io(
-            ports.CAN.drivetrain_motor_driving_fl,
-            ports.CAN.drivetrain_motor_turning_fl,
-        )
+
         self.swerve_module_fl = SwerveModule(
-            self.io_fl,
-            self.angular_offset_fl,
+            drivetrain_io.swerve_io_fl,
+            self.angular_offset_fl
         )
 
-        self.io_fr = io(
-            ports.CAN.drivetrain_motor_driving_fr,
-            ports.CAN.drivetrain_motor_turning_fr,
-        )
         self.swerve_module_fr = SwerveModule(
-            self.io_fr,
-            self.angular_offset_fr,
+            drivetrain_io.swerve_io_fr,
+            self.angular_offset_fr
         )
 
-        self.io_bl = io(
-            ports.CAN.drivetrain_motor_driving_bl,
-            ports.CAN.drivetrain_motor_turning_bl,
-        )
         self.swerve_module_bl = SwerveModule(
-            self.io_bl,
-            self.angular_offset_bl,
+            drivetrain_io.swerve_io_bl,
+            self.angular_offset_bl
         )
 
-        self.io_br = io(
-            ports.CAN.drivetrain_motor_driving_br,
-            ports.CAN.drivetrain_motor_turning_br,
-        )
         self.swerve_module_br = SwerveModule(
-            self.io_br,
-            self.angular_offset_br,
+            drivetrain_io.swerve_io_fr,
+            self.angular_offset_br
         )
 
         self.swerve_modules = {

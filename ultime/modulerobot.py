@@ -112,6 +112,7 @@ class ModuleRobot(wpilib.RobotBase):
         self._watchdog.addEpoch("RobotPeriodic()")
 
         CommandScheduler.getInstance().run()
+
         # TODO log everything
 
         for io in self.ios:

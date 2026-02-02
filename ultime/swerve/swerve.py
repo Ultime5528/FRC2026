@@ -1,38 +1,31 @@
-import math
 from typing import Callable
 
-from rev import SparkSim
-from wpilib import RobotBase
-from wpilib.simulation import RoboRioSim
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
-from wpimath.system.plant import DCMotor
 from wpiutil import Sendable, SendableBuilder
 
 from ultime.swerve import swerveconfig
-from ultime.swerve.swerveIO import SwerveIO, SwerveInputs, SwerveOutputs
+from ultime.swerve.swervemoduleio import SwerveModuleIo, SwerveModuleIoSim
 from ultime.timethis import tt
 
 
 class SwerveModule:
     def __init__(
         self,
-        io: SwerveIO,
+        io: SwerveModuleIo | SwerveModuleIoSim,
         chassis_angular_offset: float,
     ):
         self._chassis_angular_offset = chassis_angular_offset
 
         self.desired_velocity = 0.0
 
-        self._inputs = io.inputs
-        self._outputs = io.outputs
+        self.io = io
+        self._inputs = self.io.inputs
+        self._outputs = self.io.outputs
 
     def setDriveVelocity(
         self, velocity_meters_per_sec: float, accel_meters_per_sec: float
     ):
-        if abs(velocity_meters_per_sec) < 0.001:
-            velocity_meters_per_sec = 0.0
-
         direction = 0
         if velocity_meters_per_sec > 0:
             direction = 1

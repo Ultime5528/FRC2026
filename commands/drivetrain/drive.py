@@ -75,7 +75,7 @@ class DriveField(Command):
             * rot_hyp
         )
 
-        if is_red == DriverStation.Alliance.kRed:
+        if is_red:
             x_speed *= -1
             y_speed *= -1
 
