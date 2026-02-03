@@ -25,6 +25,7 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
+    climber_motor = 9
 
 class PWM(Immutable):
     pass
