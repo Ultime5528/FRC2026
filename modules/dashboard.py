@@ -5,6 +5,8 @@ from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.intake.ascend import Ascend
+from commands.intake.descend import Descend
 from commands.intake.roll import Roll
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
@@ -27,6 +29,8 @@ class DashboardModule(Module):
         # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
         putCommandOnDashboard("Intake", Roll(hardware.intake))
+        putCommandOnDashboard("Intake", Ascend(hardware.intake))
+        putCommandOnDashboard("Intake", Descend(hardware.intake))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
 

@@ -132,5 +132,3 @@ class LinearSubsystem(Subsystem):
             (self._sim_position - self._sim_initial_position)
             / self.getPositionConversionFactor()
         )
-
-        self.getPositionConversionFactor

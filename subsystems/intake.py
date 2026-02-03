@@ -1,6 +1,5 @@
 import rev
 import wpilib
-
 import ports
 from ultime.autoproperty import autoproperty
 from ultime.linearsubsystem import LinearSubsystem
@@ -9,6 +8,8 @@ from ultime.switch import Switch
 
 class Intake(LinearSubsystem):
     speed_intake = autoproperty(0.5)
+    speed_pivot_ascend = autoproperty(0.5)
+    speed_pivot_descend = autoproperty(-0.5)
     maintain = autoproperty(0.2)
     min_position = autoproperty(0)
     max_position = autoproperty(0)
@@ -29,7 +30,7 @@ class Intake(LinearSubsystem):
             Switch.Type.NormallyClosed, ports.DIO.intake_switch_max
         )
 
-    def roll(self):
+    def roll_intake(self):
         self.motor_intake.set(self.speed_intake)
 
     def maintainer(self):
@@ -38,6 +39,12 @@ class Intake(LinearSubsystem):
     def stop_intake(self):
         self.motor_intake.stopMotor()
 
+    def ascend_pivot(self):
+        self._motor_pivot.set(self.speed_pivot_ascend)
+
+    def descend_pivot(self):
+        self._motor_pivot.set(self.speed_pivot_descend)
+
     def stop_pivot(self):
         self._motor_pivot.stopMotor()
 
@@ -45,16 +52,16 @@ class Intake(LinearSubsystem):
         return self._motor_pivot
 
     def getMinPosition(self) -> float:
-        self.min_position
+        return self.min_position
 
     def getMaxPosition(self) -> float:
         return self.max_position
 
     def isSwitchMinPressed(self) -> bool:
-        return self._switch_min.isPressed()
+        return not self._switch_min.isPressed()
 
     def isSwitchMaxPressed(self) -> bool:
-        return self._switch_max.isPressed()
+        return not self._switch_max.isPressed()
 
     def getEncoderPosition(self) -> float:
         return self._encoder_pivot.getPosition()
@@ -69,4 +76,4 @@ class Intake(LinearSubsystem):
         self._motor_pivot.set(speed)
 
     def getMotorOutput(self) -> float:
-        return self._motor_pivot.getOutputCurrent()
+        return self._motor_pivot.get()
