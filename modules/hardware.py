@@ -6,7 +6,6 @@ from subsystems.drivetrain import Drivetrain
 from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from ultime.module import Module
 from ultime.subsystem import Subsystem
-from ultime.swerve.swervemoduleio import SwerveModuleIo, SwerveModuleIoSim
 
 
 class HardwareModule(Module):

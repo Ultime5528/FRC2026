@@ -1,16 +1,13 @@
 import weakref
 from enum import Enum, auto
-from queue import PriorityQueue
 from typing import Final
 
-import commands2
 import hal
 import wpilib
 from commands2 import CommandScheduler
-from ntcore import NetworkTable, NetworkTableInstance
+from ntcore import NetworkTableInstance
 from robotpy_ext.misc import NotifierDelay
-from robotpy_ext.misc.simple_watchdog import SimpleWatchdog
-from wpilib import RobotBase, DSControlWord, Watchdog, SmartDashboard, RobotController
+from wpilib import RobotBase, Watchdog, SmartDashboard
 
 from ultime.module import ModuleList, Module
 
@@ -59,7 +56,6 @@ class ModuleRobot(wpilib.RobotBase):
         #    self.driveStationConnected()
 
         # si le mode change, appeler les fonctions de sortie et d'entrée
-
         if self._last_mode is not mode:
             # fonctions de sortie
             if self._last_mode is ModuleRobot.Mode.kDisable:

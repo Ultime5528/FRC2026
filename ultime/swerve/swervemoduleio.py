@@ -1,9 +1,7 @@
 import math
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-import hal
 from rev import (
     SparkMax,
     ResetMode,

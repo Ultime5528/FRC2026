@@ -56,25 +56,20 @@ class Drivetrain(Subsystem):
         self.heading_controller = PIDController(10, 0, 0)
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
 
-
         self.swerve_module_fl = SwerveModule(
-            drivetrain_io.swerve_io_fl,
-            self.angular_offset_fl
+            drivetrain_io.swerve_io_fl, self.angular_offset_fl
         )
 
         self.swerve_module_fr = SwerveModule(
-            drivetrain_io.swerve_io_fr,
-            self.angular_offset_fr
+            drivetrain_io.swerve_io_fr, self.angular_offset_fr
         )
 
         self.swerve_module_bl = SwerveModule(
-            drivetrain_io.swerve_io_bl,
-            self.angular_offset_bl
+            drivetrain_io.swerve_io_bl, self.angular_offset_bl
         )
 
         self.swerve_module_br = SwerveModule(
-            drivetrain_io.swerve_io_fr,
-            self.angular_offset_br
+            drivetrain_io.swerve_io_fr, self.angular_offset_br
         )
 
         self.swerve_modules = {
