@@ -32,7 +32,7 @@ class PWM(Immutable):
 
 
 class DIO(Immutable):
-    pass
+    climber_switch = 0
 
 
 class PDP(Immutable):

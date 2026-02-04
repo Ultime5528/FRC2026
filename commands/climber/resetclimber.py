@@ -1,19 +1,25 @@
 from commands2 import Command
 
+from subsystems.climber import Climber
+
 
 class ResetClimber(Command):
     def __init__(self, climber: Climber):
         super().__init__()
         self.climber = climber
         self.addRequirements(climber)
-        self.touched_switch = False
 
     def initialize(self):
-        self.touched_switch = False
-        self.climber.state = self.climber.State.Moving
+        self.climber.state = self.climber.State.Unknown
 
     def execute(self):
-        pass
+        if not self.climber.isDown():
+            self.climber.moveDown()
+        else:
+            self.climber.stop()
+            self.climber.setOffset()
+            self.climber.state = self.climber.State.Ready
+
 
     def isFinished(self) -> bool:
-        return self.touched_switch and self.climber.getPosition() <= 0.0
+        return self.climber.isDown()
