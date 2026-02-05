@@ -3,6 +3,7 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.Shooter.prepare_shoot import PrepareShoot
 from commands.Shooter.shoot import Shoot
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
@@ -43,7 +44,8 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
-        putCommandOnDashboard("Shoot", Shoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
