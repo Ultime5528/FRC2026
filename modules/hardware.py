@@ -3,6 +3,7 @@ from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
+from subsystems.guide import Guide
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 
@@ -17,8 +18,11 @@ class HardwareModule(Module):
         self.drivetrain = Drivetrain()
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
+        self.guide = Guide()
+
         self.pdp = PowerDistribution()
 
         self.subsystems: list[Subsystem] = [
             self.drivetrain,
+            self.guide,
         ]
