@@ -15,7 +15,9 @@ class Shoot(Command):
         pass
 
     def execute(self):
-        self.shooter.shoot()
+        speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
+        self.shooter.shoot(speed_rpm)
+        self.shooter.sendFuel()
 
     def isFinished(self) -> bool:
         return False
