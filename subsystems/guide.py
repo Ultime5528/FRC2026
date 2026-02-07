@@ -1,11 +1,10 @@
 import wpilib
 from wpilib import RobotBase
 from wpilib.simulation import EncoderSim
-from wpiutil import SendableBuilder
 
 import ports
 from ultime.autoproperty import autoproperty
-from ultime.linearsubsystem import LinearSubsystem
+from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch
 
 
@@ -23,7 +22,7 @@ class Guide(LinearSubsystem):
             False,
             False,
             True,
-            3.0,
+            100.0,
         )
         self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
         self._encoder = wpilib.Encoder(

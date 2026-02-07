@@ -1,6 +1,6 @@
 from ultime.autoproperty import FloatProperty, asCallable
 from ultime.command import Command
-from ultime.linearsubsystem import LinearSubsystem
+from ultime.linear.linearsubsystem import LinearSubsystem
 
 
 def createManualMoveClass(

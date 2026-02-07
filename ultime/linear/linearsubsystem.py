@@ -121,20 +121,20 @@ class LinearSubsystem(Subsystem):
             self._prev_is_at_max = self.isSwitchMaxPressed()
 
     def simulationPeriodic(self) -> None:
-        # current_time = wpilib.Timer.getFPGATimestamp()
-        # dt = current_time - self._sim_prev_time
-        # self._sim_prev_time = current_time
+        current_time = wpilib.Timer.getFPGATimestamp()
+        dt = current_time - self._sim_prev_time
+        self._sim_prev_time = current_time
 
         delta = (
             (self.getMotorOutput() - self._sim_gravity)
             * self._sim_motor_to_distance_factor
-            # * dt
+            * dt
         )
         self._sim_position += delta
 
         self.setSimulationEncoderPosition(
             (self._sim_position - self._sim_initial_position)
-            / self._sim_motor_to_distance_factor
+            / self.getPositionConversionFactor()
         )
 
         if self._sim_position <= self.getMinPosition():
@@ -148,6 +148,10 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(False)
 
     def initSendable(self, builder: SendableBuilder) -> None:
+        def setHasReset(value: bool) -> None:
+            self._has_reset = value
+
+
         builder.addBooleanProperty(
             "switch_min_pressed", self.isSwitchMinPressed, lambda _: None
         )
@@ -155,3 +159,6 @@ class LinearSubsystem(Subsystem):
             "switch_max_pressed", self.isSwitchMaxPressed, lambda _: None
         )
         builder.addDoubleProperty("position", self.getPosition, lambda _: None)
+        builder.addBooleanProperty(
+            "has_reset", self.hasReset, setHasReset
+        )
