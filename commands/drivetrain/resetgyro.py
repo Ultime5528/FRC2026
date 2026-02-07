@@ -1,13 +1,13 @@
 from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Rotation2d, Pose3d, Rotation3d
 
-from modules.questtagvision import QuestTagVisionModule
+from modules.questvision import QuestVisionModule
 from subsystems.drivetrain import Drivetrain
 from ultime.command import Command
 
 
 class ResetGyro(Command):
-    def __init__(self, drivetrain: Drivetrain, quest: QuestTagVisionModule):
+    def __init__(self, drivetrain: Drivetrain, quest: QuestVisionModule):
         super().__init__()
         self.drivetrain = drivetrain
         self.quest = quest

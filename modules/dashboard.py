@@ -7,7 +7,7 @@ from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
-from modules.questtagvision import QuestTagVisionModule
+from modules.questvision import QuestVisionModule
 from ultime.module import Module, ModuleList
 
 
@@ -15,7 +15,7 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        quest: QuestTagVisionModule,
+        quest: QuestVisionModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
