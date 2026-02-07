@@ -13,8 +13,9 @@ class ModuleRobot(commands2.TimedCommandRobot):
         super().__init__(self.period)
         self.modules = ModuleList()
 
-    def addModules(self, *modules: Module):
-        self.modules.addModules(*modules)
+    def addModule(self, module: Module):
+        self.modules.addModules(module)
+        return module
 
     def robotInit(self):
         self.modules.robotInit()

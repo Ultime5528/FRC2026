@@ -1,5 +1,7 @@
 import ast
+import gc
 import inspect
+import typing
 from textwrap import dedent
 from typing import List, Type
 from unittest.mock import patch
@@ -43,71 +45,39 @@ def test_arguments():
             ), f"Argument {name} of {obj.__name__} has no type annotation"
 
 
-def test_requirements():
-    for obj in get_commands():
-        addReqs = None
+def test_requirements(robot: Robot):
+    gc.collect()
 
-        # Added by @ignore_requirements decorator
-        ignore_reqs = getattr(obj, "__ignore_reqs", [])
+    commands = []
+    failures = []
 
-        for c in ast.walk(ast.parse(dedent(inspect.getsource(obj.__init__)))):
-            if isinstance(c, ast.Call):
-                if isinstance(c.func, ast.Attribute):
-                    if c.func.attr == "addRequirements":
-                        assert (
-                            addReqs is None
-                        ), f"{obj.__name__} calls addRequirements() multiple times"
-                        addReqs = c
-                elif isinstance(c.func, ast.Name):
-                    if c.func.id == "addRequirements":
-                        assert (
-                            addReqs is None
-                        ), f"{obj.__name__} calls addRequirements() multiple times"
-                        addReqs = c
-        super_classes = obj.__bases__
-        for super_class in super_classes:
-            for c in ast.walk(
-                ast.parse(dedent(inspect.getsource(super_class.__init__)))
-            ):
-                if isinstance(c, ast.Call):
-                    if isinstance(c.func, ast.Attribute):
-                        if c.func.attr == "addRequirements":
-                            assert (
-                                addReqs is None
-                            ), f"{obj.__name__} calls addRequirements() multiple times"
-                            addReqs = c
-                    elif isinstance(c.func, ast.Name):
-                        if c.func.id == "addRequirements":
-                            assert (
-                                addReqs is None
-                            ), f"{obj.__name__} calls addRequirements() multiple times"
-                            addReqs = c
+    for obj in gc.get_objects():
+        if (
+            isinstance(obj, Command)
+            and not obj.__class__.__module__.startswith("commands2")
+            and not obj.__class__.__module__.startswith("ultime.command")
+        ):
+            commands.append(obj)
 
-        subsystem_args = {}
-        for name, arg in get_arguments(obj).items():
-            if (
-                name not in ignore_reqs
-                and isinstance(arg.annotation, type)
-                and issubclass(arg.annotation, Subsystem)
-            ):  # if is a class and is subsystem
-                subsystem_args[name] = arg
+    assert commands, "No found commands"
 
-        if addReqs:
-            actual_required_subsystems = []
-            for arg in addReqs.args:
-                if isinstance(arg, ast.Attribute):
-                    actual_required_subsystems.append(arg.attr)
-                elif isinstance(arg, ast.Name):
-                    actual_required_subsystems.append(arg.id)
+    for command in commands:
+        requirements = command.getRequirements()
 
-            for sub_arg in subsystem_args.keys():
-                assert (
-                    sub_arg in actual_required_subsystems
-                ), f"{obj.__name__} does not require {sub_arg} (consider using ignore_requirements)"
-        else:
-            assert (
-                not subsystem_args
-            ), f"{obj.__name__} does not require {list(subsystem_args.values())} (consider using ignore_requirements)"
+        stored_subsystems = []
+        for attr_name in dir(command):
+            attr = getattr(command, attr_name)
+            if isinstance(attr, Subsystem):
+                stored_subsystems.append(attr)
+
+        # Check requirements
+        for subsystem in stored_subsystems:
+            if subsystem not in requirements:
+                failures.append(
+                    f"{type(command).__name__}: missing {type(subsystem).__name__} in requirements"
+                )
+
+        assert not failures, "\n" + "\n".join(f"  - {f}" for f in failures)
 
 
 def test_command_scheduler_enabled(robot_controller: RobotTestController, robot: Robot):

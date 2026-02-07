@@ -52,31 +52,17 @@ class Switch:
         else:
             raise TypeError(f"Type is not instance of Switch.Type: {type}")
 
-    def setSimPressed(self):
+    def setSimValue(self, pressed):
         if not RobotBase.isSimulation():
-            raise RuntimeError("setSimPressed should only be called in simulation")
+            raise RuntimeError("setSimValue should only be called in simulation")
         if self._type == Switch.Type.NormallyOpen:
-            self._sim_input.setValue(True)
+            self._sim_input.setValue(pressed)
         elif self._type == Switch.Type.NormallyClosed:
-            self._sim_input.setValue(False)
+            self._sim_input.setValue(not pressed)
         elif self._type == Switch.Type.AlwaysPressed:
-            self._sim_switch_state = True
+            self._sim_switch_state = pressed
         elif self._type == Switch.Type.AlwaysUnpressed:
-            self._sim_switch_state = True
-        else:
-            raise TypeError(f"Type is not instance of Switch.Type: {type}")
-
-    def setSimUnpressed(self):
-        if not RobotBase.isSimulation():
-            raise RuntimeError("setSimUnpressed should only be called in simulation")
-        if self._type == Switch.Type.NormallyOpen:
-            self._sim_input.setValue(False)
-        elif self._type == Switch.Type.NormallyClosed:
-            self._sim_input.setValue(True)
-        elif self._type == Switch.Type.AlwaysPressed:
-            self._sim_switch_state = False
-        elif self._type == Switch.Type.AlwaysUnpressed:
-            self._sim_switch_state = False
+            self._sim_switch_state = pressed
         else:
             raise TypeError(f"Type is not instance of Switch.Type: {type}")
 

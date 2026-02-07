@@ -7,9 +7,10 @@ from commands.Shooter.prepare_shoot import PrepareShoot
 from commands.Shooter.shoot import Shoot
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
-from modules.questtagvision import QuestTagVisionModule
+from modules.questvision import QuestVisionModule
 from ultime.module import Module, ModuleList
 
 
@@ -17,7 +18,7 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        quest: QuestTagVisionModule,
+        quest: QuestVisionModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
@@ -46,6 +47,15 @@ class DashboardModule(Module):
         )
         putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
+
+        """
+        GUIDE
+        """
+        putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
+        putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
