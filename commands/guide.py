@@ -30,9 +30,6 @@ class MoveGuide(MoveLinear):
         cmd = cls(
             guide,
             lambda: move_properties.position_open,
-            lambda: move_properties.speed_min,
-            lambda: move_properties.speed_max,
-            lambda: move_properties.accel,
         )
         cmd.setName(cls.__name__ + ".toOpen")
         return cmd
@@ -42,12 +39,18 @@ class MoveGuide(MoveLinear):
         cmd = cls(
             guide,
             lambda: move_properties.position_close,
+        )
+        cmd.setName(cls.__name__ + ".toOpen")
+        return cmd
+
+    def __init__(self, guide: Guide, end_position: FloatProperty):
+        super().__init__(
+            guide,
+            end_position,
             lambda: move_properties.speed_min,
             lambda: move_properties.speed_max,
             lambda: move_properties.accel,
         )
-        cmd.setName(cls.__name__ + ".toOpen")
-        return cmd
 
 
 class _PropertiesManual:
