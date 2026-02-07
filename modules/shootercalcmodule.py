@@ -1,5 +1,4 @@
 import math
-from pickle import REDUCE
 
 from wpilib import DriverStation
 from wpimath.geometry import Rotation2d, Translation3d, Pose3d, Translation2d
@@ -10,6 +9,9 @@ from ultime.autoproperty import autoproperty
 from ultime.module import Module
 
 long_zone = autoproperty(6.0)
+
+red_hub = Translation3d(4.625594, 4.034536, 3.057144)
+blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
 
 
 def computeRobotRotationToAlign(
@@ -79,7 +81,9 @@ class ShooterCalcModule(Module):
 
     def _getTargetPose(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            return Translation3d()
+            return red_hub
+        else:
+            return blue_hub
 
     def shouldUseGuide(self) -> bool:
         return shouldUseGuide(
