@@ -31,11 +31,11 @@ def test_reset_command(robot_controller: RobotTestController, robot: Robot):
 
     assert guide.getMotorOutput() > 0.0
 
-    robot_controller.wait_until(lambda: not guide.isSwitchMinPressed(), 5.0, delta=0.02)
+    robot_controller.wait_until(lambda: not guide.isSwitchMinPressed(), 5.0)
 
     assert not guide.isSwitchMinPressed()
 
-    robot_controller.wait_until(lambda: not cmd.isScheduled(), 5.0, delta=0.02)
+    robot_controller.wait_until(lambda: not cmd.isScheduled(), 5.0)
 
     assert not cmd.isScheduled()
     assert guide.getMotorOutput() == 0.0

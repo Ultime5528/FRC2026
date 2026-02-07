@@ -1,53 +1,52 @@
 from subsystems.guide import Guide
 from ultime.linear import manualmovelinear, resetlinear, movelinear
-from ultime.autoproperty import autoproperty
+from ultime.autoproperty import autoproperty, FloatProperty
+from ultime.linear.movelinear import MoveLinear
 
 
-class ManualMoveGuide:
-    pass
-
-
-ManualMoveGuide = manualmovelinear.createManualMoveClass(
-    ManualMoveGuide.__name__,
+_ManualMoveGuide = manualmovelinear.createManualMoveClass(
     lambda: manual_move_properties.speed_up,
     lambda: manual_move_properties.speed_down,
 )
 
 
-class ResetGuide:
+class ManualMoveGuide(_ManualMoveGuide):
     pass
 
 
-ResetGuide = resetlinear.createResetLinearClass(
-    ResetGuide.__name__,
+_ResetGuide = resetlinear.createResetLinearClass(
     lambda: reset_properties.speed_up,
     lambda: reset_properties.speed_down,
 )
 
 
-class MoveGuide:
-    @staticmethod
-    def toOpen(guide: Guide):
-        cmd = movelinear.MoveLinear(
+class ResetGuide(_ResetGuide):
+    pass
+
+
+class MoveGuide(MoveLinear):
+    @classmethod
+    def toOpen(cls, guide: Guide):
+        cmd = cls(
             guide,
-            move_properties.position_open,
-            move_properties.speed_min,
-            move_properties.speed_max,
-            move_properties.accel,
+            lambda: move_properties.position_open,
+            lambda: move_properties.speed_min,
+            lambda: move_properties.speed_max,
+            lambda: move_properties.accel,
         )
-        cmd.setName(MoveGuide.__name__ + ".toOpen")
+        cmd.setName(cls.__name__ + ".toOpen")
         return cmd
 
-    @staticmethod
-    def toClose(guide: Guide):
-        cmd = movelinear.MoveLinear(
+    @classmethod
+    def toClose(cls, guide: Guide):
+        cmd = cls(
             guide,
-            move_properties.position_close,
-            move_properties.speed_min,
-            move_properties.speed_max,
-            move_properties.accel,
+            lambda: move_properties.position_close,
+            lambda: move_properties.speed_min,
+            lambda: move_properties.speed_max,
+            lambda: move_properties.accel,
         )
-        cmd.setName(MoveGuide.__name__ + ".toOpen")
+        cmd.setName(cls.__name__ + ".toOpen")
         return cmd
 
 

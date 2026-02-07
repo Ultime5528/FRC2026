@@ -3,9 +3,7 @@ from ultime.command import Command
 from ultime.linear.linearsubsystem import LinearSubsystem
 
 
-def createManualMoveClass(
-    class_name, speed_up: FloatProperty, speed_down: FloatProperty
-):
+def createManualMoveClass(speed_up: FloatProperty, speed_down: FloatProperty):
     class ManualMoveLinear(Command):
         @classmethod
         def up(cls, subsystem: LinearSubsystem):
@@ -38,8 +36,5 @@ def createManualMoveClass(
 
         def end(self, interrupted: bool):
             self.subsystem.setSpeed(0.0)
-
-    ManualMoveLinear.__name__ = class_name
-    ManualMoveLinear.__qualname__ = class_name
 
     return ManualMoveLinear

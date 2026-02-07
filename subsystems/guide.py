@@ -17,12 +17,12 @@ class Guide(LinearSubsystem):
 
     def __init__(self):
         super().__init__(
-            0.0,
-            True,
-            False,
-            False,
-            True,
-            100.0,
+            sim_initial_position=0.0,
+            should_reset_min=True,
+            should_reset_max=False,
+            should_block_min_position=False,
+            should_block_max_position=True,
+            sim_motor_to_distance_factor=100.0,
         )
         self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
         self._motor.setInverted(False)

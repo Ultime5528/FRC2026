@@ -3,9 +3,7 @@ from ultime.command import Command
 from ultime.linear.linearsubsystem import LinearSubsystem
 
 
-def createResetLinearClass(
-    class_name, speed_up: FloatProperty, speed_down: FloatProperty
-):
+def createResetLinearClass(speed_up: FloatProperty, speed_down: FloatProperty):
     class ResetLinear(Command):
         @classmethod
         def up(cls, subsystem: LinearSubsystem):
@@ -51,8 +49,5 @@ def createResetLinearClass(
 
         def end(self, interrupted: bool):
             self.subsystem.setSpeed(0.0)
-
-    ResetLinear.__name__ = class_name
-    ResetLinear.__qualname__ = class_name
 
     return ResetLinear
