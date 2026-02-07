@@ -22,6 +22,7 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.guide = self.addSubsystem(Guide())
+        self.shooter = self.addSubsystem(Shooter())
 
         self.pdp = PowerDistribution()
 

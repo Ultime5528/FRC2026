@@ -7,7 +7,7 @@ from ultime.autoproperty import autoproperty
 class PrepareShoot(Command):
     rpm_range = autoproperty(150)
 
-    def __init__(self, shooter: Shooter, end_stop=False):
+    def __init__(self, shooter: Shooter, end_stop: bool = False):
         super().__init__()
         self.shooter = shooter
         self.end_stop = end_stop
