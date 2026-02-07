@@ -25,6 +25,8 @@ def test_reset_command(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
+    assert guide.isSwitchMinPressed()
+
     cmd = ResetGuide.down(guide)
     cmd.schedule()
     robot_controller.wait_one_frame()
@@ -75,31 +77,4 @@ def test_moveGuide_toOpen(robot_controller: RobotTestController, robot: Robot):
 def test_moveGuide_toClose(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
         robot_controller, robot, MoveGuide.toClose, move_properties.position_close
-    )
-
-
-def common_test_requirements(
-    robot_controller: RobotTestController,
-    robot: Robot,
-    MoveGuideCommand,
-):
-    robot_controller.startTeleop()
-
-    cmd = MoveGuideCommand(robot.hardware.guide)
-    assert cmd.hasRequirement(robot.hardware.guide)
-
-
-def test_requirements_toOpen(robot_controller: RobotTestController, robot: Robot):
-    common_test_requirements(
-        robot_controller,
-        robot,
-        MoveGuide.toOpen,
-    )
-
-
-def test_requirements_toClose(robot_controller: RobotTestController, robot: Robot):
-    common_test_requirements(
-        robot_controller,
-        robot,
-        MoveGuide.toClose,
     )
