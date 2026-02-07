@@ -1,5 +1,4 @@
 import wpimath
-from wpimath.geometry import Transform3d
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty

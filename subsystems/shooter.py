@@ -1,12 +1,12 @@
 import rev
 from rev import SparkMaxSim
 from wpilib import RobotBase
-from wpimath.system.plant import DCMotor
 from wpimath.filter import LinearFilter
+from wpimath.system.plant import DCMotor
 
+import ports
 from ultime.autoproperty import autoproperty
 from ultime.subsystem import Subsystem
-import ports
 
 
 class Shooter(Subsystem):
@@ -50,15 +50,11 @@ class Shooter(Subsystem):
     def shoot(self, rpm):
         self._flywheel_controller.setSetpoint(rpm, rev.SparkMax.ControlType.kVelocity)
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
-        speed_rpm = 666.6  # Mettre la valeur du Hayder ici
-        self._is_at_velocity = abs(average - speed_rpm) < self.tolerance
+        self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
-        if self._is_at_velocity:
-            self._indexer.setVoltage(self.indexer_speed)
-            self._feeder.setVoltage(self.feeder_speed)
-        else:
-            pass
+        self._indexer.set(self.indexer_speed)
+        self._feeder.set(self.feeder_speed)
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
@@ -77,3 +73,6 @@ class Shooter(Subsystem):
             return self._flywheel_sim.getVelocity()
         else:
             return self._encoder.getVelocity()
+
+    def isAtVelocity(self):
+        return self._is_at_velocity

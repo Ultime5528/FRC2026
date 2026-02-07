@@ -3,8 +3,8 @@ from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
-from subsystems.shooter import Shooter
 from subsystems.guide import Guide
+from subsystems.shooter import Shooter
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 

@@ -1,16 +1,18 @@
 from subsystems.shooter import Shooter
+from ultime.autoproperty import autoproperty
 from ultime.command import Command
 
 
 class Shoot(Command):
+    speed_rpm = autoproperty(666.6)
+
     def __init__(self, shooter: Shooter):
         super().__init__()
         self.shooter = shooter
         self.addRequirements(self.shooter)
 
     def execute(self):
-        speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
-        self.shooter.shoot(speed_rpm)
+        self.shooter.shoot(self.speed_rpm)
 
         if self.shooter.isAtVelocity():
             self.shooter.sendFuel()
