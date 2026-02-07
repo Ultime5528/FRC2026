@@ -15,6 +15,8 @@ class Guide(LinearSubsystem):
     position_unuse = autoproperty(0.0)
     position_use = autoproperty(90.0)
 
+    position_conversion_factor = autoproperty(1.0)
+
     def __init__(self):
         super().__init__(
             sim_initial_position=0.0,
@@ -56,7 +58,7 @@ class Guide(LinearSubsystem):
         return self._encoder.get()
 
     def getPositionConversionFactor(self):
-        return 1.0
+        return self.position_conversion_factor
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._sim_encoder.setCount(int(position))
