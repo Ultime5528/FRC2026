@@ -26,7 +26,9 @@ class Guide(LinearSubsystem):
             3.0,
         )
         self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
-        self._encoder = wpilib.Encoder(ports.DIO.guide_encoder_a, ports.DIO.guide_encoder_b)
+        self._encoder = wpilib.Encoder(
+            ports.DIO.guide_encoder_a, ports.DIO.guide_encoder_b
+        )
         self._min_switch = Switch(Switch.Type.NormallyOpen, ports.DIO.guide_switch)
 
         if RobotBase.isSimulation():

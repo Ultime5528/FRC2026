@@ -10,6 +10,7 @@ class _Properties:
     speed_up = autoproperty(0.25, subtable=ManualMoveGuide.__name__)
     speed_down = autoproperty(-0.25, subtable=ManualMoveGuide.__name__)
 
+
 manual_move_properties = _Properties()
 
 ManualMoveGuide = manualmovelinear.createManualMoveClass(

@@ -30,7 +30,6 @@ class LinearSubsystem(Subsystem):
         self._sim_initial_position = sim_initial_position
         self._sim_position = sim_initial_position
         self._sim_prev_time = wpilib.Timer.getFPGATimestamp()
-        self._sim_prev_time = wpilib.Timer.getFPGATimestamp()
         self._sim_motor_to_distance_factor = sim_motor_to_distance_factor
         self._sim_gravity = sim_gravity
 
@@ -122,14 +121,14 @@ class LinearSubsystem(Subsystem):
             self._prev_is_at_max = self.isSwitchMaxPressed()
 
     def simulationPeriodic(self) -> None:
-        current_time = wpilib.Timer.getFPGATimestamp()
-        dt = current_time - self._sim_prev_time
-        self._sim_prev_time = current_time
+        # current_time = wpilib.Timer.getFPGATimestamp()
+        # dt = current_time - self._sim_prev_time
+        # self._sim_prev_time = current_time
 
         delta = (
             (self.getMotorOutput() - self._sim_gravity)
             * self._sim_motor_to_distance_factor
-            * dt
+            # * dt
         )
         self._sim_position += delta
 
@@ -149,6 +148,10 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(False)
 
     def initSendable(self, builder: SendableBuilder) -> None:
-        builder.addBooleanProperty("switch_min_pressed", self.isSwitchMinPressed, lambda _: None)
-        builder.addBooleanProperty("switch_max_pressed", self.isSwitchMaxPressed, lambda _: None)
+        builder.addBooleanProperty(
+            "switch_min_pressed", self.isSwitchMinPressed, lambda _: None
+        )
+        builder.addBooleanProperty(
+            "switch_max_pressed", self.isSwitchMaxPressed, lambda _: None
+        )
         builder.addDoubleProperty("position", self.getPosition, lambda _: None)
