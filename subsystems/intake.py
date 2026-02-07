@@ -8,8 +8,8 @@ from ultime.switch import Switch
 
 class Intake(LinearSubsystem):
     speed_intake = autoproperty(0.5)
-    speed_pivot_ascend = autoproperty(0.5)
-    speed_pivot_descend = autoproperty(-0.5)
+    speed_pivot_retreat = autoproperty(0.5)
+    speed_pivot_deploy = autoproperty(-0.5)
     maintain = autoproperty(0.2)
     min_position = autoproperty(0)
     max_position = autoproperty(0)
@@ -20,7 +20,8 @@ class Intake(LinearSubsystem):
             ports.CAN.intake_motor_pivot, rev.SparkMax.MotorType.kBrushless
         )
         self._encoder_pivot = self._motor_pivot.getEncoder()
-        self.motor_intake = rev.SparkMax(
+
+        self.motor_feeder = rev.SparkMax(
             ports.CAN.intake_motor_intake, rev.SparkMax.MotorType.kBrushless
         )
         self._switch_min = Switch(
@@ -31,19 +32,19 @@ class Intake(LinearSubsystem):
         )
 
     def roll_intake(self):
-        self.motor_intake.set(self.speed_intake)
+        self.motor_feeder.set(self.speed_intake)
 
     def maintainer(self):
         self._motor_pivot.set(self.maintain)
 
     def stop_intake(self):
-        self.motor_intake.stopMotor()
+        self.motor_feeder.stopMotor()
 
-    def ascend_pivot(self):
-        self._motor_pivot.set(self.speed_pivot_ascend)
+    def retreat_pivot(self):
+        self._motor_pivot.set(self.speed_pivot_retreat)
 
-    def descend_pivot(self):
-        self._motor_pivot.set(self.speed_pivot_descend)
+    def deploy_pivot(self):
+        self._motor_pivot.set(self.speed_pivot_deploy)
 
     def stop_pivot(self):
         self._motor_pivot.stopMotor()
