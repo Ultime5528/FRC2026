@@ -5,6 +5,7 @@ from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -23,7 +24,7 @@ class DashboardModule(Module):
         self._hardware = hardware
         self._module_list = module_list
         self.setupCopilotCommands(hardware)
-        # self.setupCommands(hardware)
+        self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
@@ -42,6 +43,15 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+
+        """
+        GUIDE
+        """
+        putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
+        putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

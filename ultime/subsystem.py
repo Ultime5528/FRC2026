@@ -8,12 +8,6 @@ from ultime.timethis import tt
 
 
 class Subsystem(AlertCreator, commands2.Subsystem):
-    @abstractmethod
-    def getCurrentDrawAmps(self) -> float:
-        raise NotImplementedError(
-            f"Subsystem {self.getName()} does not implement getCurrentDrawAmps"
-        )
-
     def initSendable(self, builder: SendableBuilder) -> None:
         super().initSendable(builder)
 

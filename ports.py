@@ -27,11 +27,13 @@ class CAN(Immutable):
 
 
 class PWM(Immutable):
-    pass
+    guide_servo = 0
 
 
 class DIO(Immutable):
-    pass
+    guide_switch = 0
+    guide_encoder_a = 1
+    guide_encoder_b = 2
 
 
 class PDP(Immutable):
