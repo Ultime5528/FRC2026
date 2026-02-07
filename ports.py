@@ -26,8 +26,8 @@ class CAN(Immutable):
     drivetrain_motor_driving_fr = 8
 
     shooter_flywheel = 9
-    shooter_aligner = 10
-    indexer_motor = 13
+    shooter_feeder = 10
+    shooter_indexer = 13
 
 
 class PWM(Immutable):

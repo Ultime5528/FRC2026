@@ -4,8 +4,6 @@ from ultime.command import Command
 
 
 class PrepareShoot(Command):
-    rpm_range = autoproperty(150.0)
-
     def __init__(self, shooter: Shooter, end_stop: bool = False):
         super().__init__()
         self.shooter = shooter

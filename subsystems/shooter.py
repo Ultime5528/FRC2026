@@ -15,8 +15,8 @@ class Shooter(Subsystem):
     kD = 0.0
     kF = 12.0 / 4400  # 12 volts max divided by max RPM
 
-    indexer_speed = autoproperty(0.5)
-    feeder_speed = autoproperty(0.5)
+    speed_indexer = autoproperty(0.5)
+    speed_feeder = autoproperty(0.5)
     tolerance = autoproperty(100.0)
 
     def __init__(self):
@@ -36,10 +36,10 @@ class Shooter(Subsystem):
         self._encoder = self._flywheel.getEncoder()
 
         self._feeder = rev.SparkMax(
-            ports.CAN.shooter_aligner, rev.SparkMax.MotorType.kBrushless
+            ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
         )
         self._indexer = self._indexer = rev.SparkMax(
-            ports.CAN.indexer_motor, rev.SparkMax.MotorType.kBrushless
+            ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
         self._velocity_filter = LinearFilter.movingAverage(25)
         self._is_at_velocity = False
@@ -53,8 +53,8 @@ class Shooter(Subsystem):
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
-        self._indexer.set(self.indexer_speed)
-        self._feeder.set(self.feeder_speed)
+        self._indexer.set(self.speed_indexer)
+        self._feeder.set(self.speed_feeder)
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
@@ -69,6 +69,7 @@ class Shooter(Subsystem):
         self._is_at_velocity = False
 
     def getCurrentSpeed(self) -> float:
+        # TODO Hardcode is_simulation from IORobot
         if RobotBase.isSimulation():
             return self._flywheel_sim.getVelocity()
         else:
