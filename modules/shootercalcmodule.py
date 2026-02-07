@@ -1,14 +1,14 @@
 import math
 
 from wpilib import DriverStation
-from wpimath.geometry import Rotation2d, Translation3d, Pose3d, Translation2d
+from wpimath.geometry import Rotation2d, Translation3d, Pose3d
 from wpimath import units
+from ultime.linearinterpolator import LinearInterpolator
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
 
-long_zone = autoproperty(6.0)
 
 red_hub = Translation3d(4.625594, 4.034536, 3.057144)
 blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
@@ -75,9 +75,26 @@ def shouldUseGuide(
 
 
 class ShooterCalcModule(Module):
-    def __init__(self, drivetrain: Drivetrain):
+    long_zone = autoproperty(6.0)
+    speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
+    rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
+    speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
+    rpm_guide_closed = autoproperty(
+        [501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34]
+    )
+
+    def __init__(
+        self,
+        drivetrain: Drivetrain,
+    ):
         super().__init__()
         self._drivetrain = drivetrain
+        self._interpolator_for_open_guide = LinearInterpolator(
+            self.speed_guide_open, self.rpm_guide_open
+        )
+        self._interpolator_for_closed_guide = LinearInterpolator(
+            self.speed_guide_closed, self.rpm_guide_closed
+        )
 
     def _getTargetPose(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
@@ -87,5 +104,21 @@ class ShooterCalcModule(Module):
 
     def shouldUseGuide(self) -> bool:
         return shouldUseGuide(
-            self._drivetrain.getPose().translation(), self._getTargetPose(), long_zone
+            self._drivetrain.getPose().translation(),
+            self._getTargetPose(),
+            self.long_zone,
         )
+
+    def getRPM(self) -> float:
+        if self.shouldUseGuide():
+            return self._interpolator_for_open_guide.interpolate(
+                computeShooterSpeedToShoot(
+                    self._drivetrain.getPose(), self._getTargetPose(), self.long_zone
+                )
+            )
+        else:
+            return self._interpolator_for_closed_guide.interpolate(
+                computeShooterSpeedToShoot(
+                    self._drivetrain.getPose(), self._getTargetPose(), self.long_zone
+                )
+            )
