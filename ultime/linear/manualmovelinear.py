@@ -22,6 +22,7 @@ def createManualMoveClass(
         def __init__(self, subsystem: LinearSubsystem, speed: FloatProperty):
             super().__init__()
             self.subsystem = subsystem
+            self.addRequirements(subsystem)
             self.speed = asCallable(speed)
 
         def execute(self):

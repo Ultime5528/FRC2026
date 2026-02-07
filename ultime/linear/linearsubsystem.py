@@ -151,7 +151,6 @@ class LinearSubsystem(Subsystem):
         def setHasReset(value: bool) -> None:
             self._has_reset = value
 
-
         builder.addBooleanProperty(
             "switch_min_pressed", self.isSwitchMinPressed, lambda _: None
         )
@@ -159,6 +158,4 @@ class LinearSubsystem(Subsystem):
             "switch_max_pressed", self.isSwitchMaxPressed, lambda _: None
         )
         builder.addDoubleProperty("position", self.getPosition, lambda _: None)
-        builder.addBooleanProperty(
-            "has_reset", self.hasReset, setHasReset
-        )
+        builder.addBooleanProperty("has_reset", self.hasReset, setHasReset)
