@@ -3,7 +3,7 @@ from ultime.autoproperty import autoproperty
 from ultime.command import Command
 
 
-class Shoot(Command):
+class ManualShoot(Command):
     speed_rpm = autoproperty(666.6)
 
     def __init__(self, shooter: Shooter):
@@ -13,9 +13,7 @@ class Shoot(Command):
 
     def execute(self):
         self.shooter.shoot(self.speed_rpm)
-
-        if self.shooter.isAtVelocity():
-            self.shooter.sendFuel()
+        self.shooter.sendFuel()
 
     def isFinished(self) -> bool:
         return False
