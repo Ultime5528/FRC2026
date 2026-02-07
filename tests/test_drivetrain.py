@@ -9,25 +9,36 @@ from commands.drivetrain.resetpose import ResetPose
 from commands.drivetrain.drive import DriveField
 from wpimath.geometry import Pose2d, Translation2d
 from robot import Robot
+from ultime.command import with_timeout
 from ultime.tests import RobotTestController
 
 
 def test_ResetGyro(robot_controller: RobotTestController, robot: Robot):
+    drivetrain = robot.hardware.drivetrain
+    xbox_remote = wpilib.simulation.XboxControllerSim(0)
+
     robot_controller.startTeleop()
-    robot_controller.wait(0.5)
-    cmd = ResetGyro(robot.hardware.drivetrain, robot.quest_vision)
-    cmd.schedule()
-    robot_controller.wait(0.5)
-    assert not cmd.isScheduled()
+
+    reset_cmd = ResetGyro(drivetrain, robot.quest_vision)
+    robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
+    init_pose = drivetrain.getPose()
+    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+    xbox_remote.setRightX(-1)
+    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
+    reset_cmd = ResetGyro(drivetrain, robot.quest_vision)
+    robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
+    assert drivetrain.getPose().rotation() == init_pose.rotation()
 
 
 def test_ResetPose(robot_controller: RobotTestController, robot: Robot):
     robot_controller.startTeleop()
-    robot_controller.wait(0.5)
-    cmd = ResetPose(robot.hardware.drivetrain, Pose2d())
-    cmd.schedule()
-    robot_controller.wait(0.5)
-    assert not cmd.isScheduled()
+    drivetrain = robot.hardware.drivetrain
+
+    drive_cmd = DriveRelative.right(drivetrain)
+    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
+    reset_cmd = ResetPose(drivetrain, Pose2d())
+    robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
+    assert drivetrain.getPose() == Pose2d()
 
 
 def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
@@ -59,24 +70,20 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
 def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     drivetrain = robot.hardware.drivetrain
     xbox_remote = wpilib.simulation.XboxControllerSim(0)
-    drive = DriveField(drivetrain, robot.hardware.controller)
-    reset_pose = ResetPose(drivetrain, Pose2d())
 
     robot_controller.startTeleop()
 
     # tests the robot moving plus the slow trigger
-    slow_cmd = drive
-    reset_cmd = reset_pose
-    slow_cmd.schedule()
-    xbox_remote.setLeftStickButton(True)
-    robot_controller.wait(0.4)
-    xbox_remote.setLeftStickButton(False)
+    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+    xbox_remote.setLeftX(1)
+    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
+
     init_pose = drivetrain.getPose().translation()
-    reset_cmd.schedule()
+    reset_cmd = ResetPose(drivetrain, Pose2d())
+    robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
     xbox_remote.setRightBumperButton(True)
-    xbox_remote.setLeftStickButton(True)
-    robot_controller.wait(0.4)
-    xbox_remote.setLeftStickButton(False)
+    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+    xbox_remote.setLeftX(1)
+    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
     fin_pose = drivetrain.getPose().translation()
-    assert fin_pose.x != init_pose.x
-    assert fin_pose.y != init_pose.y
+    assert fin_pose.x < init_pose.x
