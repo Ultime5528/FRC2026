@@ -25,6 +25,7 @@ class Guide(LinearSubsystem):
             100.0,
         )
         self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
+        self._motor.setInverted(False)
         self._encoder = wpilib.Encoder(
             ports.DIO.guide_encoder_a, ports.DIO.guide_encoder_b
         )

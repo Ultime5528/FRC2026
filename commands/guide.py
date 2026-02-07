@@ -6,6 +6,7 @@ from ultime.autoproperty import autoproperty
 class ManualMoveGuide:
     pass
 
+
 ManualMoveGuide = manualmovelinear.createManualMoveClass(
     ManualMoveGuide.__name__,
     lambda: manual_move_properties.speed_up,
@@ -16,11 +17,13 @@ ManualMoveGuide = manualmovelinear.createManualMoveClass(
 class ResetGuide:
     pass
 
+
 ResetGuide = resetlinear.createResetLinearClass(
     ResetGuide.__name__,
     lambda: reset_properties.speed_up,
     lambda: reset_properties.speed_down,
 )
+
 
 class MoveGuide:
     @staticmethod
@@ -30,7 +33,7 @@ class MoveGuide:
             move_properties.position_open,
             move_properties.speed_min,
             move_properties.speed_max,
-            move_properties.accel
+            move_properties.accel,
         )
         cmd.setName(MoveGuide.__name__ + ".toOpen")
         return cmd
@@ -42,14 +45,16 @@ class MoveGuide:
             move_properties.position_close,
             move_properties.speed_min,
             move_properties.speed_max,
-            move_properties.accel
+            move_properties.accel,
         )
         cmd.setName(MoveGuide.__name__ + ".toOpen")
         return cmd
 
+
 class _PropertiesManual:
     speed_up = autoproperty(0.25, subtable=ManualMoveGuide.__name__)
     speed_down = autoproperty(-0.25, subtable=ManualMoveGuide.__name__)
+
 
 manual_move_properties = _PropertiesManual()
 
@@ -57,6 +62,7 @@ manual_move_properties = _PropertiesManual()
 class _PropertiesReset:
     speed_up = autoproperty(0.25, subtable=ResetGuide.__name__)
     speed_down = autoproperty(-0.25, subtable=ResetGuide.__name__)
+
 
 reset_properties = _PropertiesReset()
 
@@ -69,5 +75,5 @@ class _PropertiesMove:
     position_open = autoproperty(10.0, subtable=MoveGuide.__name__)
     position_close = autoproperty(1.0, subtable=MoveGuide.__name__)
 
-move_properties = _PropertiesMove()
 
+move_properties = _PropertiesMove()
