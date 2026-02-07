@@ -78,4 +78,3 @@ def test_moveGuide_toClose(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
         robot_controller, robot, MoveGuide.toClose, move_properties.position_close
     )
-
