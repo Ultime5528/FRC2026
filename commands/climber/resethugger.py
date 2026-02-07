@@ -5,7 +5,7 @@ from subsystems.climber import Climber
 
 
 class ResetHugger(Command):
-    def __init__(self, climber : Climber):
+    def __init__(self, climber: Climber):
         super().__init__()
         self.climber = climber
         self.addRequirements(climber)

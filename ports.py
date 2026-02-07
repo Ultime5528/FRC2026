@@ -27,6 +27,7 @@ class CAN(Immutable):
 
     climber_motor = 9
 
+
 class PWM(Immutable):
     hugger_motor_left = 0
     hugger_motor_right = 1

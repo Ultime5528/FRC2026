@@ -2,6 +2,7 @@ import commands2
 from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
+from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from ultime.module import Module
 from ultime.subsystem import Subsystem
@@ -16,9 +17,8 @@ class HardwareModule(Module):
 
         self.drivetrain = Drivetrain()
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
+        self.climber = Climber()
 
         self.pdp = PowerDistribution()
 
-        self.subsystems: list[Subsystem] = [
-            self.drivetrain,
-        ]
+        self.subsystems: list[Subsystem] = [self.drivetrain, self.climber]

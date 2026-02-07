@@ -5,7 +5,7 @@ from subsystems.climber import Climber
 
 
 class Hug(Command):
-    def __init__(self, climber : Climber):
+    def __init__(self, climber: Climber):
         super().__init__()
         self.climber = climber
         self.addRequirements(climber)
@@ -14,13 +14,12 @@ class Hug(Command):
     def initialize(self):
         self.timer.reset()
         self.timer.start()
-        
+
     def execute(self):
         self.climber.hug()
-    
+
     def isFinished(self) -> bool:
         return self.timer.hasElapsed(self.climber.hugger_maximal_moving_time)
 
     def end(self, interrupted: bool):
         self.timer.stop()
-        

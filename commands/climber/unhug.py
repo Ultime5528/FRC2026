@@ -23,4 +23,3 @@ class Unhug(Command):
 
     def end(self, interrupted: bool):
         self.timer.stop()
-
