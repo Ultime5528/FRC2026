@@ -61,17 +61,9 @@ class LinearSubsystem(Subsystem):
     def setSimulationEncoderPosition(self, position: float) -> None:
         raise NotImplementedError()
 
-    def hasReset(self) -> bool:
-        return self._has_reset
-
     @abstractmethod
     def getPositionConversionFactor(self) -> float:
         raise NotImplementedError()
-
-    def getPosition(self) -> float:
-        return self.getPositionConversionFactor() * (
-            self.getEncoderPosition() + self._offset
-        )
 
     @abstractmethod
     def _setMotorOutput(self, speed: float) -> None:
@@ -80,6 +72,17 @@ class LinearSubsystem(Subsystem):
     @abstractmethod
     def getMotorOutput(self) -> float:
         raise NotImplementedError()
+
+    def hasReset(self) -> bool:
+        return self._has_reset
+
+    def invalidateReset(self) -> None:
+        self._has_reset = False
+
+    def getPosition(self) -> float:
+        return self.getPositionConversionFactor() * (
+            self.getEncoderPosition() + self._offset
+        )
 
     def setSpeed(self, speed: float) -> None:
         if speed < 0.0 and (

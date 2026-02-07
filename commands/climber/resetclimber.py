@@ -10,16 +10,16 @@ class ResetClimber(Command):
         self.addRequirements(climber)
 
     def initialize(self):
-        self.climber.state = self.climber.State.Unknown
+        self.climber.invalidateReset()
 
     def execute(self):
-        if not self.climber.isDown():
-            self.climber.moveDown()
+        if not self.climber.isSwitchMinPressed():
+            self.climber.setSpeed(-self.climber.speed)
         else:
-            self.climber.stop()
-            self.climber.setOffset()
-            self.climber.state = self.climber.State.Ready
-
+            self.climber.setSpeed(0.0)
 
     def isFinished(self) -> bool:
-        return self.climber.isDown()
+        return self.climber.isSwitchMinPressed()
+
+    def end(self, interrupted: bool):
+        self.climber.setSpeed(0.0)

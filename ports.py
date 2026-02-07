@@ -28,7 +28,8 @@ class CAN(Immutable):
     climber_motor = 9
 
 class PWM(Immutable):
-    pass
+    hugger_motor_left = 0
+    hugger_motor_right = 1
 
 
 class DIO(Immutable):
