@@ -58,7 +58,10 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(10.0)
 
-    assert shooter._flywheel_controller.getSetpoint() == approx(shooter.getCurrentSpeed(), abs=10.0)
+    assert shooter._flywheel_controller.getSetpoint() == approx(
+        shooter.getCurrentSpeed(), abs=10.0
+    )
+
 
 def test_shoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
@@ -81,5 +84,3 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
 
     assert shooter._indexer.get() == approx(shooter.speed_indexer)
     assert shooter._feeder.get() == approx(shooter.speed_feeder)
-
-
