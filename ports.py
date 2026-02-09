@@ -37,8 +37,8 @@ class DIO(Immutable):
     guide_switch = 0
     guide_encoder_a = 1
     guide_encoder_b = 2
-    intake_switch_min = 1
-    intake_switch_max = 2
+    intake_switch_min = 3
+    intake_switch_max = 4
 
 
 class PDP(Immutable):
