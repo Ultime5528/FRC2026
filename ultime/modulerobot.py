@@ -13,7 +13,7 @@ class ModuleRobot(commands2.TimedCommandRobot):
         super().__init__(self.period)
         self.modules = ModuleList()
 
-    def addModule(self, module: Module):
+    def addModule[T: Module](self, module: T) -> T:
         self.modules.addModules(module)
         return module
 

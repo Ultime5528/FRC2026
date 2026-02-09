@@ -4,6 +4,7 @@ from wpilib import PowerDistribution
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
+from subsystems.shooter import Shooter
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 
@@ -21,6 +22,7 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.guide = self.addSubsystem(Guide())
+        self.shooter = self.addSubsystem(Shooter())
 
         self.pdp = PowerDistribution()
 

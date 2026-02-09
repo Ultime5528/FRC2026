@@ -3,6 +3,9 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.shooter.manualshoot import ManualShoot
+from commands.shooter.prepareshoot import PrepareShoot
+from commands.shooter.shoot import Shoot
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
@@ -34,7 +37,7 @@ class DashboardModule(Module):
 
     def setupCommands(self, hardware):
         """
-        Groups
+        Drivetrain
         """
         # putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, ))
         putCommandOnDashboard("Drivetrain", DriveRelative.left(hardware.drivetrain))
@@ -45,7 +48,14 @@ class DashboardModule(Module):
         )
 
         """
-        GUIDE
+        shooter
+        """
+        putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
+
+        """
+        Guide
         """
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
