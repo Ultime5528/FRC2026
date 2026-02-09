@@ -18,10 +18,10 @@ def computeRobotRotationToAlign(
     robot_pose3d: Pose3d,
     shooter_offset: Translation3d,
     shooter_extremity: Translation3d,
-    hub_pose: Pose3d,
+    hub_pose: Translation3d,
 ) -> Rotation2d:
 
-    delta_hub_and_bot = hub_pose.translation() - robot_pose3d.translation()
+    delta_hub_and_bot = hub_pose - robot_pose3d.translation()
     hub_at_origin = delta_hub_and_bot.rotateBy(-robot_pose3d.rotation())
     shooter_direction = shooter_extremity - shooter_offset
 
@@ -76,6 +76,10 @@ def shouldUseGuide(
 
 class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
+    red_hub = Translation3d(4.625594, 4.034536, 3.057144)
+    blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
+    shooter_offset = Translation3d(0.2, 0.2, 0.2)
+    shooter_extremity = Translation3d(0.4, 0.3, 0.4)
     speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
     rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
     speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
@@ -98,9 +102,17 @@ class ShooterCalcModule(Module):
 
     def _getTargetPose(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            return red_hub
+            return self.red_hub
         else:
-            return blue_hub
+            return self.blue_hub
+
+    def _getAngleToAlignWithTarget(self) -> Rotation2d:
+        return computeRobotRotationToAlign(
+            self._drivetrain.getPose(),
+            self.shooter_offset,
+            self.shooter_extremity,
+            self._getTargetPose(),
+        )
 
     def shouldUseGuide(self) -> bool:
         return shouldUseGuide(
