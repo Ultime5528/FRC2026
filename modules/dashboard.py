@@ -5,13 +5,14 @@ from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from commands.intake.movedownintake import MoveDownIntake
 from commands.intake.moveupintake import MoveUpIntake
 from commands.intake.roll import Roll
 from commands.intake.reset_intake import Reset_Intake
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
-from modules.questtagvision import QuestTagVisionModule
+from modules.questvision import QuestVisionModule
 from ultime.module import Module, ModuleList
 
 
@@ -19,7 +20,7 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        quest: QuestTagVisionModule,
+        quest: QuestVisionModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
@@ -27,7 +28,7 @@ class DashboardModule(Module):
         self._hardware = hardware
         self._module_list = module_list
         self.setupCopilotCommands(hardware)
-        # self.setupCommands(hardware)
+        self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
         putCommandOnDashboard("Intake", Roll(hardware.intake))
         putCommandOnDashboard("Intake", MoveUpIntake(hardware.intake))
@@ -50,6 +51,15 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+
+        """
+        GUIDE
+        """
+        putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
+        putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
