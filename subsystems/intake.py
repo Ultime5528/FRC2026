@@ -1,8 +1,13 @@
 import rev
 import wpilib
+from rev import SparkMaxSim
+from wpilib._wpilib import RobotBase
+from wpimath._controls._controls.plant import DCMotor
+from wpiutil import SendableBuilder
+
 import ports
 from ultime.autoproperty import autoproperty
-from ultime.linearsubsystem import LinearSubsystem
+from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch
 
 
@@ -11,11 +16,11 @@ class Intake(LinearSubsystem):
     speed_pivot_retreat = autoproperty(0.5)
     speed_pivot_deploy = autoproperty(-0.5)
     maintain = autoproperty(0.2)
-    min_position = autoproperty(0)
-    max_position = autoproperty(0)
+    min_position = autoproperty(0.0)
+    max_position = autoproperty(5.0)
 
     def __init__(self):
-        super().__init__(0.0, True, True, True, True, 0.0, 9.81)
+        super().__init__(1.0, True, True, False, False, 2.0, 0.0)
         self._motor_pivot = rev.SparkMax(
             ports.CAN.intake_motor_pivot, rev.SparkMax.MotorType.kBrushless
         )
@@ -25,11 +30,15 @@ class Intake(LinearSubsystem):
             ports.CAN.intake_motor_intake, rev.SparkMax.MotorType.kBrushless
         )
         self._switch_min = Switch(
-            Switch.Type.NormallyClosed, ports.DIO.intake_switch_min
+            Switch.Type.NormallyOpen, ports.DIO.intake_switch_min
         )
         self._switch_max = Switch(
-            Switch.Type.NormallyClosed, ports.DIO.intake_switch_max
+            Switch.Type.NormallyOpen, ports.DIO.intake_switch_max
         )
+
+        if RobotBase.isSimulation():
+            self._motor_pivot_sim = SparkMaxSim(self._motor_pivot, DCMotor.NEO(1))
+            self._encoder_sim = self._motor_pivot_sim.getRelativeEncoderSim()
 
     def roll_intake(self):
         self.motor_feeder.set(self.speed_intake)
@@ -40,17 +49,8 @@ class Intake(LinearSubsystem):
     def stop_intake(self):
         self.motor_feeder.stopMotor()
 
-    def retreat_pivot(self):
-        self._motor_pivot.set(self.speed_pivot_retreat)
-
-    def deploy_pivot(self):
-        self._motor_pivot.set(self.speed_pivot_deploy)
-
     def stop_pivot(self):
         self._motor_pivot.stopMotor()
-
-    def initSimulationComponents(self):
-        return self._motor_pivot
 
     def getMinPosition(self) -> float:
         return self.min_position
@@ -59,16 +59,22 @@ class Intake(LinearSubsystem):
         return self.max_position
 
     def isSwitchMinPressed(self) -> bool:
-        return not self._switch_min.isPressed()
+        return self._switch_min.isPressed()
 
     def isSwitchMaxPressed(self) -> bool:
-        return not self._switch_max.isPressed()
+        return self._switch_max.isPressed()
+
+    def setSimSwitchMinPressed(self, pressed: bool) -> None:
+        self._switch_min.setSimValue(pressed)
+
+    def setSimSwitchMaxPressed(self, pressed: bool) -> None:
+        self._switch_max.setSimValue(pressed)
 
     def getEncoderPosition(self) -> float:
         return self._encoder_pivot.getPosition()
 
     def setSimulationEncoderPosition(self, position: float) -> None:
-        self._encoder_pivot.setPosition(position)
+        self._encoder_sim.setPosition(position)
 
     def getPositionConversionFactor(self) -> float:
         return 1.0
