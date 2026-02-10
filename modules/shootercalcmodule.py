@@ -1,14 +1,13 @@
 import math
 
 from wpilib import DriverStation
-from wpimath.geometry import Rotation2d, Translation3d, Pose3d
 from wpimath import units
-from ultime.linearinterpolator import LinearInterpolator
+from wpimath.geometry import Rotation2d, Translation3d, Pose3d
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
+from ultime.linearinterpolator import LinearInterpolator
 from ultime.module import Module
-
 
 red_hub = Translation3d(4.625594, 4.034536, 3.057144)
 blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
