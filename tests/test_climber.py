@@ -12,9 +12,9 @@ from ultime.tests import RobotTestController
 def test_ports(robot: Robot):
     climber = robot.hardware.climber
     assert climber._climber_motor.getDeviceId() == 9
-    assert climber._hugger_motor_left.getChannel() == 0
-    assert climber._hugger_motor_right.getChannel() == 1
-    assert climber._switch.getChannel() == 0
+    assert climber._hugger_motor_left.getChannel() == 1
+    assert climber._hugger_motor_right.getChannel() == 2
+    assert climber._switch.getChannel() == 3
 
 
 def test_settings(robot: Robot):
@@ -39,7 +39,7 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
 
     climber._switch.setSimPressed()
 
-    robot_controller.wait(0.05)
+    robot_controller.wait_one_frame()
 
     assert climber.getPosition() == approx(0.0, abs=0.01)
     assert climber.hasReset()

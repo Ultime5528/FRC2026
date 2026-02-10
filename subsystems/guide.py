@@ -12,14 +12,11 @@ class Guide(LinearSubsystem):
     position_min = autoproperty(0.0)
     position_max = autoproperty(90.0)
 
-    position_unuse = autoproperty(0.0)
-    position_use = autoproperty(90.0)
-
     position_conversion_factor = autoproperty(1.0)
 
     def __init__(self):
         super().__init__(
-            sim_initial_position=0.0,
+            sim_initial_position=1.0,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,

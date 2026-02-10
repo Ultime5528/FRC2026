@@ -8,9 +8,8 @@ from wpimath._controls._controls.plant import DCMotor
 
 import ports
 from ultime.autoproperty import autoproperty
-from ultime.linearsubsystem import LinearSubsystem
+from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch
-from ultime.timethis import tt
 
 
 class Climber(LinearSubsystem):
@@ -86,4 +85,4 @@ class Climber(LinearSubsystem):
 
     def unhug(self):
         self._hugger_motor_left.setAngle(self.left_angle_min)
-        self._hugger_motor_right(self.right_angle_min)
+        self._hugger_motor_right.setAngle(self.right_angle_min)

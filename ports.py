@@ -30,15 +30,15 @@ class CAN(Immutable):
 
 class PWM(Immutable):
     guide_servo = 0
-    hugger_motor_left = 0
-    hugger_motor_right = 1
+    hugger_motor_left = 1
+    hugger_motor_right = 2
 
 
 class DIO(Immutable):
     guide_switch = 0
     guide_encoder_a = 1
     guide_encoder_b = 2
-    climber_switch = 0
+    climber_switch = 3
 
 
 class PDP(Immutable):
