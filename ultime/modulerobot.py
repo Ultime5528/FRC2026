@@ -86,6 +86,8 @@ class ModuleRobot(wpilib.RobotBase):
         for io in self.ios:
             io.updateInputs()
 
+        self._watchdog.addEpoch("io.updateInputs()")
+
         # appeler les fonctions correspondantes au mode du robot
         if mode is ModuleRobot.Mode.kDisable:
             hal.observeUserProgramDisabled()
@@ -108,11 +110,14 @@ class ModuleRobot(wpilib.RobotBase):
         self._watchdog.addEpoch("RobotPeriodic()")
 
         CommandScheduler.getInstance().run()
+        self._watchdog.addEpoch("CommandScheduler.run()")
 
         # TODO log everything
 
         for io in self.ios:
             io.sendOutputs()
+
+        self._watchdog.addEpoch("io.sendOutputs()")
 
         SmartDashboard.updateValues()
         self._watchdog.addEpoch("SmartDashboard.updateValues()")

@@ -6,7 +6,7 @@ import wpimath
 from ntcore import NetworkTableInstance
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase
+from wpilib import RobotBase, SmartDashboard
 from wpimath._controls._controls.controller import PIDController
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
@@ -188,6 +188,12 @@ class Drivetrain(Subsystem):
             "Odometry failed to calculate robot position accurately.", AlertType.Error
         )
 
+        self.pubs = []
+
+        for i in range(1000):
+            topic = NetworkTableInstance.getDefault().getDoubleTopic("test-" + str(i))
+            self.pubs.append(topic.publish())
+
         if RobotBase.isSimulation():
             self.sim_yaw = 0
 
@@ -339,6 +345,13 @@ class Drivetrain(Subsystem):
         return updated_speeds
 
     def periodic(self):
+
+        #for i in range(1000):
+        #    SmartDashboard.putNumber("test-" + str(i), wpilib.getTime() + i)
+
+        for i in range(1000):
+            self.pubs[i].set(wpilib.getTime() + i)
+
         rotation = self._gyro.getRotation2d()
         swerve_positions = (
             self.swerve_module_fl.getPosition(),
