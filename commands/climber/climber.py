@@ -1,3 +1,4 @@
+import wpilib
 from commands2 import Command
 
 from subsystems.climber import Climber
@@ -26,7 +27,7 @@ class MoveClimber(MoveLinear):
     def Climbed(cls, climber: Climber):
         cmd = cls(
             climber,
-            lambda: _move_properties.position_open,
+            lambda: _move_properties.position_climbed,
         )
         cmd.setName(cls.__name__ + ".Climbed")
         return cmd
@@ -35,7 +36,7 @@ class MoveClimber(MoveLinear):
     def Ready(cls, climber: Climber):
         cmd = cls(
             climber,
-            lambda: _move_properties.position_open,
+            lambda: _move_properties.position_ready,
         )
         cmd.setName(cls.__name__ + ".Ready")
         return cmd
@@ -44,7 +45,7 @@ class MoveClimber(MoveLinear):
     def Retracted(cls, climber: Climber):
         cmd = cls(
             climber,
-            lambda: _move_properties.position_open,
+            lambda: _move_properties.position_retracted,
         )
         cmd.setName(cls.__name__ + ".Retracted")
         return cmd
@@ -53,31 +54,51 @@ class MoveClimber(MoveLinear):
         super().__init__(
             climber,
             end_position,
-            lambda: _move_properties.speed_min,
-            lambda: _move_properties.speed_max,
+            lambda: _move_properties.speed_up,
+            lambda: _move_properties.speed_down,
             lambda: _move_properties.accel,
         )
 
 class Hugger(Command):
-    @classmethod
-    def Hug(cls, climber: Climber):
-        cmd = cls(
-            climber,
-            lambda: _move_properties.position_hug,
-        )
-        cmd.setName(cls.__name__ + ".Hug")
-        return cmd
+    class Hug(Command):
+        def __init__(self, climber: Climber):
+            super().__init__()
+            self.climber = climber
+            self.addRequirements(climber)
+            self.timer = wpilib.Timer()
 
-    @classmethod
-    def Unhug(cls, climber: Climber):
-        cmd = cls(
-            climber,
-            lambda: _move_properties.position_unhug_left,
-            lambda: _move_properties.position_unhug_right,
-        )
-        cmd.setName(cls.__name__ + ".Unhug")
-        return cmd
+        def initialize(self):
+            self.timer.reset()
+            self.timer.start()
 
+        def execute(self):
+            self.climber.hug()
+
+        def isFinished(self) -> bool:
+            return self.timer.hasElapsed(_move_properties.max_hugger_moving_time)
+
+        def end(self, interrupted: bool):
+            self.timer.stop()
+
+    class Unhug(Command):
+        def __init__(self, climber: Climber):
+            super().__init__()
+            self.climber = climber
+            self.addRequirements(climber)
+            self.timer = wpilib.Timer()
+
+        def initialize(self):
+            self.timer.reset()
+            self.timer.start()
+
+        def execute(self):
+            self.climber.unhug()
+
+        def isFinished(self) -> bool:
+            return self.timer.hasElapsed(_move_properties.max_hugger_moving_time)
+
+        def end(self, interrupted: bool):
+            self.timer.stop()
 
 
 class _PropertiesManual:
@@ -96,13 +117,10 @@ class _PropertiesMove:
     speed_up = autoproperty(0.25, subtable=MoveClimber.__name__)
     speed_down = autoproperty(-0.25, subtable=MoveClimber.__name__)
     accel = autoproperty(5.0, subtable=MoveClimber.__name__)
-
     position_climbed = autoproperty(0.295, subtable=MoveClimber.__name__)
     position_ready = autoproperty(0.295, subtable=MoveClimber.__name__)
     position_retracted = autoproperty(0.21, subtable=MoveClimber.__name__)
-    position_hug_right = autoproperty(30.0, subtable=Hugger.__name__)
-    position_hug_left = autoproperty(-30.0, subtable=Hugger.__name__)
-    position_unhug_right = autoproperty(0.0, subtable=Hugger.__name__)
-    position_unhug_left = autoproperty(0.0, subtable=Hugger.__name__)
+
+    max_hugger_moving_time = autoproperty(2.0, subtable=Hugger.__name__)
 
 _move_properties = _PropertiesMove()

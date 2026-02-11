@@ -14,14 +14,12 @@ from ultime.switch import Switch
 
 class Climber(LinearSubsystem):
 
-    left_angle_min = autoproperty(0.0)
-    left_angle_max = autoproperty(45.0)
-    right_angle_min = autoproperty(0.0)
-    right_angle_max = autoproperty(45.0)
-    speed = autoproperty(0.5)
+    position_hug_left = autoproperty(-30.0)
+    position_unhug_left = autoproperty(0.0)
+    position_hug_right = autoproperty(30.0)
+    position_unhug_right = autoproperty(0.0)
     position_conversion_factor = autoproperty(0.2)
     height_max = autoproperty(0.215)
-    hugger_maximal_moving_time = autoproperty(2.0)
 
     def __init__(self):
 
@@ -80,9 +78,9 @@ class Climber(LinearSubsystem):
         return self._climber_motor.get()
 
     def hug(self):
-        self._hugger_motor_left.setAngle(self.left_angle_max)
-        self._hugger_motor_right.setAngle(self.right_angle_max)
+        self._hugger_motor_left.setAngle(self.position_hug_left)
+        self._hugger_motor_right.setAngle(self.position_hug_right)
 
     def unhug(self):
-        self._hugger_motor_left.setAngle(self.left_angle_min)
-        self._hugger_motor_right.setAngle(self.right_angle_min)
+        self._hugger_motor_left.setAngle(self.position_unhug_left)
+        self._hugger_motor_right.setAngle(self.position_unhug_right)
