@@ -6,10 +6,14 @@ from commands2 import Command
 from pathplannerlib.auto import NamedCommands, AutoBuilder
 from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.controller import PPHolonomicDriveController
-from wpilib import DriverStation, SmartDashboard
+from wpilib import DriverStation, SmartDashboard, SendableChooser
 
 from modules.hardware import HardwareModule
+from ultime.command import WaitCommand
 from ultime.module import Module
+
+p_gain_translation = 5.0
+p_gain_rotation = 5.0
 
 
 def registerNamedCommand(command: Command):
@@ -29,24 +33,23 @@ class AutonomousModule(Module):
             hardware.drivetrain.getPose,
             hardware.drivetrain.resetToPose,
             hardware.drivetrain.getRobotRelativeChassisSpeeds,
-            lambda speeds, feedforwards: hardware.drivetrain.driveFromChassisSpeedsFF(
+            lambda speeds, feedforwards: hardware.drivetrain.driveFromChassisSpeeds(
                 speeds, feedforwards
             ),
             PPHolonomicDriveController(
-                PIDConstants(5.0, 0.0, 0.0), PIDConstants(5.0, 0.0, 0.0)
+                PIDConstants(p_gain_translation, 0.0, 0.0),
+                PIDConstants(p_gain_rotation, 0.0, 0.0),
             ),
             config,
             self.shouldFlipPath,
             hardware.drivetrain,
         )
 
-        self.auto_chooser = AutoBuilder.buildAutoChooser()
+        self.auto_chooser = SendableChooser()
+        self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
 
     def shouldFlipPath(self):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
-
-    def setupCommandsOnPathPlanner(self):
-        pass
 
     def autonomousInit(self):
         self.hardware.drivetrain.swerve_odometry.resetPose(

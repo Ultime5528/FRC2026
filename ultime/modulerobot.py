@@ -152,8 +152,9 @@ class ModuleRobot(wpilib.RobotBase):
     def endCompetition(self):
         self.running = False
 
-    def addModules(self, *modules: Module):
-        self.modules.addModules(*modules)
+    def addModule(self, module: Module):
+        self.modules.addModules(module)
+        return module
 
     def robotInit(self):
         self.modules.robotInit()
