@@ -4,22 +4,28 @@ from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpiutil import Sendable, SendableBuilder
 
+from ultime.modulerobot import is_real
 from ultime.swerve import swerveconfig
-from ultime.swerve.swervemoduleio import SwerveModuleIo, SwerveModuleIoSim
+from ultime.swerve.swervemoduleio import SwerveModuleIO, SwerveModuleIoSim
 from ultime.timethis import tt
 
 
 class SwerveModule:
     def __init__(
         self,
-        io: SwerveModuleIo | SwerveModuleIoSim,
+        drive_motor_port: int,
+        turn_motor_port: int,
         chassis_angular_offset: float,
     ):
         self._chassis_angular_offset = chassis_angular_offset
 
         self.desired_velocity = 0.0
 
-        self.io = io
+        if is_real:
+            self.io = SwerveModuleIO(drive_motor_port, turn_motor_port)
+        else:
+            self.io = SwerveModuleIoSim(drive_motor_port, turn_motor_port)
+
         self._inputs = self.io.inputs
         self._outputs = self.io.outputs
 

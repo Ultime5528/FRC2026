@@ -12,6 +12,7 @@ from wpilib import RobotBase, Watchdog, SmartDashboard
 from ultime.module import ModuleList, Module
 
 is_simulation = wpilib.RobotBase.isSimulation()
+is_real = wpilib.RobotBase.isReal()
 
 
 class ModuleRobot(wpilib.RobotBase):
@@ -159,7 +160,7 @@ class ModuleRobot(wpilib.RobotBase):
     def robotInit(self):
         self.modules.robotInit()
 
-        if RobotBase.isSimulation():
+        if is_simulation:
             self.modules.simulationInit()
 
     def driveStationConnected(self):
@@ -168,7 +169,7 @@ class ModuleRobot(wpilib.RobotBase):
     def robotPeriodic(self):
         self.modules.robotPeriodic()
 
-        if RobotBase.isSimulation():
+        if is_simulation:
             self.modules.simulationPeriodic()
 
     def simulationInit(self):

@@ -16,18 +16,11 @@ class Loggable:
 
         if not pub:
             if isinstance(value, float):
-
+                pass
 
         pub.publish(value)
-
 
     def createVariable(self, initial, name=None):
         if not name:
             # TODO Lookup variable name
             pass
-
-class
-
-
-
-

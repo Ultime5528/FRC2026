@@ -16,7 +16,7 @@ from wpilib.simulation import RoboRioSim
 from wpimath._controls._controls.plant import DCMotor
 from wpimath.geometry import Rotation2d
 
-from ultime.io import Io
+from ultime.io import IO
 from ultime.swerve import swerveconfig
 
 
@@ -48,8 +48,8 @@ class SwerveOutputs:
         self.turn_position = None
 
 
-class SwerveModuleIo(Io):
-    def __init__(self, drive_motor_port, turn_motor_port):
+class SwerveModuleIO(IO):
+    def __init__(self, drive_motor_port: int, turn_motor_port: int):
         super().__init__()
         self.drive_motor_port = drive_motor_port
         self.turn_motor_port = turn_motor_port
@@ -123,8 +123,6 @@ class SwerveModuleIo(Io):
                     drive_ff_volts,
                     SparkClosedLoopController.ArbFFUnits.kVoltage,
                 )
-        else:
-            self._driving_motor.setVoltage(0.0)
 
         if turn_voltage is not None:
             self._turning_motor.setVoltage(turn_voltage)
@@ -132,13 +130,11 @@ class SwerveModuleIo(Io):
             self._turning_closed_loop_controller.setReference(
                 turn_position.radians(), SparkBase.ControlType.kPosition
             )
-        else:
-            self._turning_motor.setVoltage(0.0)
 
         self.outputs.reset()
 
 
-class SwerveModuleIoSim(SwerveModuleIo):
+class SwerveModuleIoSim(SwerveModuleIO):
     def __init__(self, drive_motor_port: int, turn_motor_port: int):
         super().__init__(drive_motor_port, turn_motor_port)
 

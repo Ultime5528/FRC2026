@@ -1,44 +1,38 @@
-import ports
-from ultime.swerve.swervemoduleio import SwerveModuleIo, SwerveModuleIoSim
+from dataclasses import dataclass, field
+from typing import Optional
+from wpimath.geometry import Rotation2d
+from ultime.gyro import ADIS16470
+from ultime.io import IO
 
 
-class DrivetrainIo:
+@dataclass
+class DriveTrainInputs:
+    gyro_angle_randians: float = 0.0
+    gyro_rotation2d: Rotation2d = field(default_factory=Rotation2d)
+
+
+@dataclass
+class DriveTrainOutputs:
+    gyro_reset: Optional[bool] = None
+
+    def reset(self):
+        self.gyro_reset = None
+
+
+class DrivetrainIO(IO):
     def __init__(self):
-        self.swerve_io_fl = SwerveModuleIo(
-            ports.CAN.drivetrain_motor_driving_fl,
-            ports.CAN.drivetrain_motor_turning_fl,
-        )
-        self.swerve_io_fr = SwerveModuleIo(
-            ports.CAN.drivetrain_motor_driving_fr,
-            ports.CAN.drivetrain_motor_turning_fr,
-        )
+        super().__init__()
+        self.gyro = ADIS16470()
 
-        self.swerve_io_bl = SwerveModuleIo(
-            ports.CAN.drivetrain_motor_driving_bl,
-            ports.CAN.drivetrain_motor_turning_bl,
-        )
-        self.swerve_io_br = SwerveModuleIo(
-            ports.CAN.drivetrain_motor_driving_br,
-            ports.CAN.drivetrain_motor_turning_br,
-        )
+        self.inputs = DriveTrainInputs()
+        self.outputs = DriveTrainOutputs()
 
+    def updateInputs(self):
+        self.inputs.gyro_angle_randians = self.gyro.getAngle()
+        self.inputs.gyro_rotation2d = self.gyro.getRotation2d()
 
-class DrivetrainIoSim:
-    def __init__(self):
-        self.swerve_io_fl = SwerveModuleIoSim(
-            ports.CAN.drivetrain_motor_driving_fl,
-            ports.CAN.drivetrain_motor_turning_fl,
-        )
-        self.swerve_io_fr = SwerveModuleIoSim(
-            ports.CAN.drivetrain_motor_driving_fr,
-            ports.CAN.drivetrain_motor_turning_fr,
-        )
+    def sendOutputs(self):
+        if self.outputs.gyro_reset is not None:
+            self.gyro.reset()
 
-        self.swerve_io_bl = SwerveModuleIoSim(
-            ports.CAN.drivetrain_motor_driving_bl,
-            ports.CAN.drivetrain_motor_turning_bl,
-        )
-        self.swerve_io_br = SwerveModuleIoSim(
-            ports.CAN.drivetrain_motor_driving_br,
-            ports.CAN.drivetrain_motor_turning_br,
-        )
+        self.outputs.reset()
