@@ -1,5 +1,3 @@
-from enum import Enum, auto
-
 import wpilib
 from wpiutil import SendableBuilder
 from rev import SparkMax, SparkMaxSim
@@ -14,12 +12,13 @@ from ultime.switch import Switch
 
 class Climber(LinearSubsystem):
 
-    position_hug_left = autoproperty(-30.0)
+    position_hug_left = autoproperty(-45.0)
     position_unhug_left = autoproperty(0.0)
-    position_hug_right = autoproperty(30.0)
-    position_unhug_right = autoproperty(0.0)
+    position_hug_right = autoproperty(0.0)
+    position_unhug_right = autoproperty(45.0)
     position_conversion_factor = autoproperty(0.2)
     height_max = autoproperty(0.215)
+    hugging_time = autoproperty(2.0)
 
     def __init__(self):
 
@@ -62,6 +61,9 @@ class Climber(LinearSubsystem):
     def isSwitchMinPressed(self) -> bool:
         return self._switch.isPressed()
 
+    def isSwitchMaxPressed(self) -> bool:
+        pass
+
     def getEncoderPosition(self) -> float:
         return self._climber_encoder.getPosition()
 
@@ -77,6 +79,12 @@ class Climber(LinearSubsystem):
     def getMotorOutput(self) -> float:
         return self._climber_motor.get()
 
+    def setSimSwitchMinPressed(self, pressed: bool) -> None:
+        self._switch.setSimValue(pressed)
+
+    def setSimSwitchMaxPressed(self, pressed: bool) -> None:
+        pass
+
     def hug(self):
         self._hugger_motor_left.setAngle(self.position_hug_left)
         self._hugger_motor_right.setAngle(self.position_hug_right)
@@ -84,3 +92,16 @@ class Climber(LinearSubsystem):
     def unhug(self):
         self._hugger_motor_left.setAngle(self.position_unhug_left)
         self._hugger_motor_right.setAngle(self.position_unhug_right)
+
+    def initSendable(self, builder: SendableBuilder) -> None:
+        super().initSendable(builder)
+
+        def noop(_):
+            pass
+
+        builder.addBooleanProperty(
+            "ClimberSwitch", (lambda: self._switch.isPressed()), noop
+        )
+        builder.addFloatProperty(
+            "ClimberMotor", (lambda: self._climber_motor.get()), noop
+        )

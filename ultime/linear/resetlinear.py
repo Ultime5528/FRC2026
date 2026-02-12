@@ -46,6 +46,7 @@ def createResetLinearClass(speed_up: FloatProperty, speed_down: FloatProperty):
                 return not self.subsystem.isSwitchMaxPressed() and self.switch_pressed
             else:
                 return not self.subsystem.isSwitchMinPressed() and self.switch_pressed
+            # return self.subsystem.hasReset()
 
         def end(self, interrupted: bool):
             self.subsystem.setSpeed(0.0)

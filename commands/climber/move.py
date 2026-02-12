@@ -7,24 +7,26 @@ from ultime.autoproperty import autoproperty, FloatProperty
 from ultime.linear.movelinear import MoveLinear
 
 _ManualMoveClimber = manualmovelinear.createManualMoveClass(
-    lambda: _manual__move_properties.speed_up,
-    lambda: _manual__move_properties.speed_down
+    lambda: _manual_move_properties.speed_up, lambda: _manual_move_properties.speed_down
 )
+
 
 class ManualMoveClimber(_ManualMoveClimber):
     pass
 
+
 _ResetClimber = resetlinear.createResetLinearClass(
-    lambda: _reset_properties.speed_up,
-    lambda: _reset_properties.speed_down
+    lambda: _reset_properties.speed_up, lambda: _reset_properties.speed_down
 )
+
 
 class ResetClimber(_ResetClimber):
     pass
 
+
 class MoveClimber(MoveLinear):
     @classmethod
-    def Climbed(cls, climber: Climber):
+    def toClimbed(cls, climber: Climber):
         cmd = cls(
             climber,
             lambda: _move_properties.position_climbed,
@@ -33,7 +35,7 @@ class MoveClimber(MoveLinear):
         return cmd
 
     @classmethod
-    def Ready(cls, climber: Climber):
+    def toReady(cls, climber: Climber):
         cmd = cls(
             climber,
             lambda: _move_properties.position_ready,
@@ -42,7 +44,7 @@ class MoveClimber(MoveLinear):
         return cmd
 
     @classmethod
-    def Retracted(cls, climber: Climber):
+    def toRetracted(cls, climber: Climber):
         cmd = cls(
             climber,
             lambda: _move_properties.position_retracted,
@@ -59,59 +61,22 @@ class MoveClimber(MoveLinear):
             lambda: _move_properties.accel,
         )
 
-class Hugger(Command):
-    class Hug(Command):
-        def __init__(self, climber: Climber):
-            super().__init__()
-            self.climber = climber
-            self.addRequirements(climber)
-            self.timer = wpilib.Timer()
-
-        def initialize(self):
-            self.timer.reset()
-            self.timer.start()
-
-        def execute(self):
-            self.climber.hug()
-
-        def isFinished(self) -> bool:
-            return self.timer.hasElapsed(_move_properties.max_hugger_moving_time)
-
-        def end(self, interrupted: bool):
-            self.timer.stop()
-
-    class Unhug(Command):
-        def __init__(self, climber: Climber):
-            super().__init__()
-            self.climber = climber
-            self.addRequirements(climber)
-            self.timer = wpilib.Timer()
-
-        def initialize(self):
-            self.timer.reset()
-            self.timer.start()
-
-        def execute(self):
-            self.climber.unhug()
-
-        def isFinished(self) -> bool:
-            return self.timer.hasElapsed(_move_properties.max_hugger_moving_time)
-
-        def end(self, interrupted: bool):
-            self.timer.stop()
-
 
 class _PropertiesManual:
     speed_up = autoproperty(0.25, subtable=ManualMoveClimber.__name__)
     speed_down = autoproperty(-0.25, subtable=ManualMoveClimber.__name__)
 
-_manual__move_properties = _PropertiesManual()
+
+_manual_move_properties = _PropertiesManual()
+
 
 class _PropertiesReset:
     speed_up = autoproperty(0.25, subtable=ResetClimber.__name__)
     speed_down = autoproperty(-0.25, subtable=ResetClimber.__name__)
 
+
 _reset_properties = _PropertiesReset()
+
 
 class _PropertiesMove:
     speed_up = autoproperty(0.25, subtable=MoveClimber.__name__)
@@ -121,6 +86,5 @@ class _PropertiesMove:
     position_ready = autoproperty(0.295, subtable=MoveClimber.__name__)
     position_retracted = autoproperty(0.21, subtable=MoveClimber.__name__)
 
-    max_hugger_moving_time = autoproperty(2.0, subtable=Hugger.__name__)
 
 _move_properties = _PropertiesMove()

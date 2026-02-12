@@ -12,14 +12,13 @@ class Hug(Command):
         self.timer = wpilib.Timer()
 
     def initialize(self):
-        self.timer.reset()
-        self.timer.start()
+        self.timer.restart()
 
     def execute(self):
         self.climber.hug()
 
     def isFinished(self) -> bool:
-        return self.timer.hasElapsed(self.climber.hugger_maximal_moving_time)
+        return self.timer.hasElapsed(self.climber.hugging_time)
 
     def end(self, interrupted: bool):
         self.timer.stop()

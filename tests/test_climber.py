@@ -2,9 +2,10 @@ from _pytest.python_api import approx
 from rev import SparkBase, SparkBaseConfig
 
 import ports
-from commands.climber.resetclimber import ResetClimber
+from commands.climber.move import ResetClimber
 from robot import Robot
 from subsystems import climber
+from subsystems.climber import Climber
 from ultime.switch import Switch
 from ultime.tests import RobotTestController
 
@@ -29,18 +30,23 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
-    cmd = ResetClimber(climber)
-    cmd.schedule()
-
-    robot_controller.wait(0.05)
-
     assert not climber.hasReset()
-    assert climber._climber_motor.get() < 0.0
 
-    climber._switch.setSimPressed()
+    cmd = ResetClimber.down(climber)
+    cmd.schedule()
 
     robot_controller.wait_one_frame()
 
-    assert climber.getPosition() == approx(0.0, abs=0.01)
+    assert climber.getMotorOutput() < 0.0
+
+    robot_controller.wait_until(lambda: climber.isSwitchMinPressed(), 5.0)
+
+    assert climber.getMotorOutput() > 0.0
+
+    robot_controller.wait_until(lambda: climber.hasReset(), 5.0)
+
+    assert not cmd.isScheduled()
+    assert not climber.isSwitchMinPressed()
+    assert climber.getPosition() == approx(0.0, abs=0.02)
     assert climber.hasReset()
     assert climber._climber_motor.get() == 0.0

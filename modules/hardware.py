@@ -20,8 +20,8 @@ class HardwareModule(Module):
 
         self.drivetrain = self.addSubsystem(Drivetrain())
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
-        self.climber = Climber()
 
+        self.climber = self.addSubsystem(Climber())
         self.guide = self.addSubsystem(Guide())
 
         self.pdp = PowerDistribution()
