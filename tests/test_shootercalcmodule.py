@@ -14,16 +14,8 @@ def test_ShooterPower(robot_controller: RobotTestController, robot: Robot):
     shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
     red_hub = shooter_calc_module.red_hub
     robot_controller.startTeleop()
-    robot_controller.run_command(ResetPose(robot.hardware.drivetrain,Pose2d((-math.sqrt(4.5)) + red_hub.x, (-math.sqrt(4.5)) + red_hub.y)), 3.0)
+    robot_controller.run_command(ResetPose(robot.hardware.drivetrain,Pose2d((red_hub.x)-4.0, (red_hub.y)-3.0)), 3.0)
     robot_controller.wait(0.2)
-    robot_controller.run_command(Sho, 3.0)
-    robot_controller.wait(0.5)
+    angle = shooter_calc_module._getAngleToAlignWithTarget()
+    rpm = shooter_calc_module.getRPM()
     assert
-
-
-def test_AlignWithReefSide_not_crash(
-    robot_controller: RobotTestController, robot: Robot
-):
-    DriverStationSim.setAllianceStationId(AllianceStationID.kRed1)
-    robot_controller.startTeleop()
-    robot_controller.run_command(AlignWithReefSide(robot.hardware.drivetrain), 10.0)

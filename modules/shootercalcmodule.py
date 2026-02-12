@@ -2,7 +2,7 @@ import math
 
 from wpilib import DriverStation
 from wpimath import units
-from wpimath.geometry import Rotation2d, Translation3d, Pose3d
+from wpimath.geometry import Rotation2d, Translation3d, Pose3d, Rotation3d
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
@@ -15,7 +15,7 @@ blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
 
 def computeRobotRotationToAlign(
     robot_pose3d: Pose3d,
-    shooter_offset: Translation3d,
+    shooter_offset: Pose3d,
     shooter_extremity: Translation3d,
     hub_pose: Translation3d,
 ) -> Rotation2d:
@@ -30,6 +30,8 @@ def computeRobotRotationToAlign(
 
     denominator = (A**2) + (B**2)
 
+
+    robot_pose3d.transformBy()
     # to avoid domain errors
     if abs(C / denominator) > 1 or denominator == 0:
         return Rotation2d()
@@ -40,26 +42,30 @@ def computeRobotRotationToAlign(
 
 
 def computeShooterSpeedToShoot(
-    robot_pose: Translation3d, target_pose: Translation3d, long_shoot_zone: float
+    shooter_position: Translation3d, target_position: Translation3d, long_shoot_zone: float
 ) -> float:
 
-    if target_pose.distance(robot_pose) >= long_shoot_zone:
+    if target_position.distance(shooter_position) >= long_shoot_zone:
         shooter_angle = math.radians(60.0)
     else:
         shooter_angle = math.radians(70.0)
 
     gravity = float(units.standard_gravity)
 
-    delta_x = target_pose.x - robot_pose.x
-    delta_y = target_pose.y - robot_pose.y
+    delta_x = target_position.x - shooter_position.x
+    delta_y = target_position.y - shooter_position.y
+    delta_z = target_position.z - target_position.z
 
-    numerator = gravity * (delta_x**2)
+    distance_xy_squared = (delta_x**2)+(delta_y**2)
+    distance_xy = math.sqrt(distance_xy_squared)
+
+    numerator = gravity * distance_xy_squared
     denominator = (2 * (math.cos(shooter_angle)) ** 2) * (
-        delta_x * (math.cos(shooter_angle)) - delta_y
+        distance_xy * (math.cos(shooter_angle)) - delta_z
     )
 
-    if denominator == 0:
-        return -1
+    if denominator == 0.0:
+        return -1.0
     else:
         return numerator / denominator
 
@@ -77,8 +83,7 @@ class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
     red_hub = Translation3d(4.625594, 4.034536, 3.057144)
     blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
-    shooter_offset = Translation3d(0.2, 0.2, 0.2)
-    shooter_extremity = Translation3d(0.4, 0.3, 0.4)
+    shooter_offset = Pose3d(-0.6,-0.5,0.0,Rotation3d(0,180,0))
     speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
     rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
     speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
@@ -98,6 +103,15 @@ class ShooterCalcModule(Module):
         self._interpolator_for_closed_guide = LinearInterpolator(
             self.speed_guide_closed, self.rpm_guide_closed
         )
+
+
+
+    e = (Pose3d(red_hub, Rotation3d())).
+
+    def robotPeriodic(self) -> None:
+        self.shooter_position = self._ComputeShooterPosition()
+        self.shooter_extremity_position = self._ComputeShooterExtremityPosition()
+        self.hub_position = self._getTargetPose()
 
     def _getTargetPose(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
