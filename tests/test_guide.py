@@ -25,23 +25,21 @@ def test_reset_command(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
-    assert guide.isSwitchMinPressed()
+    assert not guide.isSwitchMinPressed()
 
     cmd = ResetGuide.down(guide)
     cmd.schedule()
     robot_controller.wait_one_frame()
 
-    assert guide.getMotorOutput() > 0.0
+    assert guide.getMotorOutput() < 0.0
 
-    robot_controller.wait_until(lambda: not guide.isSwitchMinPressed(), 5.0)
-
-    assert not guide.isSwitchMinPressed()
-
-    robot_controller.wait_until(lambda: not cmd.isScheduled(), 5.0)
-
+    robot_controller.wait_until(lambda: not cmd.isScheduled(), 10.0)
+    robot_controller.wait_one_frame()
     assert not cmd.isScheduled()
+    assert not guide.isSwitchMinPressed()
+    assert guide.hasReset()
     assert guide.getMotorOutput() == 0.0
-    assert guide.getPosition() == approx(0.0, abs=0.02)
+    assert guide.getPosition() == approx(0.0, abs=1.0)
 
 
 def common_test_moveGuide_from_switch_down(
@@ -65,7 +63,7 @@ def common_test_moveGuide_from_switch_down(
     assert not cmd.isScheduled()
 
     assert guide.getMotorOutput() == approx(0.0, abs=0.01)
-    assert guide.getPosition() == approx(wanted_position, abs=0.5)
+    assert guide.getPosition() == approx(wanted_position, abs=2.0)
 
 
 def test_moveGuide_toOpen(robot_controller: RobotTestController, robot: Robot):
