@@ -6,7 +6,12 @@ from rev import SparkBase, SparkBaseConfig
 
 import ports
 from commands.climber.hug import Hug
-from commands.climber.move import ResetClimber, MoveClimber, _move_properties, ManualMoveClimber
+from commands.climber.move import (
+    ResetClimber,
+    MoveClimber,
+    _move_properties,
+    ManualMoveClimber,
+)
 from commands.climber.unhug import Unhug
 from robot import Robot
 from subsystems import climber
@@ -56,7 +61,13 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
     assert climber.hasReset()
     assert climber.getMotorOutput() == 0.0
 
-def _test_move_climber_common(robot_controller: RobotTestController, robot: Robot, cmd: Command, final_position: float):
+
+def _test_move_climber_common(
+    robot_controller: RobotTestController,
+    robot: Robot,
+    cmd: Command,
+    final_position: float,
+):
     climber = robot.hardware.climber
 
     robot_controller.startTeleop()
@@ -79,17 +90,36 @@ def _test_move_climber_common(robot_controller: RobotTestController, robot: Robo
     assert climber.getMotorOutput() == 0.0
     assert climber.getPosition() == approx(final_position, abs=0.02)
 
+
 def test_move_climber_to_ready(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
-    _test_move_climber_common(robot_controller, robot, MoveClimber.toReady(climber), _move_properties.position_ready)
+    _test_move_climber_common(
+        robot_controller,
+        robot,
+        MoveClimber.toReady(climber),
+        _move_properties.position_ready,
+    )
+
 
 def test_move_climber_to_retracted(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
-    _test_move_climber_common(robot_controller, robot, MoveClimber.toRetracted(climber), _move_properties.position_retracted)
+    _test_move_climber_common(
+        robot_controller,
+        robot,
+        MoveClimber.toRetracted(climber),
+        _move_properties.position_retracted,
+    )
+
 
 def test_move_climber_to_climbed(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
-    _test_move_climber_common(robot_controller, robot, MoveClimber.toClimbed(climber), _move_properties.position_climbed)
+    _test_move_climber_common(
+        robot_controller,
+        robot,
+        MoveClimber.toClimbed(climber),
+        _move_properties.position_climbed,
+    )
+
 
 def _test_manual_move_climber_up(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
@@ -115,7 +145,10 @@ def _test_manual_move_climber_up(robot_controller: RobotTestController, robot: R
     assert climber.getMotorOutput() == 0.0
     assert climber.getPosition() == approx(climber.height_max, abs=0.02)
 
-def _test_manual_move_climber_down_with_reset(robot_controller: RobotTestController, robot: Robot):
+
+def _test_manual_move_climber_down_with_reset(
+    robot_controller: RobotTestController, robot: Robot
+):
     climber = robot.hardware.climber
 
     robot_controller.startTeleop()
@@ -146,7 +179,10 @@ def _test_manual_move_climber_down_with_reset(robot_controller: RobotTestControl
     assert climber.getMotorOutput() == 0.0
     assert climber.getPosition() == approx(0.0, abs=0.02)
 
-def _test_manual_move_climber_down_without_reset(robot_controller: RobotTestController, robot: Robot):
+
+def _test_manual_move_climber_down_without_reset(
+    robot_controller: RobotTestController, robot: Robot
+):
     climber = robot.hardware.climber
 
     cmd = ManualMoveClimber.down()
@@ -162,6 +198,7 @@ def _test_manual_move_climber_down_without_reset(robot_controller: RobotTestCont
     assert not climber.hasReset()
     assert climber.getPosition() == approx(0.0, abs=0.02)
 
+
 def hug_test(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
 
@@ -170,6 +207,7 @@ def hug_test(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(climber.hugging_time)
     assert cmd.isFinished()
+
 
 def unhug_test(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
