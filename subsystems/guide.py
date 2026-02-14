@@ -10,21 +10,18 @@ from ultime.switch import Switch
 
 class Guide(LinearSubsystem):
     position_min = autoproperty(0.0)
-    position_max = autoproperty(90.0)
+    position_max = autoproperty(1.0)
 
-    position_unuse = autoproperty(0.0)
-    position_use = autoproperty(90.0)
-
-    position_conversion_factor = autoproperty(1.0)
+    position_conversion_factor = autoproperty(0.01)
 
     def __init__(self):
         super().__init__(
-            sim_initial_position=1.0,
+            sim_initial_position=0.1,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
             should_block_max_position=True,
-            sim_motor_to_distance_factor=300.0,
+            sim_motor_to_distance_factor=1.0,
         )
         self._motor_output: float = 0.0
         self._encoder_position: float = 0.0

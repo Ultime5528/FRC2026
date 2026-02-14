@@ -127,7 +127,7 @@ class AlertCreator:
         self.registered_alerts = []
 
     def createAlert(self, text: str, alert_type: AlertType) -> Alert:
-        alert = Alert(f"[{self.getName()}] {text}", alert_type, "Alerts")
+        alert = Alert(text, alert_type, group="Alerts", prefix=f"[{self.getName()}] ")
         self.registered_alerts.append(alert)
         return alert
 

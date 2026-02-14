@@ -25,21 +25,21 @@ class ResetGuide(_ResetGuide):
 
 class MoveGuide(MoveLinear):
     @classmethod
-    def toOpen(cls, guide: Guide):
+    def toUsed(cls, guide: Guide):
         cmd = cls(
             guide,
-            lambda: _move_properties.position_open,
+            lambda: _move_properties.position_used,
         )
-        cmd.setName(cls.__name__ + ".toOpen")
+        cmd.setName(cls.__name__ + ".toUsed")
         return cmd
 
     @classmethod
-    def toClose(cls, guide: Guide):
+    def toUnused(cls, guide: Guide):
         cmd = cls(
             guide,
-            lambda: _move_properties.position_close,
+            lambda: _move_properties.position_unused,
         )
-        cmd.setName(cls.__name__ + ".toClose")
+        cmd.setName(cls.__name__ + ".toUnused")
         return cmd
 
     def __init__(self, guide: Guide, end_position: FloatProperty):
@@ -73,8 +73,8 @@ class _PropertiesMove:
     speed_max = autoproperty(0.40, subtable=MoveGuide.__name__)
     accel = autoproperty(5.0, subtable=MoveGuide.__name__)
 
-    position_open = autoproperty(10.0, subtable=MoveGuide.__name__)
-    position_close = autoproperty(1.0, subtable=MoveGuide.__name__)
+    position_unused = autoproperty(0.1, subtable=MoveGuide.__name__)
+    position_used = autoproperty(0.5, subtable=MoveGuide.__name__)
 
 
 _move_properties = _PropertiesMove()

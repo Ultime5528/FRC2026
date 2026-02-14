@@ -54,20 +54,20 @@ def test_alert_sort(robot_controller: RobotTestController):
     )
 
     robot_controller.wait(0.1)
-    recent = Alert("Recent", AlertType.Warning, "AlertGroup")
-    oldest = Alert("Oldest", AlertType.Warning, "AlertGroup")
+    recent = Alert("Recent", AlertType.Warning, "AlertGroup", prefix="[P] ")
+    oldest = Alert("Oldest", AlertType.Warning, "AlertGroup", prefix="[P] ")
 
     robot_controller.wait(0.1)
     assert topic.get() == []
 
     oldest.set(True)
     robot_controller.wait(0.1)
-    assert topic.get() == ["Oldest"]
+    assert topic.get() == ["[P] Oldest"]
 
     recent.set(True)
     robot_controller.wait(0.1)
-    assert topic.get() == ["Recent", "Oldest"]
+    assert topic.get() == ["[P] Recent", "[P] Oldest"]
 
     oldest.setText("Oldest modified")
     robot_controller.wait(0.1)
-    assert topic.get() == ["Recent", "Oldest modified"]
+    assert topic.get() == ["[P] Recent", "[P] Oldest modified"]

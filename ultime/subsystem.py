@@ -2,10 +2,11 @@ import commands2
 from wpiutil import SendableBuilder
 
 from ultime.alert import AlertCreator
+from ultime.log import Loggable
 from ultime.timethis import tt
 
 
-class Subsystem(AlertCreator, commands2.Subsystem):
+class Subsystem(Loggable, AlertCreator, commands2.Subsystem):
     def getSubtable(self) -> str:
         return super().getSubtable() + self.getName() + "/"
 

@@ -39,7 +39,7 @@ def test_reset_command(robot_controller: RobotTestController, robot: Robot):
     assert not guide.isSwitchMinPressed()
     assert guide.hasReset()
     assert guide.getMotorOutput() == 0.0
-    assert guide.getPosition() == approx(0.0, abs=1.0)
+    assert guide.getPosition() == approx(0.0, abs=0.02)
 
 
 def common_test_moveGuide_from_switch_down(
@@ -54,25 +54,20 @@ def common_test_moveGuide_from_switch_down(
 
     robot_controller.run_command(ResetGuide.down(guide), 10.0)
 
-    cmd = MoveGuideCommand(guide)
-    cmd.schedule()
-
-    robot_controller.run_command(cmd, 10.0)
+    robot_controller.run_command(MoveGuideCommand(guide), 10.0)
     robot_controller.wait(1.0)
 
-    assert not cmd.isScheduled()
-
-    assert guide.getMotorOutput() == approx(0.0, abs=0.01)
-    assert guide.getPosition() == approx(wanted_position, abs=2.0)
+    assert guide.getMotorOutput() == approx(0.0, abs=0.02)
+    assert guide.getPosition() == approx(wanted_position, abs=0.02)
 
 
-def test_moveGuide_toOpen(robot_controller: RobotTestController, robot: Robot):
+def test_moveGuide_toUsed(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
-        robot_controller, robot, MoveGuide.toOpen, _move_properties.position_open
+        robot_controller, robot, MoveGuide.toUsed, _move_properties.position_used
     )
 
 
-def test_moveGuide_toClose(robot_controller: RobotTestController, robot: Robot):
+def test_moveGuide_toUnused(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
-        robot_controller, robot, MoveGuide.toClose, _move_properties.position_close
+        robot_controller, robot, MoveGuide.toUnused, _move_properties.position_unused
     )

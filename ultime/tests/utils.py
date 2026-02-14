@@ -67,6 +67,7 @@ class RobotTestController:
     def run_command(self, cmd: Command, timeout: float):
         cmd.schedule()
         self.wait_until(lambda: not cmd.isScheduled(), timeout)
+        assert not cmd.isScheduled()
 
     def wait_one_frame(self):
         DriverStationSim.notifyNewData()
@@ -91,6 +92,8 @@ class RobotTestController:
             self.wait(delta)
             time += delta
             assert time < timeout, f"Condition was not reached within {timeout} seconds"
+
+        assert cond()
 
 
 @pytest.fixture(scope="function")

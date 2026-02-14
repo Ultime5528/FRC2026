@@ -51,8 +51,8 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
         putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUsed(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
