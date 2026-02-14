@@ -1,5 +1,4 @@
 import math
-from typing import List
 
 import wpilib
 import wpimath
@@ -7,7 +6,6 @@ from ntcore import NetworkTableInstance
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
 from wpilib import RobotBase
-from wpimath._controls._controls.controller import PIDController
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
 from wpimath.kinematics import (
@@ -24,7 +22,7 @@ from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
-from ultime.swerve import SwerveModule, SwerveDriveElasticSendable
+from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
 from ultime.timethis import tt
 
 
@@ -39,26 +37,15 @@ class Drivetrain(Subsystem):
     angular_offset_bl = autoproperty(3.14)
     angular_offset_br = autoproperty(1.57)
 
-    swerve_temperature_threshold = autoproperty(55.0)
-
     period_seconds = 0.02
-
-    p_gain_translation = 10.0
-    p_gain_rotation = 10.0
 
     def __init__(self) -> None:
         super().__init__()
-
         # Swerve Module motor positions
         self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
         self.motor_bl_loc = Translation2d(-self.width / 2, self.length / 2)
         self.motor_br_loc = Translation2d(-self.width / 2, -self.length / 2)
-
-        self.x_controller = PIDController(self.p_gain_translation, 0, 0)
-        self.y_controller = PIDController(self.p_gain_translation, 0, 0)
-        self.heading_controller = PIDController(self.p_gain_rotation, 0, 0)
-        self.heading_controller.enableContinuousInput(-math.pi, math.pi)
 
         self.swerve_module_fl = SwerveModule(
             ports.CAN.drivetrain_motor_driving_fl,
@@ -91,13 +78,6 @@ class Drivetrain(Subsystem):
             "BR": self.swerve_module_br,
         }
 
-        self.last_module_position = [
-            SwerveModulePosition(),
-            SwerveModulePosition(),
-            SwerveModulePosition(),
-            SwerveModulePosition(),
-        ]
-
         self.chassis_speed_goal_pub = (
             NetworkTableInstance.getDefault()
             .getStructTopic("Chassis Speed Goal", ChassisSpeeds)
@@ -110,7 +90,10 @@ class Drivetrain(Subsystem):
             .getStructTopic("Chassis Speed", ChassisSpeeds)
             .publish()
         )
-        self.chassis_speed = ChassisSpeeds()
+
+        self._estimated_pose: Pose2d = Pose2d()
+        self._estimated_angle: Rotation2d = Rotation2d()
+        self._chassis_speed: ChassisSpeeds = ChassisSpeeds()
 
         # Gyro
         """
@@ -119,6 +102,8 @@ class Drivetrain(Subsystem):
         self._gyro = ADIS16470()
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
+        self._gyro_angles_radians: float = 0.0
+        self._gyro_rotation2d: Rotation2d = Rotation2d()
 
         self._field = wpilib.Field2d()
         wpilib.SmartDashboard.putData("Field", self._field)
@@ -128,7 +113,7 @@ class Drivetrain(Subsystem):
             self.swerve_module_fr,
             self.swerve_module_bl,
             self.swerve_module_br,
-            lambda: self._gyro.getRotation2d().radians(),
+            lambda: self._gyro_angles_radians,
         )
         wpilib.SmartDashboard.putData("SwerveDrive", swerve_drive_sendable)
 
@@ -136,21 +121,31 @@ class Drivetrain(Subsystem):
         Pose estimation
         """
 
-        self.swervedrive_kinematics = SwerveDrive4Kinematics(
+        self.swerve_drive_kinematics = SwerveDrive4Kinematics(
             self.motor_fl_loc, self.motor_fr_loc, self.motor_bl_loc, self.motor_br_loc
         )
 
         self.swerve_odometry = SwerveDrive4Odometry(
-            self.swervedrive_kinematics,
-            self._gyro.getRotation2d(),
-            self.last_module_position,
+            self.swerve_drive_kinematics,
+            self._gyro_rotation2d,
+            (
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+            ),
             Pose2d(0, 0, 0),
         )
 
         self.swerve_estimator = SwerveDrive4PoseEstimator(
-            self.swervedrive_kinematics,
-            self._gyro.getRotation2d(),
-            self.last_module_position,
+            self.swerve_drive_kinematics,
+            self._gyro_rotation2d,
+            (
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+                SwerveModulePosition(),
+            ),
             Pose2d(0, 0, 0),
         )
 
@@ -160,15 +155,6 @@ class Drivetrain(Subsystem):
         """
         Alerts
         """
-
-        self.alerts_hot = {
-            location: self.createAlert(
-                f"{location} Swerve is too hot. Allow swerves to cool down.",
-                AlertType.Warning,
-            )
-            for location in self.swerve_modules.keys()
-        }
-
         self.alerts_faults = {
             location: self.createAlert(
                 f"{location} Swerve has active faults/warnings. Check for them on REV Hardware Client.",
@@ -176,26 +162,6 @@ class Drivetrain(Subsystem):
             )
             for location in self.swerve_modules.keys()
         }
-
-        self.alerts_drive_encoder = {
-            location: self.createAlert(
-                f"{location} Swerve Drive encoder measured velocity is too low.",
-                AlertType.Error,
-            )
-            for location in self.swerve_modules.keys()
-        }
-
-        self.alerts_turning_motor = {
-            location: self.createAlert(
-                f"{location} Swerve turning motor failed to reach desired state.",
-                AlertType.Error,
-            )
-            for location in self.swerve_modules.keys()
-        }
-
-        self.alert_odometry = self.createAlert(
-            "Odometry failed to calculate robot position accurately.", AlertType.Error
-        )
 
         if RobotBase.isSimulation():
             self.sim_yaw = 0
@@ -236,7 +202,7 @@ class Drivetrain(Subsystem):
 
         self.chassis_speed_goal_pub.set(corrected_chassis_speed)
 
-        swerve_module_states = self.swervedrive_kinematics.toSwerveModuleStates(
+        swerve_module_states = self.swerve_drive_kinematics.toSwerveModuleStates(
             corrected_chassis_speed
         )
 
@@ -260,20 +226,20 @@ class Drivetrain(Subsystem):
             swerve_module_states[3], ff.accelerationsMPS[3]
         )
 
-    def getGyroAngle(self):
+    def getGyroAngleRadians(self):
         """
         Wrapped between -180 and 180
         """
-        return self._gyro.getAngle()
+        return self._gyro_angles_radians
 
     def getEstimatedAngle(self):
-        return self.getPose().rotation()
+        return self._estimated_angle
 
     def resetGyro(self):
         self._gyro.reset()
 
     def getPose(self):
-        return self.swerve_estimator.getEstimatedPosition()
+        return self._estimated_pose
 
     def setForwardFormation(self):
         """
@@ -340,16 +306,15 @@ class Drivetrain(Subsystem):
         )
         return updated_speeds
 
-    def periodic(self):
-        rotation = self._gyro.getRotation2d()
-        swerve_positions = (
-            self.swerve_module_fl.getPosition(),
-            self.swerve_module_fr.getPosition(),
-            self.swerve_module_bl.getPosition(),
-            self.swerve_module_br.getPosition(),
-        )
+    def readInputs(self):
+        self.swerve_module_fl.readInputs()
+        self.swerve_module_fr.readInputs()
+        self.swerve_module_bl.readInputs()
+        self.swerve_module_br.readInputs()
 
-        chassis_speed = self.swervedrive_kinematics.toChassisSpeeds(
+        self._estimated_pose = self.swerve_estimator.getEstimatedPosition()
+        self._estimated_angle = self._estimated_pose.rotation()
+        self._chassis_speed = self.swerve_drive_kinematics.toChassisSpeeds(
             (
                 self.swerve_module_fl.getState(),
                 self.swerve_module_fr.getState(),
@@ -358,25 +323,25 @@ class Drivetrain(Subsystem):
             )
         )
 
-        self.chassis_speed_pub.set(chassis_speed)
-        self.chassis_speed = chassis_speed
-        self.swerve_estimator.update(rotation, swerve_positions)
-        self.swerve_odometry.update(rotation, swerve_positions)
+        self._gyro_angles_radians = self._gyro.getAngle()
+        self._gyro_rotation2d = self._gyro.getRotation2d()
+
+    def periodic(self):
+        swerve_positions = (
+            self.swerve_module_fl.getPosition(),
+            self.swerve_module_fr.getPosition(),
+            self.swerve_module_bl.getPosition(),
+            self.swerve_module_br.getPosition(),
+        )
+
+        self.chassis_speed_pub.set(self._chassis_speed)
+        self.swerve_estimator.update(self._gyro_rotation2d, swerve_positions)
+        self.swerve_odometry.update(self._gyro_rotation2d, swerve_positions)
 
         self.odometry_pose.setPose(self.swerve_odometry.getPose())
         self._field.setRobotPose(self.swerve_estimator.getEstimatedPosition())
 
         for location, swerve_module in self.swerve_modules.items():
-            if (
-                swerve_module._driving_motor.getMotorTemperature()
-                > self.swerve_temperature_threshold
-                or swerve_module._turning_motor.getMotorTemperature()
-                > self.swerve_temperature_threshold
-            ):
-                self.alerts_hot[location].set(True)
-            else:
-                self.alerts_hot[location].set(False)
-
             if (
                 swerve_module._driving_motor.hasActiveFault()
                 or swerve_module._turning_motor.hasActiveFault()
@@ -393,14 +358,7 @@ class Drivetrain(Subsystem):
         self.swerve_module_bl.simulationUpdate(self.period_seconds)
         self.swerve_module_br.simulationUpdate(self.period_seconds)
 
-        module_states = (
-            self.swerve_module_fl.getState(),
-            self.swerve_module_fr.getState(),
-            self.swerve_module_bl.getState(),
-            self.swerve_module_br.getState(),
-        )
-        chassis_speed = self.swervedrive_kinematics.toChassisSpeeds(module_states)
-        chassis_rotation_speed = chassis_speed.omega
+        chassis_rotation_speed = self._chassis_speed.omega
         self.sim_yaw += chassis_rotation_speed * self.period_seconds
         self._gyro.setSimAngle(math.degrees(self.sim_yaw))
 
@@ -408,18 +366,11 @@ class Drivetrain(Subsystem):
         """
         Returns robot relative chassis speeds from current swerve module states
         """
-        module_states = (
-            self.swerve_module_fl.getState(),
-            self.swerve_module_fr.getState(),
-            self.swerve_module_bl.getState(),
-            self.swerve_module_br.getState(),
-        )
-        chassis_speed = self.swervedrive_kinematics.toChassisSpeeds(module_states)
-        return chassis_speed
+        return self._chassis_speed
 
     def resetToPose(self, pose: Pose2d):
         self.swerve_estimator.resetPosition(
-            self._gyro.getRotation2d(),
+            self._gyro_rotation2d,
             (
                 self.swerve_module_fl.getPosition(),
                 self.swerve_module_fr.getPosition(),
@@ -447,7 +398,7 @@ class Drivetrain(Subsystem):
         def noop(_):
             pass
 
-        builder.addFloatProperty("GyroAngle", tt(self.getGyroAngle), noop)
+        builder.addFloatProperty("GyroAngle", tt(self.getGyroAngleRadians), noop)
         builder.addFloatProperty(
             "SpeedGoal",
             tt(

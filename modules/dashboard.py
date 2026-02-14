@@ -9,6 +9,7 @@ from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
+from ultime.log import Logger
 from ultime.module import Module, ModuleList
 
 
@@ -50,12 +51,12 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
         putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUsed(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
-            wpilib.SmartDashboard.putData(subsystem.getName(), subsystem)
+            Logger.getInstance().addLoggable(subsystem)
 
         wpilib.SmartDashboard.putData("Gyro", self._hardware.drivetrain._gyro)
         wpilib.SmartDashboard.putData(
