@@ -63,24 +63,24 @@ class MoveClimber(MoveLinear):
 
 
 class _PropertiesManual:
-    speed_up = autoproperty(0.25, subtable=ManualMoveClimber.__name__)
-    speed_down = autoproperty(-0.25, subtable=ManualMoveClimber.__name__)
+    speed_up = autoproperty(0.5, subtable=ManualMoveClimber.__name__)
+    speed_down = autoproperty(-0.5, subtable=ManualMoveClimber.__name__)
 
 
 _manual_move_properties = _PropertiesManual()
 
 
 class _PropertiesReset:
-    speed_up = autoproperty(0.25, subtable=ResetClimber.__name__)
-    speed_down = autoproperty(-0.25, subtable=ResetClimber.__name__)
+    speed_up = autoproperty(0.5, subtable=ResetClimber.__name__)
+    speed_down = autoproperty(-0.5, subtable=ResetClimber.__name__)
 
 
 _reset_properties = _PropertiesReset()
 
 
 class _PropertiesMove:
-    speed_up = autoproperty(0.25, subtable=MoveClimber.__name__)
-    speed_down = autoproperty(-0.25, subtable=MoveClimber.__name__)
+    speed_up = autoproperty(0.5, subtable=MoveClimber.__name__)
+    speed_down = autoproperty(-0.5, subtable=MoveClimber.__name__)
     accel = autoproperty(5.0, subtable=MoveClimber.__name__)
     position_climbed = autoproperty(0.295, subtable=MoveClimber.__name__)
     position_ready = autoproperty(0.295, subtable=MoveClimber.__name__)

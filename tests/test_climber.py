@@ -1,8 +1,9 @@
 from _pytest.python_api import approx
+from commands2 import Command
 from rev import SparkBase, SparkBaseConfig
 
 import ports
-from commands.climber.move import ResetClimber
+from commands.climber.move import ResetClimber, MoveClimber, _move_properties
 from robot import Robot
 from subsystems import climber
 from subsystems.climber import Climber
@@ -49,4 +50,39 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
     assert not climber.isSwitchMinPressed()
     assert climber.getPosition() == approx(0.0, abs=0.02)
     assert climber.hasReset()
-    assert climber._climber_motor.get() == 0.0
+    assert climber.getMotorOutput() == 0.0
+
+def _test_move_climber_common(robot_controller: RobotTestController, robot: Robot, cmd: Command, final_position: float):
+    climber = robot.hardware.climber
+
+    robot_controller.startTeleop()
+
+    cmd_reset_climber = ResetClimber.down(climber)
+    robot_controller.run_command(cmd_reset_climber, 10.0)
+    robot_controller.wait_one_frame()
+    assert not cmd_reset_climber.isScheduled()
+    assert climber.hasReset()
+
+    cmd.schedule()
+
+    robot_controller.wait_one_frame()
+    assert climber.getMotorOutput() > 0.0
+
+    robot_controller.run_command(cmd, 10.0)
+    robot_controller.wait_one_frame()
+
+    assert not cmd.isScheduled()
+    assert climber.getMotorOutput() == 0.0
+    assert climber.getPosition() == approx(final_position, abs=0.02)
+
+def test_move_climber_to_ready(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+    _test_move_climber_common(robot_controller, robot, MoveClimber.toReady(climber), _move_properties.position_ready)
+
+def test_move_climber_to_retracted(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+    _test_move_climber_common(robot_controller, robot, MoveClimber.toRetracted(climber), _move_properties.position_retracted)
+
+def test_move_climber_to_climbed(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+    _test_move_climber_common(robot_controller, robot, MoveClimber.toClimbed(climber), _move_properties.position_climbed)

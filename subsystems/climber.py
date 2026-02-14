@@ -17,7 +17,7 @@ class Climber(LinearSubsystem):
     position_hug_right = autoproperty(0.0)
     position_unhug_right = autoproperty(45.0)
     position_conversion_factor = autoproperty(0.2)
-    height_max = autoproperty(0.215)
+    height_max = autoproperty(0.295)
     hugging_time = autoproperty(2.0)
 
     def __init__(self):
