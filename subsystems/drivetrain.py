@@ -1,6 +1,7 @@
 import math
 import wpilib
 import wpimath
+from commands2 import ProfiledPIDCommand
 from ntcore import NetworkTableInstance
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
@@ -36,16 +37,10 @@ class Drivetrain(Subsystem):
     angular_offset_bl = autoproperty(3.14)
     angular_offset_br = autoproperty(1.57)
 
-    swerve_temperature_threshold = autoproperty(55.0)
-
     period_seconds = 0.02
-
-    p_gain_translation = 10.0
-    p_gain_rotation = 10.0
 
     def __init__(self) -> None:
         super().__init__()
-
         # Swerve Module motor positions
         self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
