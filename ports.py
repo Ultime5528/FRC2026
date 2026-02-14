@@ -30,8 +30,8 @@ class CAN(Immutable):
 
 class PWM(Immutable):
     guide_servo = 0
-    hugger_motor_left = 1
-    hugger_motor_right = 2
+    climber_servo_left = 1
+    climber_servo_right = 2
 
 
 class DIO(Immutable):

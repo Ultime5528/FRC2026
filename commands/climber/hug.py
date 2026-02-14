@@ -18,7 +18,7 @@ class Hug(Command):
         self.climber.hug()
 
     def isFinished(self) -> bool:
-        return self.timer.hasElapsed(self.climber.hugging_time)
+        return self.timer.hasElapsed(self.climber.delay_hug)
 
     def end(self, interrupted: bool):
         self.timer.stop()

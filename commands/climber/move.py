@@ -1,9 +1,6 @@
-import wpilib
-from commands2 import Command
-
 from subsystems.climber import Climber
-from ultime.linear import manualmovelinear, resetlinear, movelinear
 from ultime.autoproperty import autoproperty, FloatProperty
+from ultime.linear import manualmovelinear, resetlinear
 from ultime.linear.movelinear import MoveLinear
 
 _ManualMoveClimber = manualmovelinear.createManualMoveClass(

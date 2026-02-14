@@ -1,10 +1,7 @@
-from asyncio import wait
-
 from _pytest.python_api import approx
 from commands2 import Command
-from rev import SparkBase, SparkBaseConfig
+from rev import SparkBase
 
-import ports
 from commands.climber.hug import Hug
 from commands.climber.move import (
     ResetClimber,
@@ -14,8 +11,6 @@ from commands.climber.move import (
 )
 from commands.climber.unhug import Unhug
 from robot import Robot
-from subsystems import climber
-from subsystems.climber import Climber
 from ultime.switch import Switch
 from ultime.tests import RobotTestController
 
@@ -205,7 +200,7 @@ def hug_test(robot_controller: RobotTestController, robot: Robot):
     cmd = Hug(climber)
     cmd.schedule()
 
-    robot_controller.wait(climber.hugging_time)
+    robot_controller.wait(climber.delay_hug)
     assert cmd.isFinished()
 
 
@@ -215,5 +210,5 @@ def unhug_test(robot_controller: RobotTestController, robot: Robot):
     cmd = Unhug(climber)
     cmd.schedule()
 
-    robot_controller.wait(climber.hugging_time)
+    robot_controller.wait(climber.delay_hug)
     assert cmd.isFinished()

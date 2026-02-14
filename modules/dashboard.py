@@ -38,7 +38,7 @@ class DashboardModule(Module):
 
     def setupCommands(self, hardware):
         """
-        Groups
+        Drivetrain
         """
         # putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, ))
         putCommandOnDashboard("Drivetrain", DriveRelative.left(hardware.drivetrain))
@@ -49,7 +49,7 @@ class DashboardModule(Module):
         )
 
         """
-        GUIDE
+        Guide
         """
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
@@ -58,7 +58,7 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
 
         """
-        CLIMBER
+        Climber
         """
         putCommandOnDashboard("Climber", ManualMoveClimber.up(hardware.climber))
         putCommandOnDashboard("Climber", ManualMoveClimber.down(hardware.climber))

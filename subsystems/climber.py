@@ -1,8 +1,8 @@
 import wpilib
-from wpiutil import SendableBuilder
 from rev import SparkMax, SparkMaxSim
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
+from wpiutil import SendableBuilder
 
 import ports
 from ultime.autoproperty import autoproperty
@@ -11,40 +11,31 @@ from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
-
     position_hug_left = autoproperty(-45.0)
     position_unhug_left = autoproperty(0.0)
     position_hug_right = autoproperty(0.0)
     position_unhug_right = autoproperty(45.0)
+    delay_hug = autoproperty(2.0)
+
     position_conversion_factor = autoproperty(0.2)
     height_max = autoproperty(0.295)
-    hugging_time = autoproperty(2.0)
 
     def __init__(self):
-
-        sim_initial_position = self.height_max
-        should_reset_min = True
-        should_reset_max = False
-        should_block_min_position = True
-        should_block_max_position = True
-        sim_motor_to_distance_factor = self.position_conversion_factor
-        sim_gravity = 0.0
-
         super().__init__(
-            sim_initial_position,
-            should_reset_min,
-            should_reset_max,
-            should_block_min_position,
-            should_block_max_position,
-            sim_motor_to_distance_factor,
-            sim_gravity,
+            sim_initial_position=self.height_max,
+            should_reset_min=True,
+            should_reset_max=False,
+            should_block_min_position=False,
+            should_block_max_position=True,
+            sim_motor_to_distance_factor=1.0,
+            sim_gravity=0.0,
         )
 
         self._climber_motor = SparkMax(
             ports.CAN.climber_motor, SparkMax.MotorType.kBrushless
         )
-        self._hugger_motor_left = wpilib.Servo(ports.PWM.hugger_motor_left)
-        self._hugger_motor_right = wpilib.Servo(ports.PWM.hugger_motor_right)
+        self._hugger_motor_left = wpilib.Servo(ports.PWM.climber_servo_left)
+        self._hugger_motor_right = wpilib.Servo(ports.PWM.climber_servo_right)
         self._climber_encoder = self._climber_motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
 
@@ -62,7 +53,7 @@ class Climber(LinearSubsystem):
         return self._switch.isPressed()
 
     def isSwitchMaxPressed(self) -> bool:
-        pass
+        return False
 
     def getEncoderPosition(self) -> float:
         return self._climber_encoder.getPosition()
