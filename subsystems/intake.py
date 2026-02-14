@@ -1,9 +1,7 @@
 import rev
-import wpilib
 from rev import SparkMaxSim
 from wpilib._wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
-from wpiutil import SendableBuilder
 
 import ports
 from ultime.autoproperty import autoproperty
@@ -27,12 +25,8 @@ class Intake(LinearSubsystem):
         self.motor_feeder = rev.SparkMax(
             ports.CAN.intake_motor_intake, rev.SparkMax.MotorType.kBrushless
         )
-        self._switch_min = Switch(
-            Switch.Type.NormallyOpen, ports.DIO.intake_switch_min
-        )
-        self._switch_max = Switch(
-            Switch.Type.NormallyOpen, ports.DIO.intake_switch_max
-        )
+        self._switch_min = Switch(Switch.Type.NormallyOpen, ports.DIO.intake_switch_min)
+        self._switch_max = Switch(Switch.Type.NormallyOpen, ports.DIO.intake_switch_max)
 
         if RobotBase.isSimulation():
             self._motor_pivot_sim = SparkMaxSim(self._motor_pivot, DCMotor.NEO(1))

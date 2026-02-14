@@ -1,8 +1,7 @@
 from subsystems.guide import Guide
-from ultime.linear import manualmovelinear, resetlinear, movelinear
 from ultime.autoproperty import autoproperty, FloatProperty
+from ultime.linear import manualmovelinear, resetlinear
 from ultime.linear.movelinear import MoveLinear
-
 
 _ManualMoveGuide = manualmovelinear.createManualMoveClass(
     lambda: manual_move_properties.speed_up,

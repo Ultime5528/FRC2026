@@ -1,24 +1,27 @@
-from ultime.linear import manualmovelinear, resetlinear, movelinear
-from ultime.autoproperty import autoproperty, FloatProperty
-from ultime.linear.movelinear import MoveLinear
 from subsystems.intake import Intake
-
+from ultime.autoproperty import autoproperty, FloatProperty
+from ultime.linear import manualmovelinear, resetlinear
+from ultime.linear.movelinear import MoveLinear
 
 _ManualMoveIntake = manualmovelinear.createManualMoveClass(
     lambda: manual_move_properties.speed_up,
     lambda: manual_move_properties.speed_down,
 )
 
+
 class ManualMoveIntake(_ManualMoveIntake):
     pass
+
 
 _ResetIntake = resetlinear.createResetLinearClass(
     lambda: reset_properties.speed_up,
     lambda: reset_properties.speed_down,
 )
 
+
 class ResetIntake(_ResetIntake):
     pass
+
 
 class MoveIntake(MoveLinear):
     @classmethod

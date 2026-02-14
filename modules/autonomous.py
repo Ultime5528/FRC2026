@@ -6,7 +6,7 @@ from commands2 import Command
 from pathplannerlib.auto import NamedCommands, AutoBuilder
 from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.controller import PPHolonomicDriveController
-from wpilib import DriverStation, SmartDashboard, SendableChooser
+from wpilib import DriverStation, SendableChooser
 
 from modules.hardware import HardwareModule
 from ultime.command import WaitCommand

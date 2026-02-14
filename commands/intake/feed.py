@@ -1,8 +1,8 @@
-from ultime.command import Command
 from subsystems.intake import Intake
+from ultime.command import Command
 
 
-class Roll(Command):
+class Feed(Command):
 
     def __init__(self, intake: Intake):
         super().__init__()

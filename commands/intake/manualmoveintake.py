@@ -31,7 +31,9 @@ class ManualMoveIntake(Command):
     def end(self, interrupted: bool):
         self.intake.stop_pivot()
 
+
 class _ClassProperties:
-        speed = autoproperty(0.15, subtable=ManualMoveIntake.__name__)
+    speed = autoproperty(0.15, subtable=ManualMoveIntake.__name__)
+
 
 manual_move_properties = _ClassProperties()
