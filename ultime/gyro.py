@@ -8,6 +8,7 @@ from wpimath.geometry import Rotation2d
 from wpiutil import Sendable, SendableBuilder
 
 from ultime.autoproperty import autoproperty, defaultSetter
+from ultime.modulerobot import is_real
 from ultime.timethis import tt
 
 
@@ -132,7 +133,7 @@ class ADIS16470(Gyro):
         self._gyro_sim_pitch.set(pitch)
 
     def calibrate(self):
-        if wpilib.RobotBase.isReal():
+        if is_real:
             self.gyro.calibrate()
 
     def initSendable(self, builder: SendableBuilder) -> None:

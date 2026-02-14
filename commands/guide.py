@@ -4,8 +4,8 @@ from ultime.linear import manualmovelinear, resetlinear
 from ultime.linear.movelinear import MoveLinear
 
 _ManualMoveGuide = manualmovelinear.createManualMoveClass(
-    lambda: manual_move_properties.speed_up,
-    lambda: manual_move_properties.speed_down,
+    lambda: _manual_move_properties.speed_up,
+    lambda: _manual_move_properties.speed_down,
 )
 
 
@@ -14,8 +14,8 @@ class ManualMoveGuide(_ManualMoveGuide):
 
 
 _ResetGuide = resetlinear.createResetLinearClass(
-    lambda: reset_properties.speed_up,
-    lambda: reset_properties.speed_down,
+    lambda: _reset_properties.speed_up,
+    lambda: _reset_properties.speed_down,
 )
 
 
@@ -28,7 +28,7 @@ class MoveGuide(MoveLinear):
     def toOpen(cls, guide: Guide):
         cmd = cls(
             guide,
-            lambda: move_properties.position_open,
+            lambda: _move_properties.position_open,
         )
         cmd.setName(cls.__name__ + ".toOpen")
         return cmd
@@ -37,18 +37,18 @@ class MoveGuide(MoveLinear):
     def toClose(cls, guide: Guide):
         cmd = cls(
             guide,
-            lambda: move_properties.position_close,
+            lambda: _move_properties.position_close,
         )
-        cmd.setName(cls.__name__ + ".toOpen")
+        cmd.setName(cls.__name__ + ".toClose")
         return cmd
 
     def __init__(self, guide: Guide, end_position: FloatProperty):
         super().__init__(
             guide,
             end_position,
-            lambda: move_properties.speed_min,
-            lambda: move_properties.speed_max,
-            lambda: move_properties.accel,
+            lambda: _move_properties.speed_min,
+            lambda: _move_properties.speed_max,
+            lambda: _move_properties.accel,
         )
 
 
@@ -57,7 +57,7 @@ class _PropertiesManual:
     speed_down = autoproperty(-0.25, subtable=ManualMoveGuide.__name__)
 
 
-manual_move_properties = _PropertiesManual()
+_manual_move_properties = _PropertiesManual()
 
 
 class _PropertiesReset:
@@ -65,7 +65,7 @@ class _PropertiesReset:
     speed_down = autoproperty(-0.25, subtable=ResetGuide.__name__)
 
 
-reset_properties = _PropertiesReset()
+_reset_properties = _PropertiesReset()
 
 
 class _PropertiesMove:
@@ -77,4 +77,4 @@ class _PropertiesMove:
     position_close = autoproperty(1.0, subtable=MoveGuide.__name__)
 
 
-move_properties = _PropertiesMove()
+_move_properties = _PropertiesMove()

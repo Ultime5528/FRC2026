@@ -84,7 +84,7 @@ class DriveField(Command):
             y_speed *= self.speed_rate
             rot_speed *= self.speed_rate
 
-        self.drivetrain.drive(x_speed, y_speed, rot_speed, True)
+        self.drivetrain.driveFromStickInputs(x_speed, y_speed, rot_speed, True)
 
     def end(self, interrupted: bool) -> None:
         self.drivetrain.stop()

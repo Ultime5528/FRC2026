@@ -1,6 +1,6 @@
 from _pytest.python_api import approx
 
-from commands.guide import ResetGuide, MoveGuide, move_properties
+from commands.guide import ResetGuide, MoveGuide, _move_properties
 from robot import Robot
 from ultime.switch import Switch
 from ultime.tests import RobotTestController
@@ -68,11 +68,11 @@ def common_test_moveGuide_from_switch_down(
 
 def test_moveGuide_toOpen(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
-        robot_controller, robot, MoveGuide.toOpen, move_properties.position_open
+        robot_controller, robot, MoveGuide.toOpen, _move_properties.position_open
     )
 
 
 def test_moveGuide_toClose(robot_controller: RobotTestController, robot: Robot):
     common_test_moveGuide_from_switch_down(
-        robot_controller, robot, MoveGuide.toClose, move_properties.position_close
+        robot_controller, robot, MoveGuide.toClose, _move_properties.position_close
     )

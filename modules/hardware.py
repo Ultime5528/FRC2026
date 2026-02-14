@@ -3,10 +3,8 @@ from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
-from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from subsystems.guide import Guide
 from ultime.module import Module
-from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
 
 
@@ -19,10 +17,7 @@ class HardwareModule(Module):
         self.panel_1 = commands2.button.CommandJoystick(1)
         self.panel_2 = commands2.button.CommandJoystick(2)
 
-        if is_simulation:
-            self.drivetrain = Drivetrain(DrivetrainIoSim())
-        else:
-            self.drivetrain = Drivetrain(DrivetrainIo())
+        self.drivetrain = Drivetrain()
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.guide = self.addSubsystem(Guide())
