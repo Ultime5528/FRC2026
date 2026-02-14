@@ -25,15 +25,20 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
+    climber_motor = 9
+
 
 class PWM(Immutable):
     guide_servo = 0
+    climber_servo_left = 1
+    climber_servo_right = 2
 
 
 class DIO(Immutable):
     guide_switch = 0
     guide_encoder_a = 1
     guide_encoder_b = 2
+    climber_switch = 3
 
 
 class PDP(Immutable):

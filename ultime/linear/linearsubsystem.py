@@ -154,6 +154,8 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(False)
 
     def initSendable(self, builder: SendableBuilder) -> None:
+        super().initSendable(builder)
+
         def setHasReset(value: bool) -> None:
             self._has_reset = value
 

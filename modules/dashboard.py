@@ -3,6 +3,9 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.climber.hug import Hug
+from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.climber.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
@@ -35,7 +38,7 @@ class DashboardModule(Module):
 
     def setupCommands(self, hardware):
         """
-        Groups
+        Drivetrain
         """
         # putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, ))
         putCommandOnDashboard("Drivetrain", DriveRelative.left(hardware.drivetrain))
@@ -46,13 +49,25 @@ class DashboardModule(Module):
         )
 
         """
-        GUIDE
+        Guide
         """
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
         putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
         putCommandOnDashboard("Guide", MoveGuide.toUsed(hardware.guide))
         putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
+
+        """
+        Climber
+        """
+        putCommandOnDashboard("Climber", ManualMoveClimber.up(hardware.climber))
+        putCommandOnDashboard("Climber", ManualMoveClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", ResetClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
+        putCommandOnDashboard("Climber", Hug(hardware.climber))
+        putCommandOnDashboard("Climber", Unhug(hardware.climber))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
