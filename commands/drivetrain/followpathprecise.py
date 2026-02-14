@@ -4,6 +4,7 @@ from pathplannerlib.path import PathPlannerPath
 from commands.drivetrain.alignpreciseafterpath import AlignPreciseAfterPath
 from subsystems.drivetrain import Drivetrain
 
+
 class FollowPathPrecise(SequentialCommandGroup):
     def __init__(self, drivetrain: Drivetrain, path: PathPlannerPath):
         super().__init__()
@@ -13,5 +14,5 @@ class FollowPathPrecise(SequentialCommandGroup):
 
         self.addCommands(
             self.drivetrain.getFollowCommand(self.path),
-            AlignPreciseAfterPath(self.drivetrain, self.path)
+            AlignPreciseAfterPath(self.drivetrain, self.path),
         )

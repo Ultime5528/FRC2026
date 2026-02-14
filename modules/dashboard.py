@@ -46,7 +46,9 @@ class DashboardModule(Module):
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
         path = PathPlannerPath.fromPathFile("Test")
-        putCommandOnDashboard("Drivetrain", FollowPathPrecise(hardware.drivetrain, path))
+        putCommandOnDashboard(
+            "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
+        )
 
         """
         GUIDE

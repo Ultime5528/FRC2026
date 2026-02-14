@@ -26,7 +26,9 @@ class AlignPreciseAfterPath(Command):
         else:
             path = self.path
 
-        self.after_path_goal = Pose2d(path.getPathPoses()[-1].translation(), path.getGoalEndState().rotation)
+        self.after_path_goal = Pose2d(
+            path.getPathPoses()[-1].translation(), path.getGoalEndState().rotation
+        )
         self.pathplanner_trajectory.pose = self.after_path_goal
 
     def execute(self):
@@ -43,5 +45,8 @@ class AlignPreciseAfterPath(Command):
             .distance(self.after_path_goal.translation())
             < self.distance_threshold
         ) and (
-            self.drivetrain.getEstimatedAngle().relativeTo(self.after_path_goal.rotation()).degrees() < self.rotation_threshold
+            self.drivetrain.getEstimatedAngle()
+            .relativeTo(self.after_path_goal.rotation())
+            .degrees()
+            < self.rotation_threshold
         )
