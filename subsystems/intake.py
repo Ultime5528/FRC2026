@@ -12,9 +12,7 @@ from ultime.switch import Switch
 
 
 class Intake(LinearSubsystem):
-    speed_intake = autoproperty(0.5)
-    speed_pivot_retreat = autoproperty(0.5)
-    speed_pivot_deploy = autoproperty(-0.5)
+    speed_feeder = autoproperty(0.5)
     maintain = autoproperty(0.2)
     min_position = autoproperty(0.0)
     max_position = autoproperty(5.0)
@@ -40,13 +38,13 @@ class Intake(LinearSubsystem):
             self._motor_pivot_sim = SparkMaxSim(self._motor_pivot, DCMotor.NEO(1))
             self._encoder_sim = self._motor_pivot_sim.getRelativeEncoderSim()
 
-    def roll_intake(self):
-        self.motor_feeder.set(self.speed_intake)
+    def feed(self):
+        self.motor_feeder.set(self.speed_feeder)
 
     def maintainer(self):
         self._motor_pivot.set(self.maintain)
 
-    def stop_intake(self):
+    def stop_feeder(self):
         self.motor_feeder.stopMotor()
 
     def stop_pivot(self):

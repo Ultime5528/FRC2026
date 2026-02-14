@@ -9,10 +9,10 @@ class Roll(Command):
         self.intake = intake
 
     def execute(self):
-        self.intake.roll_intake()
+        self.intake.feed()
 
     def isFinished(self) -> bool:
         return False
 
     def end(self, interrupted: bool):
-        self.intake.stop_intake()
+        self.intake.stop_feeder()

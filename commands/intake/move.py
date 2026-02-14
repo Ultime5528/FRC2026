@@ -17,28 +17,26 @@ _ResetIntake = resetlinear.createResetLinearClass(
     lambda: reset_properties.speed_down,
 )
 
-
 class ResetIntake(_ResetIntake):
     pass
 
-
 class MoveIntake(MoveLinear):
     @classmethod
-    def moveUp(cls, intake: Intake):
+    def toUp(cls, intake: Intake):
         cmd = cls(
             intake,
             lambda: move_properties.position_up,
         )
-        cmd.setName(cls.__name__ + ".moveUp")
+        cmd.setName(cls.__name__ + ".toUp")
         return cmd
 
     @classmethod
-    def moveDown(cls, intake: Intake):
+    def toDown(cls, intake: Intake):
         cmd = cls(
             intake,
             lambda: move_properties.position_down,
         )
-        cmd.setName(cls.__name__ + ".moveDown")
+        cmd.setName(cls.__name__ + ".toDown")
         return cmd
 
     def __init__(self, intake: Intake, end_position: FloatProperty):

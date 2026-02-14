@@ -6,8 +6,9 @@ from wpilib import SmartDashboard
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
-from commands.intake.move import MoveIntake, ResetIntake
-from commands.intake.roll import Roll
+from commands.intake.move import MoveIntake, ResetIntake, ManualMoveIntake
+from commands.intake.feed import Roll
+from commands.intake.manualmoveintake import ManualMoveIntake
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -59,9 +60,13 @@ class DashboardModule(Module):
         Intake
         """
         putCommandOnDashboard("Intake", Roll(hardware.intake))
-        putCommandOnDashboard("Intake", MoveIntake.moveUp(hardware.intake))
-        putCommandOnDashboard("Intake", MoveIntake.moveDown(hardware.intake))
+        putCommandOnDashboard("Intake", MoveIntake.toUp(hardware.intake))
+        putCommandOnDashboard("Intake", MoveIntake.toDown(hardware.intake))
         putCommandOnDashboard("Intake", ResetIntake.up(hardware.intake))
+        putCommandOnDashboard("Intake", ManualMoveIntake.up(hardware.intake))
+        putCommandOnDashboard("Intake", ManualMoveIntake.down(hardware.intake))
+
+
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
