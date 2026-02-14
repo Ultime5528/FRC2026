@@ -1,6 +1,6 @@
 import math
 
-from rev import SparkMaxConfig, ClosedLoopConfig, SparkBaseConfig, FeedbackSensor
+from rev import SparkMaxConfig, SparkBaseConfig, FeedbackSensor
 
 max_speed_per_second = 4
 max_angular_speed = 2 * math.pi

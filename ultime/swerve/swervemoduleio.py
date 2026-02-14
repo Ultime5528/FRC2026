@@ -11,7 +11,6 @@ from rev import (
     SparkClosedLoopController,
     SparkSim,
 )
-from wpilib import RobotBase
 from wpilib.simulation import RoboRioSim
 from wpimath._controls._controls.plant import DCMotor
 from wpimath.geometry import Rotation2d

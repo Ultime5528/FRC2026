@@ -57,7 +57,13 @@ class Loggable:
 
 
 class LogValue[T]:
-    def __init__(self, key: str, initial_value: T, subscribe = False, inst: NetworkTableInstance = None):
+    def __init__(
+        self,
+        key: str,
+        initial_value: T,
+        subscribe=False,
+        inst: NetworkTableInstance = None,
+    ):
         self._key = key
         self._value = initial_value
         self._type = type(initial_value)
@@ -82,7 +88,9 @@ class LogValue[T]:
 
         self._sub = None
         if subscribe:
-            self._sub = self._topic.subscribe(self._value, PubSubOptions(pollStorage=1, disableLocal=True))
+            self._sub = self._topic.subscribe(
+                self._value, PubSubOptions(pollStorage=1, disableLocal=True)
+            )
 
     def flush(self):
         if self._has_changed:

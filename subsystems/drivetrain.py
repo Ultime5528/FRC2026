@@ -6,7 +6,7 @@ import wpimath
 from ntcore import NetworkTableInstance
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase, SmartDashboard
+from wpilib import RobotBase
 from wpimath._controls._controls.controller import PIDController
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
@@ -19,13 +19,12 @@ from wpimath.kinematics import (
 )
 from wpiutil import SendableBuilder
 
-import ports
+from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
-from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
 from ultime.timethis import tt
 
 

@@ -11,7 +11,6 @@ from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
 from ultime.log import Logger
 from ultime.module import Module, ModuleList
-from ultime.modulerobot import ModuleRobot
 
 
 class DashboardModule(Module):

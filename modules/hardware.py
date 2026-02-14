@@ -1,13 +1,13 @@
 import commands2
-from wpilib import PowerDistribution, RobotBase
+from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
 from subsystems.drivetrain import Drivetrain
-from subsystems.guide import Guide
 from subsystems.drivetrainio import DrivetrainIo, DrivetrainIoSim
+from subsystems.guide import Guide
 from ultime.module import Module
-from ultime.subsystem import Subsystem
 from ultime.modulerobot import is_simulation
+from ultime.subsystem import Subsystem
 
 
 class HardwareModule(Module):

@@ -17,7 +17,6 @@ from typing import List, Optional
 import ntcore
 from wpimath.geometry import Pose3d, Translation3d, Rotation3d, Quaternion
 
-
 # Import generated protobuf classes
 from .generated import commands_pb2
 from .generated import data_pb2
