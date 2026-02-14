@@ -55,9 +55,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">99 statements &nbsp;</span>
+            <span class="text">100 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">35<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">64<span class="text"> missing</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">65<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
             <button type="button" class="par run show_par button_toggle_par" value="par" data-shortcut="p" title="Toggle lines partially run">0<span class="text"> partial</span></button>
         </h2>
@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_12a22b4e9b903ff2_manualmovelinear_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-02-14 20:53 +0000
+            created at 2026-02-14 21:17 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -238,17 +238,19 @@
     <p class="mis show_mis"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">setSimSwitchMaxPressed</span><span class="op">(</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">    <span class="key">def</span> <span class="nam">initSendable</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">builder</span><span class="op">:</span> <span class="nam">SendableBuilder</span><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">        <span class="key">def</span> <span class="nam">setHasReset</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">bool</span><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">_has_reset</span> <span class="op">=</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">            <span class="str">"switch_min_pressed"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">isSwitchMinPressed</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">            <span class="str">"switch_max_pressed"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">isSwitchMaxPressed</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis mis2 show_mis"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addDoubleProperty</span><span class="op">(</span><span class="str">"position"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">getPosition</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span><span class="str">"has_reset"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">hasReset</span><span class="op">,</span> <span class="nam">setHasReset</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">initSendable</span><span class="op">(</span><span class="nam">builder</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">        <span class="key">def</span> <span class="nam">setHasReset</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">bool</span><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">_has_reset</span> <span class="op">=</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">            <span class="str">"switch_min_pressed"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">isSwitchMinPressed</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">            <span class="str">"switch_max_pressed"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">isSwitchMaxPressed</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis mis2 show_mis"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addDoubleProperty</span><span class="op">(</span><span class="str">"position"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">getPosition</span><span class="op">,</span> <span class="key">lambda</span> <span class="nam">_</span><span class="op">:</span> <span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t">        <span class="nam">builder</span><span class="op">.</span><span class="nam">addBooleanProperty</span><span class="op">(</span><span class="str">"has_reset"</span><span class="op">,</span> <span class="nam">self</span><span class="op">.</span><span class="nam">hasReset</span><span class="op">,</span> <span class="nam">setHasReset</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -258,7 +260,7 @@
             <a class="nav" href="z_12a22b4e9b903ff2_manualmovelinear_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-02-14 20:53 +0000
+            created at 2026-02-14 21:17 +0000
         </p>
     </div>
 </footer>
