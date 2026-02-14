@@ -188,12 +188,6 @@ class Drivetrain(Subsystem):
             "Odometry failed to calculate robot position accurately.", AlertType.Error
         )
 
-        self.pubs = []
-
-        for i in range(1000):
-            topic = NetworkTableInstance.getDefault().getDoubleTopic("test-" + str(i))
-            self.pubs.append(topic.publish())
-
         if RobotBase.isSimulation():
             self.sim_yaw = 0
 
@@ -345,13 +339,6 @@ class Drivetrain(Subsystem):
         return updated_speeds
 
     def periodic(self):
-
-        #for i in range(1000):
-        #    SmartDashboard.putNumber("test-" + str(i), wpilib.getTime() + i)
-
-        for i in range(1000):
-            self.pubs[i].set(wpilib.getTime() + i)
-
         rotation = self._gyro.getRotation2d()
         swerve_positions = (
             self.swerve_module_fl.getPosition(),
