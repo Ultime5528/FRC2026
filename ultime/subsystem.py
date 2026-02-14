@@ -8,6 +8,9 @@ from ultime.timethis import tt
 
 
 class Subsystem(AlertCreator, commands2.Subsystem):
+    def readInputs(self):
+        pass
+
     def initSendable(self, builder: SendableBuilder) -> None:
         super().initSendable(builder)
 

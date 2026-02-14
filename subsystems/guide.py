@@ -3,15 +3,17 @@ from wpilib import RobotBase
 from wpilib.simulation import EncoderSim
 
 import ports
-from subsystems.guideio import GuideIO
 from ultime.autoproperty import autoproperty
 from ultime.linear.linearsubsystem import LinearSubsystem
-from ultime.modulerobot import is_simulation
+from ultime.switch import Switch
 
 
 class Guide(LinearSubsystem):
     position_min = autoproperty(0.0)
     position_max = autoproperty(90.0)
+
+    position_unuse = autoproperty(0.0)
+    position_use = autoproperty(90.0)
 
     position_conversion_factor = autoproperty(1.0)
 
@@ -24,14 +26,23 @@ class Guide(LinearSubsystem):
             should_block_max_position=True,
             sim_motor_to_distance_factor=100.0,
         )
+        self._motor_output: float = 0.0
+        self._encoder_position: float = 0.0
+        self._switch_pressed: bool = False
 
-        self._io = GuideIO()
-        self._inputs = self._io.inputs
-        self._outputs = self._io.outputs
+        self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
+        self._motor.setInverted(False)
+        self._encoder = wpilib.Encoder(
+            ports.DIO.guide_encoder_a, ports.DIO.guide_encoder_b
+        )
+        self._min_switch = Switch(Switch.Type.NormallyOpen, ports.DIO.guide_switch)
 
-        if is_simulation:
-            encoder = self._io._encoder
-            self._sim_encoder = EncoderSim(encoder)
+        if RobotBase.isSimulation():
+            self._sim_encoder = EncoderSim(self._encoder)
+
+    def readInputs(self):
+        self._encoder_position = self._encoder.get()
+        self._switch_pressed = self._min_switch.isPressed()
 
     def getMinPosition(self) -> float:
         return self.position_min
@@ -40,19 +51,19 @@ class Guide(LinearSubsystem):
         return self.position_max
 
     def setSimSwitchMinPressed(self, pressed: bool) -> None:
-        self._io._min_switch.setSimValue(pressed)
+        self._min_switch.setSimValue(pressed)
 
     def setSimSwitchMaxPressed(self, pressed: bool) -> None:
         pass
 
     def isSwitchMinPressed(self) -> bool:
-        return self._inputs.switch_pressed
+        return self._switch_pressed
 
     def isSwitchMaxPressed(self) -> bool:
         return False
 
     def getEncoderPosition(self) -> float:
-        return self._inputs.encoder_position
+        return self._encoder_position
 
     def getPositionConversionFactor(self):
         return self.position_conversion_factor
@@ -61,7 +72,7 @@ class Guide(LinearSubsystem):
         self._sim_encoder.setCount(int(position))
 
     def _setMotorOutput(self, speed: float) -> None:
-        self._outputs.motor_output = speed
+        self._motor.set(speed)
 
     def getMotorOutput(self) -> float:
-        return self._inputs.motor_output
+        return self._motor.get()

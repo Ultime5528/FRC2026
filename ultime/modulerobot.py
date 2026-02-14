@@ -7,7 +7,7 @@ import wpilib
 from commands2 import CommandScheduler
 from ntcore import NetworkTableInstance
 from robotpy_ext.misc import NotifierDelay
-from wpilib import RobotBase, Watchdog, SmartDashboard
+from wpilib import Watchdog, SmartDashboard
 
 from ultime.module import ModuleList, Module
 
@@ -24,8 +24,6 @@ class ModuleRobot(wpilib.RobotBase):
         kTest = auto()
 
     period: Final[float] = 0.02
-
-    ios = weakref.WeakSet()
 
     def __init__(self):
         super().__init__()
@@ -56,6 +54,10 @@ class ModuleRobot(wpilib.RobotBase):
         #    self.called_ds_connected = True
         #    self.driveStationConnected()
 
+        for subsystem in CommandScheduler.getInstance()._subsystems.keys():
+            subsystem.readInputs()
+        self._watchdog.addEpoch("ReadInputs()")
+
         # si le mode change, appeler les fonctions de sortie et d'entrée
         if self._last_mode is not mode:
             # fonctions de sortie
@@ -84,11 +86,6 @@ class ModuleRobot(wpilib.RobotBase):
 
             self._last_mode = mode
 
-        for io in self.ios:
-            io.updateInputs()
-
-        self._watchdog.addEpoch("io.updateInputs()")
-
         # appeler les fonctions correspondantes au mode du robot
         if mode is ModuleRobot.Mode.kDisable:
             hal.observeUserProgramDisabled()
@@ -114,11 +111,6 @@ class ModuleRobot(wpilib.RobotBase):
         self._watchdog.addEpoch("CommandScheduler.run()")
 
         # TODO log everything
-
-        for io in self.ios:
-            io.sendOutputs()
-
-        self._watchdog.addEpoch("io.sendOutputs()")
 
         SmartDashboard.updateValues()
         self._watchdog.addEpoch("SmartDashboard.updateValues()")

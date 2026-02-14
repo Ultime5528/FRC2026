@@ -9,15 +9,15 @@ from ultime.tests import RobotTestController
 def test_ports(robot: Robot):
     guide = robot.hardware.guide
 
-    assert guide._io._motor.getChannel() == 0
-    assert guide._io._min_switch.getChannel() == 0
+    assert guide._motor.getChannel() == 0
+    assert guide._min_switch.getChannel() == 0
 
 
 def test_settings(robot: Robot):
     guide = robot.hardware.guide
 
-    assert guide._io._min_switch.getType() == Switch.Type.NormallyOpen
-    assert not guide._io._motor.getInverted()
+    assert guide._min_switch.getType() == Switch.Type.NormallyOpen
+    assert not guide._motor.getInverted()
 
 
 def test_reset_command(robot_controller: RobotTestController, robot: Robot):

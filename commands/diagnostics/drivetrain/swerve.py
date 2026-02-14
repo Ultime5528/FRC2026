@@ -8,7 +8,7 @@ from wpimath.kinematics import SwerveModuleState
 from ultime.alert import Alert
 from ultime.autoproperty import autoproperty
 from ultime.proxy import proxy
-from ultime.swerve import SwerveModule
+from ultime.swerve.swerve import SwerveModule
 
 
 class DiagnoseSwerveModuleTurnEncoder(Command):
