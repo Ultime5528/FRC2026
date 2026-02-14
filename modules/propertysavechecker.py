@@ -1,6 +1,6 @@
 import wpilib
 from ntcore import NetworkTableInstance
-from wpilib import DriverStation, Timer, RobotBase
+from wpilib import DriverStation, Timer
 
 from properties import loop_delay, entry_name_check_time, entry_name_check_mirror
 from ultime.autoproperty import mode, PropertyMode

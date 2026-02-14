@@ -1,4 +1,3 @@
-import weakref
 from enum import Enum, auto
 from typing import Final
 
@@ -109,7 +108,6 @@ class ModuleRobot(wpilib.RobotBase):
 
         CommandScheduler.getInstance().run()
         self._watchdog.addEpoch("CommandScheduler.run()")
-
 
         if is_simulation:
             hal.simPeriodicBefore()

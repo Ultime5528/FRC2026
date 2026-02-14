@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import Optional
 
-from wpilib import DigitalInput, RobotBase
+from wpilib import DigitalInput
 from wpilib.simulation import DIOSim
 
 from ultime.modulerobot import is_simulation, is_real

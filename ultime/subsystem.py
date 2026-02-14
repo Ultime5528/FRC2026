@@ -2,7 +2,6 @@ import commands2
 from wpiutil import SendableBuilder
 
 from ultime.alert import AlertCreator
-from ultime.log import Loggable
 from ultime.timethis import tt
 
 
