@@ -4,9 +4,13 @@ from typing import List
 import wpilib
 import wpimath
 from ntcore import NetworkTableInstance
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import PIDConstants, RobotConfig
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.path import PathPlannerPath
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase
+from wpilib import RobotBase, DriverStation
 from wpimath._controls._controls.controller import PIDController
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
@@ -31,6 +35,8 @@ from ultime.timethis import tt
 class Drivetrain(Subsystem):
     width = 0.597
     length = 0.673
+    p_gain_translation = 5.0
+    p_gain_rotation = 5.0
     max_angular_speed = autoproperty(25.0)
     max_speed = autoproperty(5.0)
 
@@ -43,9 +49,6 @@ class Drivetrain(Subsystem):
 
     period_seconds = 0.02
 
-    p_gain_translation = 10.0
-    p_gain_rotation = 10.0
-
     def __init__(self) -> None:
         super().__init__()
 
@@ -54,11 +57,6 @@ class Drivetrain(Subsystem):
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
         self.motor_bl_loc = Translation2d(-self.width / 2, self.length / 2)
         self.motor_br_loc = Translation2d(-self.width / 2, -self.length / 2)
-
-        self.x_controller = PIDController(self.p_gain_translation, 0, 0)
-        self.y_controller = PIDController(self.p_gain_translation, 0, 0)
-        self.heading_controller = PIDController(self.p_gain_rotation, 0, 0)
-        self.heading_controller.enableContinuousInput(-math.pi, math.pi)
 
         self.swerve_module_fl = SwerveModule(
             ports.CAN.drivetrain_motor_driving_fl,
@@ -111,6 +109,26 @@ class Drivetrain(Subsystem):
             .publish()
         )
         self.chassis_speed = ChassisSpeeds()
+
+        self.pp_holonomic_drive_controller = PPHolonomicDriveController(
+            PIDConstants(self.p_gain_translation, 0.0, 0.0),
+            PIDConstants(self.p_gain_rotation, 0.0, 0.0),
+        )
+
+        config = RobotConfig.fromGUISettings()
+
+        AutoBuilder.configure(
+            self.getPose,
+            self.resetToPose,
+            self.getRobotRelativeChassisSpeeds,
+            lambda speeds, feedforwards: self.driveFromChassisSpeeds(
+                speeds, feedforwards
+            ),
+            self.pp_holonomic_drive_controller,
+            config,
+            self.shouldFlipPath,
+            self,
+        )
 
         # Gyro
         """
@@ -440,6 +458,12 @@ class Drivetrain(Subsystem):
 
     def getCurrentDrawAmps(self):
         return 0.0
+
+    def shouldFlipPath(self):
+        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
+
+    def getFollowCommand(self, path: PathPlannerPath):
+        return AutoBuilder.followPath(path)
 
     def initSendable(self, builder: SendableBuilder) -> None:
         super().initSendable(builder)

@@ -1,9 +1,11 @@
 import commands2
 import wpilib
 from commands2 import CommandScheduler
+from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.followpathprecise import FollowPathPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
@@ -43,6 +45,8 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        path = PathPlannerPath.fromPathFile("Test")
+        putCommandOnDashboard("Drivetrain", FollowPathPrecise(hardware.drivetrain, path))
 
         """
         GUIDE
