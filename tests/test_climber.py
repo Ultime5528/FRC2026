@@ -1,9 +1,13 @@
+from asyncio import wait
+
 from _pytest.python_api import approx
 from commands2 import Command
 from rev import SparkBase, SparkBaseConfig
 
 import ports
-from commands.climber.move import ResetClimber, MoveClimber, _move_properties
+from commands.climber.hug import Hug
+from commands.climber.move import ResetClimber, MoveClimber, _move_properties, ManualMoveClimber
+from commands.climber.unhug import Unhug
 from robot import Robot
 from subsystems import climber
 from subsystems.climber import Climber
@@ -86,3 +90,92 @@ def test_move_climber_to_retracted(robot_controller: RobotTestController, robot:
 def test_move_climber_to_climbed(robot_controller: RobotTestController, robot: Robot):
     climber = robot.hardware.climber
     _test_move_climber_common(robot_controller, robot, MoveClimber.toClimbed(climber), _move_properties.position_climbed)
+
+def _test_manual_move_climber_up(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+
+    robot_controller.startTeleop()
+
+    cmd_reset_climber = ResetClimber.down(climber)
+    robot_controller.run_command(cmd_reset_climber, 10.0)
+    robot_controller.wait_one_frame()
+    assert not cmd_reset_climber.isScheduled()
+    assert climber.hasReset()
+
+    cmd = ManualMoveClimber.up()
+    cmd.schedule()
+
+    robot_controller.wait_one_frame()
+    assert climber.getMotorOutput() > 0.0
+
+    robot_controller.run_command(cmd, 10.0)
+    robot_controller.wait_one_frame()
+
+    assert not cmd.isScheduled()
+    assert climber.getMotorOutput() == 0.0
+    assert climber.getPosition() == approx(climber.height_max, abs=0.02)
+
+def _test_manual_move_climber_down_with_reset(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+
+    robot_controller.startTeleop()
+
+    cmd_reset_climber = ResetClimber.down(climber)
+    robot_controller.run_command(cmd_reset_climber, 10.0)
+    robot_controller.wait_one_frame()
+    assert not cmd_reset_climber.isScheduled()
+    assert climber.hasReset()
+
+    cmd_manual_move_up = ManualMoveClimber.up()
+    cmd_manual_move_up.schedule()
+
+    assert climber.getMotorOutput() > 0.0
+    robot_controller.run_command(cmd_manual_move_up, 10.0)
+    assert not cmd_manual_move_up.isScheduled()
+
+    cmd = ManualMoveClimber.down()
+    cmd.schedule()
+
+    robot_controller.wait_one_frame()
+    assert climber.getMotorOutput() < 0.0
+
+    robot_controller.run_command(cmd, 10.0)
+    robot_controller.wait_one_frame()
+
+    assert not cmd.isScheduled()
+    assert climber.getMotorOutput() == 0.0
+    assert climber.getPosition() == approx(0.0, abs=0.02)
+
+def _test_manual_move_climber_down_without_reset(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+
+    cmd = ManualMoveClimber.down()
+    cmd.schedule()
+
+    robot_controller.wait_one_frame()
+    assert climber.getMotorOutput() < 0.0
+
+    robot_controller.run_command(cmd, 10.0)
+
+    assert climber.getMotorOutput() == 0.0
+    assert climber.isSwitchMinPressed()
+    assert not climber.hasReset()
+    assert climber.getPosition() == approx(0.0, abs=0.02)
+
+def hug_test(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+
+    cmd = Hug(climber)
+    cmd.schedule()
+
+    robot_controller.wait(climber.hugging_time)
+    assert cmd.isFinished()
+
+def unhug_test(robot_controller: RobotTestController, robot: Robot):
+    climber = robot.hardware.climber
+
+    cmd = Unhug(climber)
+    cmd.schedule()
+
+    robot_controller.wait(climber.hugging_time)
+    assert cmd.isFinished()

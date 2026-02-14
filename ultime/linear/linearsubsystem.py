@@ -93,10 +93,6 @@ class LinearSubsystem(Subsystem):
                 and self.hasReset()
                 and self.getPosition() < self.getMinPosition()
             )
-            or (
-                    not self.hasReset()
-                    and not self._should_reset_min
-            )
         ):
             speed = 0.0
         elif speed > 0.0 and (
@@ -105,10 +101,6 @@ class LinearSubsystem(Subsystem):
                 self._should_block_max_position
                 and self.hasReset()
                 and self.getPosition() > self.getMaxPosition()
-            )
-            or (
-            not self.hasReset()
-            and not self._should_reset_max
             )
         ):
             speed = 0.0
