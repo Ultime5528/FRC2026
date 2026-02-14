@@ -9,7 +9,9 @@ from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
+from ultime.log import Logger
 from ultime.module import Module, ModuleList
+from ultime.modulerobot import ModuleRobot
 
 
 class DashboardModule(Module):
@@ -55,7 +57,7 @@ class DashboardModule(Module):
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
-            wpilib.SmartDashboard.putData(subsystem.getName(), subsystem)
+            Logger.getInstance().addLoggable(subsystem)
 
         wpilib.SmartDashboard.putData("Gyro", self._hardware.drivetrain._gyro)
         wpilib.SmartDashboard.putData(

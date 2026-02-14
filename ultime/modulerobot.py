@@ -5,10 +5,10 @@ from typing import Final
 import hal
 import wpilib
 from commands2 import CommandScheduler
-from ntcore import NetworkTableInstance
 from robotpy_ext.misc import NotifierDelay
 from wpilib import RobotBase, Watchdog, SmartDashboard
 
+from ultime.log import Logger
 from ultime.module import ModuleList, Module
 
 is_simulation = wpilib.RobotBase.isSimulation()
@@ -112,15 +112,9 @@ class ModuleRobot(wpilib.RobotBase):
         CommandScheduler.getInstance().run()
         self._watchdog.addEpoch("CommandScheduler.run()")
 
-        # TODO log everything
-
         for io in self.ios:
             io.sendOutputs()
-
         self._watchdog.addEpoch("io.sendOutputs()")
-
-        SmartDashboard.updateValues()
-        self._watchdog.addEpoch("SmartDashboard.updateValues()")
 
         if is_simulation:
             hal.simPeriodicBefore()
@@ -128,12 +122,16 @@ class ModuleRobot(wpilib.RobotBase):
             hal.simPeriodicAfter()
             self._watchdog.addEpoch("SimulationPeriodic()")
 
+        SmartDashboard.updateValues()
+        self._watchdog.addEpoch("SmartDashboard.updateValues()")
+
+        Logger.getInstance().flush()
+        self._watchdog.addEpoch("Logger.getInstance().flush()")
+
         self._watchdog.disable()
 
-        NetworkTableInstance.getDefault().flushLocal()
-
         if self._watchdog.isExpired():
-            wpilib.reportError(f"Loop time  of {self.period}s overrun")
+            wpilib.reportError(f"Loop time of {self.period}s overrun")
             self._watchdog.printEpochs()
 
     def startCompetition(self):
