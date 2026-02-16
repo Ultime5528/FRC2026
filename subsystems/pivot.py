@@ -32,10 +32,7 @@ class Pivot(LinearSubsystem):
     def maintain(self):
         position = self.getPosition()
 
-        if position >= self.position_maintain_min:
-            self._motor.set(self.speed_maintain)
-
-        if position <= self.position_maintain_max:
+        if self.position_maintain_min <= position <= self.position_maintain_max:
             self._motor.set(self.speed_maintain)
         else:
             self._motor.stopMotor()

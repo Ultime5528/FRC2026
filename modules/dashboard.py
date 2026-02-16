@@ -58,10 +58,14 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
 
         """
-        Intake
+        FEEDER
         """
         putCommandOnDashboard("Intake", GrabFuel(hardware.feeder))
         putCommandOnDashboard("Intake", EjectFuel(hardware.feeder))
+
+        """
+        PIVOT
+        """
         putCommandOnDashboard("Intake", MovePivot.toUp(hardware.pivot))
         putCommandOnDashboard("Intake", MovePivot.toDown(hardware.pivot))
         putCommandOnDashboard("Intake", ResetIntake.up(hardware.pivot))

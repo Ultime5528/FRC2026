@@ -13,13 +13,13 @@ class ManualMovePivot(_ManualMovePivot):
     pass
 
 
-_ResetIntake = resetlinear.createResetLinearClass(
+_ResetPivot = resetlinear.createResetLinearClass(
     lambda: reset_properties.speed_up,
     lambda: reset_properties.speed_down,
 )
 
 
-class ResetIntake(_ResetIntake):
+class ResetIntake(_ResetPivot):
     pass
 
 
