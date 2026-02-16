@@ -27,6 +27,10 @@ class CAN(Immutable):
 
     climber_motor = 9
 
+    shooter_flywheel = 14
+    shooter_feeder = 13
+    shooter_indexer = 12
+
 
 class PWM(Immutable):
     guide_servo = 0
