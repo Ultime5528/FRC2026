@@ -1,6 +1,6 @@
 from pytest import approx
 
-from commands.shooter.manualshoot import ManualShoot
+from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from robot import Robot
@@ -34,7 +34,9 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(10.0)
 
-    assert cmd.speed_rpm == approx(shooter.getCurrentSpeed(), abs=10.0)
+    assert manual_shoot_properties.speed_rpm == approx(
+        shooter.getCurrentSpeed(), abs=10.0
+    )
 
 
 def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):

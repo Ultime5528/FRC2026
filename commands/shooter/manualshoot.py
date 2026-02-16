@@ -10,7 +10,7 @@ class ManualPrepareShoot(Command):
         self.addRequirements(self.shooter)
 
     def execute(self):
-        self.shooter.shoot(_manual_shoot_property.speed_rpm)
+        self.shooter.shoot(manual_shoot_properties.speed_rpm)
 
     def isFinished(self) -> bool:
         return False
@@ -28,8 +28,8 @@ class ManualShoot(ManualPrepareShoot):
         self.shooter.sendFuel()
 
 
-class _ManualShootProperty:
+class _ManualShootProperties:
     speed_rpm = autoproperty(666.6, subtable=ManualShoot.__name__)
 
 
-_manual_shoot_property = _ManualShootProperty()
+manual_shoot_properties = _ManualShootProperties()
