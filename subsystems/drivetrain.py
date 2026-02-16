@@ -1,4 +1,5 @@
 import math
+from pickle import SETITEMS
 
 import wpilib
 import wpimath
@@ -23,6 +24,7 @@ from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
+from ultime.switch import Switch
 from ultime.timethis import tt
 
 
@@ -41,6 +43,14 @@ class Drivetrain(Subsystem):
 
     def __init__(self) -> None:
         super().__init__()
+        # Photocells
+        self.photocell_left = Switch(
+            Switch.Type.NormallyOpen, ports.DIO.drivetrain_photocell_left
+        )
+        self.photocell_right = Switch(
+            Switch.Type.NormallyOpen, ports.DIO.drivetrain_photocell_right
+        )
+
         # Swerve Module motor positions
         self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
@@ -165,6 +175,15 @@ class Drivetrain(Subsystem):
 
         if RobotBase.isSimulation():
             self.sim_yaw = 0
+
+    def seesTowerLeft(self):
+        return self.photocell_left.isPressed()
+
+    def seesTowerRight(self):
+        return self.photocell_right.isPressed()
+
+    def alignedToTower(self):
+        return self.photocell_left.isPressed() and self.photocell_right.isPressed()
 
     def driveFromStickInputs(
         self,

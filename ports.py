@@ -39,6 +39,8 @@ class DIO(Immutable):
     guide_encoder_a = 1
     guide_encoder_b = 2
     climber_switch = 3
+    drivetrain_photocell_left = 4
+    drivetrain_photocell_right = 5
 
 
 class PDP(Immutable):
