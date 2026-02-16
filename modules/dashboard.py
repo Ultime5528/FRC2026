@@ -6,12 +6,12 @@ from wpilib import SmartDashboard
 from commands.climber.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.climber.unhug import Unhug
-from commands.shooter.manualshoot import ManualShoot
-from commands.shooter.prepareshoot import PrepareShoot
-from commands.shooter.shoot import Shoot
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.shooter.manualshoot import ManualShoot
+from commands.shooter.prepareshoot import PrepareShoot
+from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule

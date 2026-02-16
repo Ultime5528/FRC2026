@@ -1,5 +1,4 @@
 from subsystems.shooter import Shooter
-from ultime.autoproperty import autoproperty
 from ultime.command import Command
 
 

@@ -26,10 +26,10 @@ class CAN(Immutable):
     drivetrain_motor_driving_fr = 8
 
     climber_motor = 9
-    
-    shooter_flywheel = 9
-    shooter_feeder = 10
-    shooter_indexer = 13
+
+    shooter_flywheel = 14
+    shooter_feeder = 13
+    shooter_indexer = 12
 
 
 class PWM(Immutable):
