@@ -1,7 +1,6 @@
 from abc import abstractmethod
 
 import wpilib
-from wpiutil import SendableBuilder
 
 from ultime.subsystem import Subsystem
 

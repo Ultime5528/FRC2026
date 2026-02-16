@@ -1,5 +1,4 @@
 import math
-from pickle import SETITEMS
 
 import wpilib
 import wpimath
@@ -16,7 +15,6 @@ from wpimath.kinematics import (
     SwerveDrive4Odometry,
     SwerveModulePosition,
 )
-from wpiutil import SendableBuilder
 
 import ports
 from ultime.alert import AlertType
@@ -25,7 +23,6 @@ from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
 from ultime.switch import Switch
-from ultime.timethis import tt
 
 
 class Drivetrain(Subsystem):
