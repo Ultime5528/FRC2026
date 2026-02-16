@@ -143,7 +143,7 @@ class ModuleRobot(wpilib.RobotBase):
     def endCompetition(self):
         self.running = False
 
-    def addModule(self, module: Module):
+    def addModule[T: Module](self, module: T) -> T:
         self.modules.addModules(module)
         return module
 

@@ -31,6 +31,10 @@ class CAN(Immutable):
     
     pivot_motor = 12
 
+    shooter_flywheel = 14
+    shooter_feeder = 13
+    shooter_indexer = 12
+
 
 class PWM(Immutable):
     guide_servo = 0

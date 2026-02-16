@@ -7,6 +7,7 @@ from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder
 from subsystems.guide import Guide
+from subsystems.shooter import Shooter
 from subsystems.pivot import Pivot
 from ultime.module import Module
 from ultime.subsystem import Subsystem
@@ -26,6 +27,7 @@ class HardwareModule(Module):
 
         self.climber = self.addSubsystem(Climber())
         self.guide = self.addSubsystem(Guide())
+        self.shooter = self.addSubsystem(Shooter())
         self.feeder = self.addSubsystem(Feeder())
         self.pivot = self.addSubsystem(Pivot())
         self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
