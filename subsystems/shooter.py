@@ -6,6 +6,7 @@ from wpimath.system.plant import DCMotor
 
 import ports
 from ultime.autoproperty import autoproperty
+from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
 
 
@@ -35,6 +36,8 @@ class Shooter(Subsystem):
         self._flywheel_controller = self._flywheel.getClosedLoopController()
         self._encoder = self._flywheel.getEncoder()
 
+        self.current_flywheel_speed = self.createProperty(0.0)
+
         self._feeder = rev.SparkMax(
             ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
         )
@@ -42,19 +45,27 @@ class Shooter(Subsystem):
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
         self._velocity_filter = LinearFilter.movingAverage(25)
-        self._is_at_velocity = False
 
-        if RobotBase.isSimulation():
+        self._is_at_velocity = self.createProperty(False)
+
+        if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
 
     def shoot(self, rpm):
         self._flywheel_controller.setSetpoint(rpm, rev.SparkMax.ControlType.kVelocity)
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
+        self.log("average_speed", average)
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
         self._indexer.set(self.speed_indexer)
         self._feeder.set(self.speed_feeder)
+
+    def readInputs(self):
+        if is_simulation:
+            self.current_flywheel_speed = self._flywheel_sim.getVelocity()
+        else:
+            self.current_flywheel_speed = self._encoder.getVelocity()
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
@@ -69,11 +80,7 @@ class Shooter(Subsystem):
         self._is_at_velocity = False
 
     def getCurrentSpeed(self) -> float:
-        # TODO Hardcode is_simulation from IORobot
-        if RobotBase.isSimulation():
-            return self._flywheel_sim.getVelocity()
-        else:
-            return self._encoder.getVelocity()
+        return self.current_flywheel_speed
 
     def isAtVelocity(self):
         return self._is_at_velocity
