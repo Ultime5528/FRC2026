@@ -13,7 +13,6 @@ from google.protobuf.internal import builder as _builder
 _runtime_version.ValidateProtobufRuntimeVersion(
     _runtime_version.Domain.PUBLIC, 6, 31, 1, "", "data.proto"
 )
-from . import geometry3d_pb2 as geometry3d__pb2
 
 _sym_db = _symbol_database.Default()
 

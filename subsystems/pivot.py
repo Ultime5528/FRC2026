@@ -1,9 +1,9 @@
+import rev
 from rev import SparkMaxSim
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
 import ports
-import rev
 from ultime.autoproperty import autoproperty
 from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch

@@ -1,7 +1,7 @@
+from subsystems.pivot import Pivot
 from ultime.autoproperty import autoproperty, FloatProperty
 from ultime.linear import manualmovelinear, resetlinear
 from ultime.linear.movelinear import MoveLinear
-from subsystems.pivot import Pivot
 
 _ManualMovePivot = manualmovelinear.createManualMoveClass(
     lambda: manual_move_properties.speed_up,

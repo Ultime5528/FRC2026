@@ -1,5 +1,5 @@
-from ultime.command import Command
 from subsystems.pivot import Pivot
+from ultime.command import Command
 
 
 class MaintainPivot(Command):

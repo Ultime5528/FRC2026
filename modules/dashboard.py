@@ -5,10 +5,10 @@ from wpilib import SmartDashboard
 
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
-from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
-from commands.feeder.grabfuel import GrabFuel
-from commands.pivot.maintainpivot import MaintainPivot
 from commands.feeder.ejectfuel import EjectFuel
+from commands.feeder.grabfuel import GrabFuel
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.pivot.maintainpivot import MaintainPivot
 from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
