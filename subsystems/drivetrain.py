@@ -112,7 +112,7 @@ class Drivetrain(Subsystem):
         self._gyro = ADIS16470()
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
-        self._gyro_angles_radians: float = 0.0
+        self._gyro_angles_radians = self.createProperty(0.0)
         self._gyro_rotation2d: Rotation2d = Rotation2d()
 
         self._field = wpilib.Field2d()
@@ -411,24 +411,9 @@ class Drivetrain(Subsystem):
     def getCurrentDrawAmps(self):
         return 0.0
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-
-        def noop(_):
-            pass
-
-        builder.addFloatProperty("GyroAngle", tt(self.getGyroAngleRadians), noop)
-        builder.addFloatProperty(
-            "SpeedGoal",
-            tt(
-                lambda: math.hypot(
-                    self.chassis_speed_goal.vx, self.chassis_speed_goal.vy
-                )
-            ),
-            noop,
+    def logValues(self):
+        self.log(
+            "speed_goal",
+            math.hypot(self.chassis_speed_goal.vx, self.chassis_speed_goal.vy),
         )
-        builder.addFloatProperty(
-            "Speed",
-            tt(lambda: math.hypot(self.chassis_speed.vx, self.chassis_speed.vy)),
-            noop,
-        )
+        self.log("speed", math.hypot(self.chassis_speed.vx, self.chassis_speed.vy))

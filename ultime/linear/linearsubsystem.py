@@ -39,6 +39,7 @@ class LinearSubsystem(Subsystem):
         self.log("min_switch_pressed", self.isSwitchMinPressed())
         self.log("max_switch_pressed", self.isSwitchMaxPressed())
         self.log("motor_output", self.getMotorOutput())
+        self.log("has_reset", self.hasReset())
 
     @abstractmethod
     def getMinPosition(self) -> float:
@@ -153,18 +154,3 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(True)
         else:
             self.setSimSwitchMaxPressed(False)
-
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-
-        def setHasReset(value: bool) -> None:
-            self._has_reset = value
-
-        builder.addBooleanProperty(
-            "switch_min_pressed", self.isSwitchMinPressed, lambda _: None
-        )
-        builder.addBooleanProperty(
-            "switch_max_pressed", self.isSwitchMaxPressed, lambda _: None
-        )
-        builder.addDoubleProperty("position", self.getPosition, lambda _: None)
-        builder.addBooleanProperty("has_reset", self.hasReset, setHasReset)
