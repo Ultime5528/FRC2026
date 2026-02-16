@@ -38,6 +38,7 @@ class LinearSubsystem(Subsystem):
         self.log("encoder_position", self.getEncoderPosition())
         self.log("min_switch_pressed", self.isSwitchMinPressed())
         self.log("max_switch_pressed", self.isSwitchMaxPressed())
+        self.log("motor_output", self.getMotorOutput())
 
     @abstractmethod
     def getMinPosition(self) -> float:

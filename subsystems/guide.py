@@ -23,7 +23,6 @@ class Guide(LinearSubsystem):
             should_block_max_position=True,
             sim_motor_to_distance_factor=1.0,
         )
-        self._motor_output: float = 0.0
         self._encoder_position: float = 0.0
         self._switch_pressed: bool = False
 
