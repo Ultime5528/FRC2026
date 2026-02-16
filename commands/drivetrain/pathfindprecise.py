@@ -5,7 +5,7 @@ from commands.drivetrain.alignpreciseafterpath import AlignPreciseAfterPath
 from subsystems.drivetrain import Drivetrain
 
 
-class FollowPathPrecise(SequentialCommandGroup):
+class PathFindPrecise(SequentialCommandGroup):
     def __init__(self, drivetrain: Drivetrain, pose: Pose2d):
         super().__init__()
         self.drivetrain = drivetrain
@@ -13,6 +13,7 @@ class FollowPathPrecise(SequentialCommandGroup):
         self.pose = pose
 
         self.addCommands(
-            self.drivetrain.getFollowCommand(self.path),
+            self.drivetrain.getPathFindingCommand(self.pose),
             AlignPreciseAfterPath(self.drivetrain, self.pose),
+
         )

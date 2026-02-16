@@ -7,7 +7,7 @@ from ntcore import NetworkTableInstance
 from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.config import PIDConstants, RobotConfig
 from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.path import PathPlannerPath
+from pathplannerlib.path import PathPlannerPath, PathConstraints
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
 from wpilib import RobotBase, DriverStation
@@ -115,6 +115,9 @@ class Drivetrain(Subsystem):
             PIDConstants(self.p_gain_rotation, 0.0, 0.0),
         )
 
+        """
+        Config used in the path following
+        """
         config = RobotConfig.fromGUISettings()
 
         AutoBuilder.configure(
@@ -128,6 +131,16 @@ class Drivetrain(Subsystem):
             config,
             self.shouldFlipPath,
             self,
+        )
+
+        """
+        Config used only when path finding to a pose
+        """
+        self.pathfinding_constraints = PathConstraints(
+            maxVelocityMps=3.0,
+            maxAccelerationMpsSq=1.0,
+            maxAngularVelocityRps=3.1415,
+            maxAngularAccelerationRpsSq=3.1415
         )
 
         # Gyro
@@ -466,7 +479,10 @@ class Drivetrain(Subsystem):
         return AutoBuilder.followPath(path)
 
     def getPathFindingCommand(self, pose: Pose2d):
-        return AutoBuilder.pathfindToPose()
+        #TODO adjust the "goal_end_vel" if wanted for a smoother "AlignPreciseAfterPath"
+        return AutoBuilder.pathfindToPose(pose=pose,
+                                          constraints=self.pathfinding_constraints,
+                                          goal_end_vel=0.0)
 
     def initSendable(self, builder: SendableBuilder) -> None:
         super().initSendable(builder)
