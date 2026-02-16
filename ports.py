@@ -26,9 +26,9 @@ class CAN(Immutable):
     drivetrain_motor_driving_fr = 8
 
     climber_motor = 9
-    
+
     feeder_motor = 11
-    
+
     pivot_motor = 12
 
     shooter_flywheel = 14
@@ -46,7 +46,7 @@ class DIO(Immutable):
     guide_switch = 7
     guide_encoder_a = 8
     guide_encoder_b = 9
-    climber_switch = 9
+    climber_switch = 6
     pivot_switch_min = -1
     pivot_switch_max = 5
 

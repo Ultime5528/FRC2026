@@ -17,12 +17,22 @@ class Pivot(LinearSubsystem):
     position_maintain_max = autoproperty(5.0)
 
     def __init__(self):
-        super().__init__(1.0, True, True, False, False, 2.0, 0.0)
+        super().__init__(
+            sim_initial_position=1.0,
+            should_reset_min=False,
+            should_reset_max=True,
+            should_block_min_position=True,
+            should_block_max_position=False,
+            sim_motor_to_distance_factor=2.0,
+            sim_gravity=0.0,
+        )
         self._motor = rev.SparkMax(
             ports.CAN.pivot_motor, rev.SparkMax.MotorType.kBrushless
         )
         self._encoder = self._motor.getEncoder()
-        self._switch_min = Switch(Switch.Type.AlwaysUnpressed, ports.DIO.pivot_switch_min)
+        self._switch_min = Switch(
+            Switch.Type.AlwaysUnpressed, ports.DIO.pivot_switch_min
+        )
         self._switch_max = Switch(Switch.Type.NormallyOpen, ports.DIO.pivot_switch_max)
 
         if RobotBase.isSimulation():
