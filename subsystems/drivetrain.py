@@ -465,6 +465,9 @@ class Drivetrain(Subsystem):
     def getFollowCommand(self, path: PathPlannerPath):
         return AutoBuilder.followPath(path)
 
+    def getPathFindingCommand(self, pose: Pose2d):
+        pass
+
     def initSendable(self, builder: SendableBuilder) -> None:
         super().initSendable(builder)
 
