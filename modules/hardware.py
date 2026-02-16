@@ -2,6 +2,7 @@ import commands2
 from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
+from subsystems.climber import Climber
 from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder
@@ -23,6 +24,7 @@ class HardwareModule(Module):
         self.drivetrain = self.addSubsystem(Drivetrain())
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
+        self.climber = self.addSubsystem(Climber())
         self.guide = self.addSubsystem(Guide())
         self.feeder = self.addSubsystem(Feeder())
         self.pivot = self.addSubsystem(Pivot())
