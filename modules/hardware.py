@@ -2,9 +2,12 @@ import commands2
 from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
+from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
+from subsystems.feeder import Feeder
 from subsystems.guide import Guide
+from subsystems.pivot import Pivot
 from subsystems.shooter import Shooter
 from ultime.module import Module
 from ultime.subsystem import Subsystem
@@ -25,6 +28,9 @@ class HardwareModule(Module):
         self.climber = self.addSubsystem(Climber())
         self.guide = self.addSubsystem(Guide())
         self.shooter = self.addSubsystem(Shooter())
+        self.feeder = self.addSubsystem(Feeder())
+        self.pivot = self.addSubsystem(Pivot())
+        self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
 

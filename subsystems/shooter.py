@@ -1,6 +1,5 @@
 import rev
 from rev import SparkMaxSim
-from wpilib import RobotBase
 from wpimath.filter import LinearFilter
 from wpimath.system.plant import DCMotor
 

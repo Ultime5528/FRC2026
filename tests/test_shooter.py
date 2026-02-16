@@ -8,9 +8,9 @@ from ultime.tests import RobotTestController
 
 
 def test_ports(robot: Robot):
-    robot.hardware.shooter._flywheel.getDeviceId() == 9
-    robot.hardware.shooter._feeder.getDeviceId() == 10
-    robot.hardware.shooter._indexer.getDeviceId() == 13
+    assert robot.hardware.shooter._flywheel.getDeviceId() == 14
+    assert robot.hardware.shooter._feeder.getDeviceId() == 13
+    assert robot.hardware.shooter._indexer.getDeviceId() == 12
 
 
 def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):

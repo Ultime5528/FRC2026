@@ -25,7 +25,11 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
-    climber_motor = 9
+    climber_motor = 11
+
+    feeder_motor = 10
+
+    pivot_motor = 9
 
     shooter_flywheel = 14
     shooter_feeder = 13
@@ -39,10 +43,12 @@ class PWM(Immutable):
 
 
 class DIO(Immutable):
-    guide_switch = 0
-    guide_encoder_a = 1
-    guide_encoder_b = 2
-    climber_switch = 3
+    guide_switch = 7
+    guide_encoder_a = 8
+    guide_encoder_b = 9
+    climber_switch = 6
+    pivot_switch_min = -1
+    pivot_switch_max = 5
 
 
 class PDP(Immutable):
