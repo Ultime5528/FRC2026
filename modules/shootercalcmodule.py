@@ -19,7 +19,11 @@ def computeRobotRotationToAlign(
     hub_pose: Translation3d,
 ) -> Rotation2d:
 
-    shooter_extremity = Translation3d((math.cos(shooter_offset.rotation().y)+shooter_offset.translation().x),(math.sin(shooter_offset.rotation().y)+shooter_offset.translation().y), 2)
+    shooter_extremity = Translation3d(
+        (math.cos(shooter_offset.rotation().y) + shooter_offset.translation().x),
+        (math.sin(shooter_offset.rotation().y) + shooter_offset.translation().y),
+        2,
+    )
 
     delta_hub_and_bot = hub_pose - robot_pose3d.translation()
     hub_at_origin = delta_hub_and_bot.rotateBy(-robot_pose3d.rotation())
@@ -31,7 +35,6 @@ def computeRobotRotationToAlign(
 
     denominator = (A**2) + (B**2)
 
-
     # to avoid domain errors
     if abs(C / denominator) > 1 or denominator == 0:
         return Rotation2d()
@@ -42,7 +45,9 @@ def computeRobotRotationToAlign(
 
 
 def computeShooterSpeedToShoot(
-    shooter_position: Translation3d, target_position: Translation3d, long_shoot_zone: float
+    shooter_position: Translation3d,
+    target_position: Translation3d,
+    long_shoot_zone: float,
 ) -> float:
 
     if target_position.distance(shooter_position) >= long_shoot_zone:
@@ -56,10 +61,9 @@ def computeShooterSpeedToShoot(
     delta_y = target_position.y - shooter_position.y
     delta_z = target_position.z - target_position.z
 
-    distance_xy = math.hypot(delta_x,delta_y)
+    distance_xy = math.hypot(delta_x, delta_y)
 
     distance_xy_squared = distance_xy**2
-
 
     numerator = gravity * distance_xy_squared
     denominator = (2 * (math.cos(shooter_angle)) ** 2) * (
@@ -80,7 +84,10 @@ def shouldUseGuide(
     else:
         return False
 
-def computeShooterPosition(robot_pose: Pose3d, shooter_pose: Transform3d) -> Translation3d:
+
+def computeShooterPosition(
+    robot_pose: Pose3d, shooter_pose: Transform3d
+) -> Translation3d:
     return (robot_pose.transformBy(shooter_pose)).translation()
 
 
@@ -88,7 +95,7 @@ class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
     red_hub = Translation3d(4.625594, 4.034536, 3.057144)
     blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
-    shooter_offset = Transform3d(-0.6,-0.5,0.0,Rotation3d(0,180,0))
+    shooter_offset = Transform3d(-0.6, -0.5, 0.0, Rotation3d(0, 180, 0))
     speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
     rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
     speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
@@ -109,15 +116,8 @@ class ShooterCalcModule(Module):
             self.speed_guide_closed, self.rpm_guide_closed
         )
 
-    def robotPeriodic(self) -> None:
-        self.shooter_position = self._ComputeShooterPosition()
-        self.shooter_extremity_position = self._ComputeShooterExtremityPosition()
-        self.hub_position = self._getTargetPose()
-
     def _getShooterPose(self) -> Translation3d:
-        return computeShooterPosition(self._drivetrain.getPose(),self.shooter_offset)
-
-
+        return computeShooterPosition(self._drivetrain.getPose(), self.shooter_offset)
 
     def _getTargetPose(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
