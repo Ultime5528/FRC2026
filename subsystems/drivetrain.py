@@ -416,4 +416,4 @@ class Drivetrain(Subsystem):
             "speed_goal",
             math.hypot(self.chassis_speed_goal.vx, self.chassis_speed_goal.vy),
         )
-        self.log("speed", math.hypot(self.chassis_speed.vx, self.chassis_speed.vy))
+        self.log("speed", math.hypot(self._chassis_speed.vx, self._chassis_speed.vy))
