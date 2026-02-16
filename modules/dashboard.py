@@ -9,7 +9,7 @@ from commands.climber.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
-from commands.shooter.manualshoot import ManualShoot
+from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
@@ -57,6 +57,7 @@ class DashboardModule(Module):
         putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
         putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))
 
         """
         Guide
