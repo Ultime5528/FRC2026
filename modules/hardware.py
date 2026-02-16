@@ -2,9 +2,11 @@ import commands2
 from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
+from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
-from subsystems.intake import Intake
+from subsystems.feeder import Feeder
+from subsystems.pivot import Pivot
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 
@@ -22,8 +24,9 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.guide = self.addSubsystem(Guide())
-
-        self.intake = self.addSubsystem(Intake())
+        self.feeder = self.addSubsystem(Feeder())
+        self.pivot = self.addSubsystem(Pivot())
+        self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
 

@@ -6,9 +6,10 @@ from wpilib import SmartDashboard
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
-from commands.intake.feed import Feed
-from commands.intake.manualmoveintake import ManualMoveIntake
-from commands.intake.move import MoveIntake, ResetIntake, ManualMoveIntake
+from commands.feeder.grabfuel import GrabFuel
+from commands.pivot.maintainpivot import MaintainPivot
+from commands.feeder.ejectfuel import EjectFuel
+from commands.pivot.move import MovePivot, ResetIntake, ManualMovePivot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -59,12 +60,14 @@ class DashboardModule(Module):
         """
         Intake
         """
-        putCommandOnDashboard("Intake", Feed(hardware.intake))
-        putCommandOnDashboard("Intake", MoveIntake.toUp(hardware.intake))
-        putCommandOnDashboard("Intake", MoveIntake.toDown(hardware.intake))
-        putCommandOnDashboard("Intake", ResetIntake.up(hardware.intake))
-        putCommandOnDashboard("Intake", ManualMoveIntake.up(hardware.intake))
-        putCommandOnDashboard("Intake", ManualMoveIntake.down(hardware.intake))
+        putCommandOnDashboard("Intake", GrabFuel(hardware.feeder))
+        putCommandOnDashboard("Intake", EjectFuel(hardware.feeder))
+        putCommandOnDashboard("Intake", MovePivot.toUp(hardware.pivot))
+        putCommandOnDashboard("Intake", MovePivot.toDown(hardware.pivot))
+        putCommandOnDashboard("Intake", ResetIntake.up(hardware.pivot))
+        putCommandOnDashboard("Intake", ManualMovePivot.up(hardware.pivot))
+        putCommandOnDashboard("Intake", ManualMovePivot.down(hardware.pivot))
+        putCommandOnDashboard("Intake", MaintainPivot(hardware.pivot))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

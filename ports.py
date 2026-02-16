@@ -25,8 +25,8 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
-    intake_motor_intake = 11
-    intake_motor_pivot = 12
+    feeder_motor = 11
+    pivot_motor = 12
 
 
 class PWM(Immutable):
