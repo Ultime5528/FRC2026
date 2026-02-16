@@ -17,10 +17,10 @@ from ultime.tests import RobotTestController
 
 def test_ports(robot: Robot):
     climber = robot.hardware.climber
-    assert climber._climber_motor.getDeviceId() == 9
+    assert climber._climber_motor.getDeviceId() == 11
     assert climber._hugger_motor_left.getChannel() == 1
     assert climber._hugger_motor_right.getChannel() == 2
-    assert climber._switch.getChannel() == 3
+    assert climber._switch.getChannel() == 6
 
 
 def test_settings(robot: Robot):

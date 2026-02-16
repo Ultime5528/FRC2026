@@ -25,11 +25,11 @@ class CAN(Immutable):
     drivetrain_motor_turning_fr = 7
     drivetrain_motor_driving_fr = 8
 
-    climber_motor = 9
+    climber_motor = 11
 
-    feeder_motor = 11
+    feeder_motor = 10
 
-    pivot_motor = 12
+    pivot_motor = 9
 
     shooter_flywheel = 14
     shooter_feeder = 13
