@@ -9,7 +9,7 @@ from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.maintainpivot import MaintainPivot
 from commands.feeder.ejectfuel import EjectFuel
-from commands.pivot.move import MovePivot, ResetIntake, ManualMovePivot
+from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -58,20 +58,20 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
 
         """
-        FEEDER
+        Feeder
         """
-        putCommandOnDashboard("Intake", GrabFuel(hardware.feeder))
-        putCommandOnDashboard("Intake", EjectFuel(hardware.feeder))
+        putCommandOnDashboard("Feeder", GrabFuel(hardware.feeder))
+        putCommandOnDashboard("Feeder", EjectFuel(hardware.feeder))
 
         """
-        PIVOT
+        Pivot
         """
-        putCommandOnDashboard("Intake", MovePivot.toUp(hardware.pivot))
-        putCommandOnDashboard("Intake", MovePivot.toDown(hardware.pivot))
-        putCommandOnDashboard("Intake", ResetIntake.up(hardware.pivot))
-        putCommandOnDashboard("Intake", ManualMovePivot.up(hardware.pivot))
-        putCommandOnDashboard("Intake", ManualMovePivot.down(hardware.pivot))
-        putCommandOnDashboard("Intake", MaintainPivot(hardware.pivot))
+        putCommandOnDashboard("Pivot", MovePivot.toUp(hardware.pivot))
+        putCommandOnDashboard("Pivot", MovePivot.toDown(hardware.pivot))
+        putCommandOnDashboard("Pivot", ResetPivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
+        putCommandOnDashboard("Pivot", MaintainPivot(hardware.pivot))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

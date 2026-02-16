@@ -19,7 +19,7 @@ _ResetPivot = resetlinear.createResetLinearClass(
 )
 
 
-class ResetIntake(_ResetPivot):
+class ResetPivot(_ResetPivot):
     pass
 
 
@@ -61,8 +61,8 @@ manual_move_properties = _PropertiesManual()
 
 
 class _PropertiesReset:
-    speed_up = autoproperty(0.25, subtable=ResetIntake.__name__)
-    speed_down = autoproperty(-0.25, subtable=ResetIntake.__name__)
+    speed_up = autoproperty(0.25, subtable=ResetPivot.__name__)
+    speed_down = autoproperty(-0.25, subtable=ResetPivot.__name__)
 
 
 reset_properties = _PropertiesReset()
