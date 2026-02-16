@@ -22,8 +22,8 @@ class Pivot(LinearSubsystem):
             ports.CAN.pivot_motor, rev.SparkMax.MotorType.kBrushless
         )
         self._encoder = self._motor.getEncoder()
-        self._switch_min = Switch(Switch.Type.NormallyOpen, ports.DIO.intake_switch_min)
-        self._switch_max = Switch(Switch.Type.NormallyOpen, ports.DIO.intake_switch_max)
+        self._switch_min = Switch(Switch.Type.AlwaysUnpressed, ports.DIO.pivot_switch_min)
+        self._switch_max = Switch(Switch.Type.NormallyOpen, ports.DIO.pivot_switch_max)
 
         if RobotBase.isSimulation():
             self._motor_sim = SparkMaxSim(self._motor, DCMotor.NEO(1))

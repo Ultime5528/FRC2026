@@ -39,12 +39,12 @@ class PWM(Immutable):
 
 
 class DIO(Immutable):
-    guide_switch = 0
-    guide_encoder_a = 1
-    guide_encoder_b = 2
-    climber_switch = 3
-    intake_switch_min = 3
-    intake_switch_max = 4
+    guide_switch = 7
+    guide_encoder_a = 8
+    guide_encoder_b = 9
+    climber_switch = 9
+    pivot_switch_min = -1
+    pivot_switch_max = 5
 
 
 class PDP(Immutable):
