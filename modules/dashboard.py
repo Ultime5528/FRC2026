@@ -3,6 +3,9 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.climber.hug import Hug
+from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.climber.unhug import Unhug
 from commands.shooter.manualshoot import ManualShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
@@ -12,6 +15,7 @@ from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
+from ultime.log import Logger
 from ultime.module import Module, ModuleList
 
 
@@ -48,7 +52,7 @@ class DashboardModule(Module):
         )
 
         """
-        shooter
+        Shooter
         """
         putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
@@ -60,12 +64,24 @@ class DashboardModule(Module):
         putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
         putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
         putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toOpen(hardware.guide))
-        putCommandOnDashboard("Guide", MoveGuide.toClose(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUsed(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
+
+        """
+        Climber
+        """
+        putCommandOnDashboard("Climber", ManualMoveClimber.up(hardware.climber))
+        putCommandOnDashboard("Climber", ManualMoveClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", ResetClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
+        putCommandOnDashboard("Climber", Hug(hardware.climber))
+        putCommandOnDashboard("Climber", Unhug(hardware.climber))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
-            wpilib.SmartDashboard.putData(subsystem.getName(), subsystem)
+            Logger.getInstance().addLoggable(subsystem)
 
         wpilib.SmartDashboard.putData("Gyro", self._hardware.drivetrain._gyro)
         wpilib.SmartDashboard.putData(

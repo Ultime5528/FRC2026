@@ -1,8 +1,10 @@
 from enum import Enum, auto
 from typing import Optional
 
-from wpilib import DigitalInput, RobotBase
+from wpilib import DigitalInput
 from wpilib.simulation import DIOSim
+
+from ultime.modulerobot import is_simulation, is_real
 
 
 class Switch:
@@ -26,7 +28,7 @@ class Switch:
         ):
             self._input = DigitalInput(port)
 
-        if RobotBase.isSimulation:
+        if is_simulation:
             if self._type == Switch.Type.NormallyOpen:
                 self._sim_input = DIOSim(self._input)
                 self._sim_input.setValue(False)
@@ -53,7 +55,7 @@ class Switch:
             raise TypeError(f"Type is not instance of Switch.Type: {type}")
 
     def setSimValue(self, pressed):
-        if not RobotBase.isSimulation():
+        if is_real:
             raise RuntimeError("setSimValue should only be called in simulation")
         if self._type == Switch.Type.NormallyOpen:
             self._sim_input.setValue(pressed)

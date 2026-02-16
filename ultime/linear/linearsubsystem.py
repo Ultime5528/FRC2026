@@ -18,10 +18,10 @@ class LinearSubsystem(Subsystem):
         sim_gravity: float = 0.0,
     ):
         super().__init__()
-        self._offset = 0.0
-        self._has_reset = False
-        self._prev_is_at_min = False
-        self._prev_is_at_max = False
+        self._offset = self.createProperty(0.0)
+        self._has_reset = self.createProperty(False)
+        self._prev_is_at_min = self.createProperty(False)
+        self._prev_is_at_max = self.createProperty(False)
         self._should_reset_min = should_reset_min
         self._should_reset_max = should_reset_max
         self._should_block_min_position = should_block_min_position
@@ -32,6 +32,12 @@ class LinearSubsystem(Subsystem):
         self._sim_prev_time = wpilib.Timer.getFPGATimestamp()
         self._sim_motor_to_distance_factor = sim_motor_to_distance_factor
         self._sim_gravity = sim_gravity
+
+    def logValues(self):
+        self.log("position", self.getPosition())
+        self.log("encoder_position", self.getEncoderPosition())
+        self.log("min_switch_pressed", self.isSwitchMinPressed())
+        self.log("max_switch_pressed", self.isSwitchMaxPressed())
 
     @abstractmethod
     def getMinPosition(self) -> float:
@@ -148,6 +154,8 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(False)
 
     def initSendable(self, builder: SendableBuilder) -> None:
+        super().initSendable(builder)
+
         def setHasReset(value: bool) -> None:
             self._has_reset = value
 

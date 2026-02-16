@@ -2,6 +2,7 @@ import commands2
 from wpilib import PowerDistribution
 
 from commands.drivetrain.drive import DriveField
+from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
 from subsystems.shooter import Shooter
@@ -21,6 +22,7 @@ class HardwareModule(Module):
         self.drivetrain = self.addSubsystem(Drivetrain())
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
+        self.climber = self.addSubsystem(Climber())
         self.guide = self.addSubsystem(Guide())
         self.shooter = self.addSubsystem(Shooter())
 
