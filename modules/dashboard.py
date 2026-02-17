@@ -66,8 +66,12 @@ class DashboardModule(Module):
         putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
-        putCommandOnDashboard("Climber", Hug(hardware.climber))
-        putCommandOnDashboard("Climber", Unhug(hardware.climber))
+
+        """
+        Hugger
+        """
+        putCommandOnDashboard("Hugger", Hug(hardware.hugger))
+        putCommandOnDashboard("Hugger", Unhug(hardware.hugger))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

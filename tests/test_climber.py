@@ -17,17 +17,15 @@ from ultime.tests import RobotTestController
 
 def test_ports(robot: Robot):
     climber = robot.hardware.climber
-    assert climber._climber_motor.getDeviceId() == 9
-    assert climber._hugger_motor_left.getChannel() == 1
-    assert climber._hugger_motor_right.getChannel() == 2
+    assert climber._motor.getDeviceId() == 9
     assert climber._switch.getChannel() == 3
 
 
 def test_settings(robot: Robot):
     climber = robot.hardware.climber
     assert climber._switch.getType() == Switch.Type.NormallyClosed
-    assert climber._climber_motor.getMotorType() == SparkBase.MotorType.kBrushless
-    assert climber._climber_motor.getInverted() == False
+    assert climber._motor.getMotorType() == SparkBase.MotorType.kBrushless
+    assert climber._motor.getInverted() == False
 
 
 def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
@@ -54,7 +52,7 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
     assert not climber.isSwitchMinPressed()
     assert climber.getPosition() == approx(0.0, abs=0.02)
     assert climber.hasReset()
-    assert climber.getMotorOutput() == 0.0
+    assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
 
 
 def _test_move_climber_common(
@@ -82,7 +80,7 @@ def _test_move_climber_common(
     robot_controller.wait_one_frame()
 
     assert not cmd.isScheduled()
-    assert climber.getMotorOutput() == 0.0
+    assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
     assert climber.getPosition() == approx(final_position, abs=0.02)
 
 
@@ -130,15 +128,12 @@ def _test_manual_move_climber_up(robot_controller: RobotTestController, robot: R
     cmd = ManualMoveClimber.up()
     cmd.schedule()
 
-    robot_controller.wait_one_frame()
-    assert climber.getMotorOutput() > 0.0
-
     robot_controller.run_command(cmd, 10.0)
     robot_controller.wait_one_frame()
 
     assert not cmd.isScheduled()
-    assert climber.getMotorOutput() == 0.0
-    assert climber.getPosition() == approx(climber.height_max, abs=0.02)
+    assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
+    assert climber.getPosition() == approx(climber.position_max, abs=0.02)
 
 
 def _test_manual_move_climber_down_with_reset(
@@ -157,21 +152,17 @@ def _test_manual_move_climber_down_with_reset(
     cmd_manual_move_up = ManualMoveClimber.up()
     cmd_manual_move_up.schedule()
 
-    assert climber.getMotorOutput() > 0.0
     robot_controller.run_command(cmd_manual_move_up, 10.0)
     assert not cmd_manual_move_up.isScheduled()
 
     cmd = ManualMoveClimber.down()
     cmd.schedule()
 
-    robot_controller.wait_one_frame()
-    assert climber.getMotorOutput() < 0.0
-
     robot_controller.run_command(cmd, 10.0)
     robot_controller.wait_one_frame()
 
     assert not cmd.isScheduled()
-    assert climber.getMotorOutput() == 0.0
+    assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
     assert climber.getPosition() == approx(0.0, abs=0.02)
 
 
@@ -183,32 +174,10 @@ def _test_manual_move_climber_down_without_reset(
     cmd = ManualMoveClimber.down()
     cmd.schedule()
 
-    robot_controller.wait_one_frame()
-    assert climber.getMotorOutput() < 0.0
-
     robot_controller.run_command(cmd, 10.0)
 
-    assert climber.getMotorOutput() == 0.0
+    assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
     assert climber.isSwitchMinPressed()
     assert not climber.hasReset()
     assert climber.getPosition() == approx(0.0, abs=0.02)
 
-
-def hug_test(robot_controller: RobotTestController, robot: Robot):
-    climber = robot.hardware.climber
-
-    cmd = Hug(climber)
-    cmd.schedule()
-
-    robot_controller.wait(climber.delay_hug)
-    assert cmd.isFinished()
-
-
-def unhug_test(robot_controller: RobotTestController, robot: Robot):
-    climber = robot.hardware.climber
-
-    cmd = Unhug(climber)
-    cmd.schedule()
-
-    robot_controller.wait(climber.delay_hug)
-    assert cmd.isFinished()

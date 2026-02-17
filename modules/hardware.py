@@ -1,10 +1,12 @@
 import commands2
 from wpilib import PowerDistribution
 
+from commands.climber.maintainclimber import MaintainClimber
 from commands.drivetrain.drive import DriveField
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
+from subsystems.hugger import Hugger
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 
@@ -22,6 +24,8 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.climber = self.addSubsystem(Climber())
+        self.climber.setDefaultCommand(MaintainClimber(self.climber))
+        self.hugger = self.addSubsystem(Hugger())
         self.guide = self.addSubsystem(Guide())
 
         self.pdp = PowerDistribution()
