@@ -34,6 +34,9 @@ class HardwareModule(Module):
 
         self.pdp = PowerDistribution()
 
+    def teleopInit(self) -> None:
+        self.shooter.updatePIDFConfig()
+
     def addSubsystem[T: Subsystem](self, subsystem: T) -> T:
         self.subsystems.append(subsystem)
         return subsystem

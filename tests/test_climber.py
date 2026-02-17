@@ -25,6 +25,7 @@ def test_ports(robot: Robot):
 
 def test_settings(robot: Robot):
     climber = robot.hardware.climber
+    assert climber._climber_motor.getInverted()
     assert climber._switch.getType() == Switch.Type.NormallyClosed
     assert climber._climber_motor.getMotorType() == SparkBase.MotorType.kBrushless
     assert climber._climber_motor.getInverted() == False

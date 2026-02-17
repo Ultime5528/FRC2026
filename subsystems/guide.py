@@ -12,7 +12,7 @@ class Guide(LinearSubsystem):
     position_min = autoproperty(0.0)
     position_max = autoproperty(1.0)
 
-    position_conversion_factor = autoproperty(0.01)
+    position_conversion_factor = autoproperty(1.0)
 
     def __init__(self):
         super().__init__(
@@ -20,18 +20,21 @@ class Guide(LinearSubsystem):
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
-            should_block_max_position=True,
+            should_block_max_position=False,
+            should_block_min_switch=False,
+            should_block_max_switch=False,
             sim_motor_to_distance_factor=1.0,
         )
         self._encoder_position: float = 0.0
         self._switch_pressed: bool = False
 
         self._motor = wpilib.VictorSP(ports.PWM.guide_servo)
-        self._motor.setInverted(False)
+        self._motor.setInverted(True)
         self._encoder = wpilib.Encoder(
             ports.DIO.guide_encoder_a, ports.DIO.guide_encoder_b
         )
-        self._min_switch = Switch(Switch.Type.NormallyOpen, ports.DIO.guide_switch)
+        self._encoder.setReverseDirection(True)
+        self._min_switch = Switch(Switch.Type.NormallyClosed, ports.DIO.guide_switch)
 
         if RobotBase.isSimulation():
             self._sim_encoder = EncoderSim(self._encoder)

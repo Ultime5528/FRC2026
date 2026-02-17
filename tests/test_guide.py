@@ -17,7 +17,7 @@ def test_settings(robot: Robot):
     guide = robot.hardware.guide
 
     assert guide._min_switch.getType() == Switch.Type.NormallyOpen
-    assert not guide._motor.getInverted()
+    assert guide._motor.getInverted()
 
 
 def test_reset_command(robot_controller: RobotTestController, robot: Robot):

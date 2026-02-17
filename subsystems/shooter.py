@@ -10,28 +10,24 @@ from ultime.subsystem import Subsystem
 
 
 class Shooter(Subsystem):
-    kP = 0.1
-    kI = 0.0
-    kD = 0.0
-    kF = 12.0 / 4400  # 12 volts max divided by max RPM
+    kP = autoproperty(0.0)
+    kI = autoproperty(0.0)
+    kD = autoproperty(0.0)
+    # 12 volts max divided by max RPM
+    kF = autoproperty(0.00222222)
 
-    speed_indexer = autoproperty(0.5)
-    speed_feeder = autoproperty(0.5)
+    speed_indexer = autoproperty(-0.15)
+    speed_feeder = autoproperty(0.3)
     tolerance = autoproperty(100.0)
 
     def __init__(self):
         super().__init__()
 
+
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
-        self._config = rev.SparkMaxConfig()
-        self._config.closedLoop.pidf(self.kP, self.kI, self.kD, self.kF)
-        self._flywheel.configure(
-            self._config,
-            rev.ResetMode.kResetSafeParameters,
-            rev.PersistMode.kNoPersistParameters,
-        )
+        self.updatePIDFConfig()
         self._flywheel_controller = self._flywheel.getClosedLoopController()
         self._encoder = self._flywheel.getEncoder()
 
@@ -49,6 +45,16 @@ class Shooter(Subsystem):
 
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
+
+    def updatePIDFConfig(self):
+        self._config = rev.SparkMaxConfig()
+        self._config.closedLoop.pidf(self.kP, self.kI, self.kD, self.kF)
+        self._flywheel.configure(
+            self._config,
+            rev.ResetMode.kResetSafeParameters,
+            rev.PersistMode.kNoPersistParameters,
+        )
+
 
     def shoot(self, rpm):
         self._flywheel_controller.setSetpoint(rpm, rev.SparkMax.ControlType.kVelocity)
