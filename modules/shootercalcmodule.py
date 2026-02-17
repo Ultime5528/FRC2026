@@ -51,11 +51,11 @@ def computeShooterSpeedToShoot(
 ) -> float:
 
     if target_position.distance(shooter_position) >= long_shoot_zone:
-        shooter_angle = math.radians(60.0)
+        shooter_angle = 60.0*(math.pi/180)
     else:
-        shooter_angle = math.radians(70.0)
+        shooter_angle = 70.0*(math.pi/180)
 
-    gravity = float(units.standard_gravity)
+    gravity = 9.80665
 
     delta_x = target_position.x - shooter_position.x
     delta_y = target_position.y - shooter_position.y
@@ -63,7 +63,7 @@ def computeShooterSpeedToShoot(
 
     distance_xy = math.hypot(delta_x, delta_y)
 
-    distance_xy_squared = distance_xy**2
+    distance_xy_squared = distance_xy ** 2
 
     numerator = gravity * distance_xy_squared
     denominator = (2 * (math.cos(shooter_angle)) ** 2) * (
@@ -86,9 +86,9 @@ def shouldUseGuide(
 
 
 def computeShooterPosition(
-    robot_pose: Pose3d, shooter_pose: Transform3d
+    robot_pose: Pose3d, shooter_offset: Transform3d
 ) -> Translation3d:
-    return (robot_pose.transformBy(shooter_pose)).translation()
+    return robot_pose.transformBy(shooter_offset).translation()
 
 
 class ShooterCalcModule(Module):
