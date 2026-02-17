@@ -9,7 +9,7 @@ from ultime.tests import RobotTestController
 def test_ports(robot: Robot):
     guide = robot.hardware.guide
 
-    assert guide._motor.getChannel() == 0
+    assert guide._motor.getChannel() == 5
     assert guide._min_switch.getChannel() == 7
 
 
