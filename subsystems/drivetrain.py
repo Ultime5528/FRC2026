@@ -48,6 +48,9 @@ class Drivetrain(Subsystem):
             Switch.Type.NormallyOpen, ports.DIO.drivetrain_photocell_right
         )
 
+        self._sees_tower_left = self.createProperty(False)
+        self._sees_tower_right = self.createProperty(False)
+
         # Swerve Module motor positions
         self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
@@ -174,13 +177,13 @@ class Drivetrain(Subsystem):
             self.sim_yaw = 0
 
     def seesTowerLeft(self):
-        return self.photocell_left.isPressed()
+        return self._sees_tower_left
 
     def seesTowerRight(self):
-        return self.photocell_right.isPressed()
+        return self._sees_tower_right
 
     def alignedToTower(self):
-        return self.photocell_left.isPressed() and self.photocell_right.isPressed()
+        return self.seesTowerLeft() and self.seesTowerRight()
 
     def driveFromStickInputs(
         self,
@@ -323,6 +326,9 @@ class Drivetrain(Subsystem):
         return updated_speeds
 
     def readInputs(self):
+        self._sees_tower_left = self.photocell_left.isPressed()
+        self._sees_tower_right = self.photocell_right.isPressed()
+
         self.swerve_module_fl.readInputs()
         self.swerve_module_fr.readInputs()
         self.swerve_module_bl.readInputs()
