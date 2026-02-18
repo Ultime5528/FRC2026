@@ -104,7 +104,9 @@ class DashboardModule(Module):
         """
         Group
         """
-        putCommandOnDashboard("Group", ResetAll(hardware.climber, hardware.pivot, hardware.guide))
+        putCommandOnDashboard(
+            "Group", ResetAll(hardware.climber, hardware.pivot, hardware.guide)
+        )
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
