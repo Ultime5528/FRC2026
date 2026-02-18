@@ -15,6 +15,7 @@ def test_ports(robot: Robot):
 
 def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
+    rpm_tolerance = manual_shoot_properties.speed_rpm * 0.01
 
     robot_controller.startTeleop()
 
@@ -34,8 +35,8 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(10.0)
 
-    assert manual_shoot_properties.speed_rpm == approx(
-        shooter.getCurrentSpeed(), abs=10.0
+    assert shooter.getCurrentSpeed() == approx(
+        manual_shoot_properties.speed_rpm, abs=rpm_tolerance
     )
 
 

@@ -97,7 +97,7 @@ class LinearSubsystem(Subsystem):
 
     def setSpeed(self, speed: float) -> None:
         if speed < 0.0 and (
-                (self.isSwitchMinPressed() and self._should_block_min_switch)
+            (self.isSwitchMinPressed() and self._should_block_min_switch)
             or (
                 self._should_block_min_position
                 and self.hasReset()
@@ -106,7 +106,7 @@ class LinearSubsystem(Subsystem):
         ):
             speed = 0.0
         elif speed > 0.0 and (
-                (self.isSwitchMaxPressed() and self._should_block_max_switch)
+            (self.isSwitchMaxPressed() and self._should_block_max_switch)
             or (
                 self._should_block_max_position
                 and self.hasReset()

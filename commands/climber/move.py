@@ -53,8 +53,8 @@ class MoveClimber(MoveLinear):
         super().__init__(
             climber,
             end_position,
-            lambda: _move_properties.speed_up,
-            lambda: _move_properties.speed_down,
+            lambda: _move_properties.speed_min,
+            lambda: _move_properties.speed_max,
             lambda: _move_properties.accel,
         )
 
@@ -76,12 +76,12 @@ _reset_properties = _PropertiesReset()
 
 
 class _PropertiesMove:
-    speed_up = autoproperty(0.1, subtable=MoveClimber.__name__)
-    speed_down = autoproperty(1.0, subtable=MoveClimber.__name__)
+    speed_min = autoproperty(0.1, subtable=MoveClimber.__name__)
+    speed_max = autoproperty(1.0, subtable=MoveClimber.__name__)
     accel = autoproperty(0.5, subtable=MoveClimber.__name__)
     position_climbed = autoproperty(100.0, subtable=MoveClimber.__name__)
     position_ready = autoproperty(190.0, subtable=MoveClimber.__name__)
-    position_retracted = autoproperty(0.0, subtable=MoveClimber.__name__)
+    position_retracted = autoproperty(1.0, subtable=MoveClimber.__name__)
 
 
 _move_properties = _PropertiesMove()

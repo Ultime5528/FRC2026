@@ -22,14 +22,14 @@ class Climber(LinearSubsystem):
 
     def __init__(self):
         super().__init__(
-            sim_initial_position=self.height_max,
+            sim_initial_position=self.height_max * 0.5,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
             should_block_max_position=True,
             should_block_min_switch=True,
             should_block_max_switch=True,
-            sim_motor_to_distance_factor=1.0,
+            sim_motor_to_distance_factor=80.0,
             sim_gravity=0.0,
         )
 

@@ -23,7 +23,6 @@ class Shooter(Subsystem):
     def __init__(self):
         super().__init__()
 
-
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
@@ -54,7 +53,6 @@ class Shooter(Subsystem):
             rev.ResetMode.kResetSafeParameters,
             rev.PersistMode.kNoPersistParameters,
         )
-
 
     def shoot(self, rpm):
         self._flywheel_controller.setSetpoint(rpm, rev.SparkMax.ControlType.kVelocity)

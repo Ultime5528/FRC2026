@@ -1,4 +1,3 @@
-
 from subsystems.shooter import Shooter
 from ultime.command import Command
 
