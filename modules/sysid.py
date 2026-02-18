@@ -63,8 +63,7 @@ class SysID(Module):
         )
 
         wpilib.SmartDashboard.putData(
-            "SysID/ForwardPosition",
-            ForwardPosition(self.drivetrain)
+            "SysID/ForwardPosition", ForwardPosition(self.drivetrain)
         )
 
         wpilib.SmartDashboard.putData(
