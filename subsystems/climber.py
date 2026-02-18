@@ -4,26 +4,22 @@ from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
 import ports
+from ultime.autoproperty import autoproperty
 from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
-    position_hug_left = autoproperty(0.0)
-    position_unhug_left = autoproperty(1.0)
-    position_hug_right = autoproperty(0.0)
-    position_unhug_right = autoproperty(0.0)
-    delay_hug = autoproperty(2.0)
 
     position_conversion_factor = autoproperty(1.0)
-    height_max = autoproperty(190.0)
+    speed_maintain = autoproperty(0.04)
+    position_min = autoproperty(0.0)
+    position_max = autoproperty(190.0)
 
     def __init__(self):
 
-        position_max = 0.295
-
         super().__init__(
-            sim_initial_position=self.height_max * 0.5,
+            sim_initial_position=self.position_max * 0.5,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
@@ -34,19 +30,12 @@ class Climber(LinearSubsystem):
             sim_gravity=0.0,
         )
 
-        self.position_conversion_factor = self.createProperty(0.2)
-        self.speed_maintain = self.createProperty(0.04)
-        self.position_min = self.createProperty(0.0)
-        self.position_max = self.createProperty(position_max)
-
-        self._motor = SparkMax(
-            ports.CAN.climber_motor, SparkMax.MotorType.kBrushless
-        )
-        self._climber_motor.setInverted(False)
-        self._hugger_motor_left = wpilib.Servo(ports.PWM.climber_servo_left)
-        self._hugger_motor_right = wpilib.Servo(ports.PWM.climber_servo_right)
-        self._climber_encoder = self._climber_motor.getEncoder()
+        self._motor = SparkMax(ports.CAN.climber_motor, SparkMax.MotorType.kBrushless)
+        self._motor.setInverted(False)
+        self._encoder = self._motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
+
+        self.maintain_position_tolerance = self.position_max * 0.01
 
         if RobotBase.isSimulation():
             self._sim_motor = SparkMaxSim(self._motor, DCMotor.NEO(1))
@@ -87,5 +76,9 @@ class Climber(LinearSubsystem):
 
     def maintain(self):
         position = self.getPosition()
-        if self.hasReset() and position >= (self.position_min - 0.01) and position <= (self.position_max + 0.01):
+        if (
+            self.hasReset()
+            and position >= (self.position_min - self.maintain_position_tolerance)
+            and position <= (self.position_max + self.maintain_position_tolerance)
+        ):
             self._motor.set(self.speed_maintain)

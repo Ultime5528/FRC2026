@@ -3,9 +3,9 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
-from commands.climber.hug import Hug
+from commands.hugger.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
-from commands.climber.unhug import Unhug
+from commands.hugger.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
