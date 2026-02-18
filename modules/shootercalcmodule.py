@@ -16,14 +16,9 @@ blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
 def computeRobotRotationToAlign(
     robot_pose3d: Pose3d,
     shooter_offset: Transform3d,
+    shooter_extremity: Translation3d,
     hub_pose: Translation3d,
-) -> Rotation2d:
-
-    shooter_extremity = Translation3d(
-        (math.cos(shooter_offset.rotation().y) + shooter_offset.translation().x),
-        (math.sin(shooter_offset.rotation().y) + shooter_offset.translation().y),
-        2,
-    )
+) -> float:
 
     delta_hub_and_bot = hub_pose - robot_pose3d.translation()
     hub_at_origin = delta_hub_and_bot.rotateBy(-robot_pose3d.rotation())
@@ -37,11 +32,9 @@ def computeRobotRotationToAlign(
 
     # to avoid domain errors
     if abs(C / denominator) > 1 or denominator == 0:
-        return Rotation2d()
+        return 0.0
     else:
-        return robot_pose3d.toPose2d().rotation() + Rotation2d(
-            math.atan2(-B, -A) + math.acos(C / denominator)
-        )
+        return math.atan2(-B, -A) + math.acos(C / denominator)
 
 
 def computeShooterSpeedToShoot(
@@ -57,23 +50,23 @@ def computeShooterSpeedToShoot(
 
     gravity = 9.80665
 
-    delta_x = target_position.x - shooter_position.x
-    delta_y = target_position.y - shooter_position.y
-    delta_z = target_position.z - target_position.z
+    distance_shooter_xy = math.hypot(shooter_position.x,shooter_position.y)
+    distance_target_xy = math.hypot(target_position.x,target_position.y)
+    delta_xy = distance_target_xy - distance_shooter_xy
+    delta_z = target_position.z - shooter_position.z
 
-    distance_xy = math.hypot(delta_x, delta_y)
 
-    distance_xy_squared = distance_xy ** 2
+    distance_xy_squared = delta_xy ** 2
 
     numerator = gravity * distance_xy_squared
-    denominator = (2 * (math.cos(shooter_angle)) ** 2) * (
-        distance_xy * (math.cos(shooter_angle)) - delta_z
+    denominator = (2 * ((math.cos(shooter_angle)) ** 2)) * (
+        delta_xy * (math.tan(shooter_angle)) - delta_z
     )
 
     if denominator == 0.0:
         return -1.0
     else:
-        return numerator / denominator
+        return math.sqrt(numerator / denominator)
 
 
 def shouldUseGuide(
@@ -95,7 +88,8 @@ class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
     red_hub = Translation3d(4.625594, 4.034536, 3.057144)
     blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
-    shooter_offset = Transform3d(-0.6, -0.5, 0.0, Rotation3d(0, 180, 0))
+    shooter_offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d(Translation3d(0,0,1),0))
+    shooter_extremity = Transform3d(0.1525,-0.271,0.5,Rotation3d(Translation3d(0,0,1),0))
     speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
     rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
     speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
@@ -125,10 +119,11 @@ class ShooterCalcModule(Module):
         else:
             return self.blue_hub
 
-    def _getAngleToAlignWithTarget(self) -> Rotation2d:
+    def _getAngleToAlignWithTarget(self) -> float:
         return computeRobotRotationToAlign(
             self._drivetrain.getPose(),
             self.shooter_offset,
+            self.shooter_extremity,
             self._getTargetPose(),
         )
 
