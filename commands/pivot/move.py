@@ -53,8 +53,8 @@ class MovePivot(MoveLinear):
 
 
 class _PropertiesManual:
-    speed_up = autoproperty(0.25, subtable=ManualMovePivot.__name__)
-    speed_down = autoproperty(-0.25, subtable=ManualMovePivot.__name__)
+    speed_up = autoproperty(0.15, subtable=ManualMovePivot.__name__)
+    speed_down = autoproperty(-0.15, subtable=ManualMovePivot.__name__)
 
 
 manual_move_properties = _PropertiesManual()

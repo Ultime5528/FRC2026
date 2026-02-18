@@ -16,7 +16,7 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    speed_indexer = autoproperty(-0.15)
+    speed_indexer = autoproperty(0.15)
     speed_feeder = autoproperty(0.3)
     tolerance = autoproperty(100.0)
 
