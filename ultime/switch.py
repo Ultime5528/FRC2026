@@ -27,6 +27,10 @@ class Switch:
             or switch_type == Switch.Type.NormallyOpen
         ):
             self._input = DigitalInput(port)
+        elif self._type == Switch.Type.AlwaysPressed:
+            self._sim_switch_state = True
+        elif self._type == Switch.Type.AlwaysUnpressed:
+            self._sim_switch_state = False
 
         if is_simulation:
             if self._type == Switch.Type.NormallyOpen:
@@ -35,12 +39,6 @@ class Switch:
             elif self._type == Switch.Type.NormallyClosed:
                 self._sim_input = DIOSim(self._input)
                 self._sim_input.setValue(True)
-            elif self._type == Switch.Type.AlwaysPressed:
-                self._sim_switch_state = True
-            elif self._type == Switch.Type.AlwaysUnpressed:
-                self._sim_switch_state = False
-            else:
-                raise TypeError(f"Type is not instance of Switch.Type: {type}")
 
     def isPressed(self) -> bool:
         if self._type == Switch.Type.NormallyOpen:

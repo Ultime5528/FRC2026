@@ -9,20 +9,29 @@ from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
+    position_hug_left = autoproperty(0.0)
+    position_unhug_left = autoproperty(1.0)
+    position_hug_right = autoproperty(0.0)
+    position_unhug_right = autoproperty(0.0)
+    delay_hug = autoproperty(2.0)
 
+    position_conversion_factor = autoproperty(1.0)
+    height_max = autoproperty(190.0)
 
     def __init__(self):
 
         position_max = 0.295
 
         super().__init__(
-            sim_initial_position= position_max,
+            sim_initial_position=self.height_max * 0.5,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
             should_block_max_position=True,
-            sim_motor_to_distance_factor=1.0,
-            sim_gravity=0.04,
+            should_block_min_switch=True,
+            should_block_max_switch=True,
+            sim_motor_to_distance_factor=80.0,
+            sim_gravity=0.0,
         )
 
         self.position_conversion_factor = self.createProperty(0.2)
@@ -33,7 +42,10 @@ class Climber(LinearSubsystem):
         self._motor = SparkMax(
             ports.CAN.climber_motor, SparkMax.MotorType.kBrushless
         )
-        self._encoder = self._motor.getEncoder()
+        self._climber_motor.setInverted(False)
+        self._hugger_motor_left = wpilib.Servo(ports.PWM.climber_servo_left)
+        self._hugger_motor_right = wpilib.Servo(ports.PWM.climber_servo_right)
+        self._climber_encoder = self._climber_motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
 
         if RobotBase.isSimulation():

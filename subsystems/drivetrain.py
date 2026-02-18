@@ -15,7 +15,6 @@ from wpimath.kinematics import (
     SwerveDrive4Odometry,
     SwerveModulePosition,
 )
-from wpiutil import SendableBuilder
 
 import ports
 from ultime.alert import AlertType
@@ -23,7 +22,7 @@ from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
-from ultime.timethis import tt
+from ultime.switch import Switch
 
 
 class Drivetrain(Subsystem):
@@ -41,6 +40,17 @@ class Drivetrain(Subsystem):
 
     def __init__(self) -> None:
         super().__init__()
+        # Photocells
+        self.photocell_left = Switch(
+            Switch.Type.NormallyOpen, ports.DIO.drivetrain_photocell_left
+        )
+        self.photocell_right = Switch(
+            Switch.Type.NormallyOpen, ports.DIO.drivetrain_photocell_right
+        )
+
+        self._sees_tower_left = self.createProperty(False)
+        self._sees_tower_right = self.createProperty(False)
+
         # Swerve Module motor positions
         self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
         self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
@@ -102,7 +112,7 @@ class Drivetrain(Subsystem):
         self._gyro = ADIS16470()
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
-        self._gyro_angles_radians: float = 0.0
+        self._gyro_angles_radians = self.createProperty(0.0)
         self._gyro_rotation2d: Rotation2d = Rotation2d()
 
         self._field = wpilib.Field2d()
@@ -165,6 +175,15 @@ class Drivetrain(Subsystem):
 
         if RobotBase.isSimulation():
             self.sim_yaw = 0
+
+    def seesTowerLeft(self):
+        return self._sees_tower_left
+
+    def seesTowerRight(self):
+        return self._sees_tower_right
+
+    def alignedToTower(self):
+        return self.seesTowerLeft() and self.seesTowerRight()
 
     def driveFromStickInputs(
         self,
@@ -307,6 +326,9 @@ class Drivetrain(Subsystem):
         return updated_speeds
 
     def readInputs(self):
+        self._sees_tower_left = self.photocell_left.isPressed()
+        self._sees_tower_right = self.photocell_right.isPressed()
+
         self.swerve_module_fl.readInputs()
         self.swerve_module_fr.readInputs()
         self.swerve_module_bl.readInputs()
@@ -392,24 +414,9 @@ class Drivetrain(Subsystem):
     def getCurrentDrawAmps(self):
         return 0.0
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-
-        def noop(_):
-            pass
-
-        builder.addFloatProperty("GyroAngle", tt(self.getGyroAngleRadians), noop)
-        builder.addFloatProperty(
-            "SpeedGoal",
-            tt(
-                lambda: math.hypot(
-                    self.chassis_speed_goal.vx, self.chassis_speed_goal.vy
-                )
-            ),
-            noop,
+    def logValues(self):
+        self.log(
+            "speed_goal",
+            math.hypot(self.chassis_speed_goal.vx, self.chassis_speed_goal.vy),
         )
-        builder.addFloatProperty(
-            "Speed",
-            tt(lambda: math.hypot(self.chassis_speed.vx, self.chassis_speed.vy)),
-            noop,
-        )
+        self.log("speed", math.hypot(self._chassis_speed.vx, self._chassis_speed.vy))

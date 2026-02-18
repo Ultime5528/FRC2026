@@ -3,10 +3,14 @@ from wpilib import PowerDistribution
 
 from commands.climber.maintainclimber import MaintainClimber
 from commands.drivetrain.drive import DriveField
+from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
+from subsystems.feeder import Feeder
 from subsystems.guide import Guide
 from subsystems.hugger import Hugger
+from subsystems.pivot import Pivot
+from subsystems.shooter import Shooter
 from ultime.module import Module
 from ultime.subsystem import Subsystem
 
@@ -27,8 +31,15 @@ class HardwareModule(Module):
         self.climber.setDefaultCommand(MaintainClimber(self.climber))
         self.hugger = self.addSubsystem(Hugger())
         self.guide = self.addSubsystem(Guide())
+        self.shooter = self.addSubsystem(Shooter())
+        self.feeder = self.addSubsystem(Feeder())
+        self.pivot = self.addSubsystem(Pivot())
+        self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
+
+    def teleopInit(self) -> None:
+        self.shooter.updatePIDFConfig()
 
     def addSubsystem[T: Subsystem](self, subsystem: T) -> T:
         self.subsystems.append(subsystem)
