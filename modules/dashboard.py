@@ -13,6 +13,7 @@ from commands.feeder.grabfuel import GrabFuel
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
 from commands.pivot.maintainpivot import MaintainPivot
 from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
+from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
@@ -99,6 +100,11 @@ class DashboardModule(Module):
         putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", MaintainPivot(hardware.pivot))
+
+        """
+        Group
+        """
+        putCommandOnDashboard("Group", ResetAll(hardware.climber, hardware.pivot, hardware.guide))
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
