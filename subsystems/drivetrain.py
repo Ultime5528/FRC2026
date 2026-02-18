@@ -176,13 +176,13 @@ class Drivetrain(Subsystem):
         if RobotBase.isSimulation():
             self.sim_yaw = 0
 
-    def seesTowerLeft(self):
+    def seesTowerLeft(self) -> bool:
         return self._sees_tower_left
 
-    def seesTowerRight(self):
+    def seesTowerRight(self) -> bool:
         return self._sees_tower_right
 
-    def alignedToTower(self):
+    def alignedToTower(self) -> bool:
         return self.seesTowerLeft() and self.seesTowerRight()
 
     def driveFromStickInputs(
