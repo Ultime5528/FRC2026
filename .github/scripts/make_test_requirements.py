@@ -7,7 +7,7 @@ with open("pyproject.toml", "rb") as f:
 
 print(f"Detected robotpy version: {robotpy_version}")
 
-reqs = f"""flake8==7.1.1
+reqs = f"""flake8==7.3.0
 robotpy=={robotpy_version}
 """
 

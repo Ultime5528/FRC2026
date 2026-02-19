@@ -1,7 +1,6 @@
 from abc import abstractmethod
 
 import wpilib
-from wpiutil import SendableBuilder
 
 from ultime.subsystem import Subsystem
 
@@ -18,10 +17,10 @@ class LinearSubsystem(Subsystem):
         sim_gravity: float = 0.0,
     ):
         super().__init__()
-        self._offset = 0.0
-        self._has_reset = False
-        self._prev_is_at_min = False
-        self._prev_is_at_max = False
+        self._offset = self.createProperty(0.0)
+        self._has_reset = self.createProperty(False)
+        self._prev_is_at_min = self.createProperty(False)
+        self._prev_is_at_max = self.createProperty(False)
         self._should_reset_min = should_reset_min
         self._should_reset_max = should_reset_max
         self._should_block_min_position = should_block_min_position
@@ -32,6 +31,14 @@ class LinearSubsystem(Subsystem):
         self._sim_prev_time = wpilib.Timer.getFPGATimestamp()
         self._sim_motor_to_distance_factor = sim_motor_to_distance_factor
         self._sim_gravity = sim_gravity
+
+    def logValues(self):
+        self.log("position", self.getPosition())
+        self.log("encoder_position", self.getEncoderPosition())
+        self.log("min_switch_pressed", self.isSwitchMinPressed())
+        self.log("max_switch_pressed", self.isSwitchMaxPressed())
+        self.log("motor_output", self.getMotorOutput())
+        self.log("has_reset", self.hasReset())
 
     @abstractmethod
     def getMinPosition(self) -> float:
@@ -146,16 +153,3 @@ class LinearSubsystem(Subsystem):
             self.setSimSwitchMaxPressed(True)
         else:
             self.setSimSwitchMaxPressed(False)
-
-    def initSendable(self, builder: SendableBuilder) -> None:
-        def setHasReset(value: bool) -> None:
-            self._has_reset = value
-
-        builder.addBooleanProperty(
-            "switch_min_pressed", self.isSwitchMinPressed, lambda _: None
-        )
-        builder.addBooleanProperty(
-            "switch_max_pressed", self.isSwitchMaxPressed, lambda _: None
-        )
-        builder.addDoubleProperty("position", self.getPosition, lambda _: None)
-        builder.addBooleanProperty("has_reset", self.hasReset, setHasReset)

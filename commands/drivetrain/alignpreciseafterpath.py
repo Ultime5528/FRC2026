@@ -12,9 +12,10 @@ class AlignPreciseAfterPath(Command):
     distance_threshold = autoproperty(0.05)
     rotation_threshold = autoproperty(2.0)
 
-    def __init__(self, drivetrain: Drivetrain, path_or_pose: PathPlannerPath|Pose2d):
+    def __init__(self, drivetrain: Drivetrain, path_or_pose: PathPlannerPath | Pose2d):
         super().__init__()
         self.drivetrain = drivetrain
+        self.addRequirements(drivetrain)
         self.path_or_pose = path_or_pose
         self.after_path_goal: Pose2d = Pose2d()
         self.holonomic_drive_controller = self.drivetrain.pp_holonomic_drive_controller
