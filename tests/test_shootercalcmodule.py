@@ -52,20 +52,12 @@ def test_zero_angles():
             shooter_second_offset,
             rotated_target,
         )
-        assert (
-            angle_correction == approx(0.0, abs=0.0001)
-            or angle_correction == approx(math.tau, abs=0.0001)
-            or angle_correction == approx(-math.tau, abs=0.0001)
-        )
+        assert angle_correction == approx(0.0, abs=0.0001)
 
         angle_correction_simple = computeRobotRotationToAlignSimple(
             rotated_shooter_pose3d, rotated_target
         )
-        assert (
-            angle_correction_simple == approx(0.0, abs=0.0001)
-            or angle_correction_simple == approx(math.tau, abs=0.0001)
-            or angle_correction_simple == approx(-math.tau, abs=0.0001)
-        )
+        assert angle_correction_simple == approx(0.0, abs=0.0001)
 
 
 def _test_counterclockwise_common(added_angle_to_target: float, sign_of_angle):
