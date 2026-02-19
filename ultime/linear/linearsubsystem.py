@@ -95,24 +95,30 @@ class LinearSubsystem(Subsystem):
     def setSimSwitchMaxPressed(self, pressed: bool) -> None:
         raise NotImplementedError()
 
-    def setSpeed(self, speed: float) -> None:
-        if speed < 0.0 and (
+    def shouldBlockDown(self) -> bool:
+        return (
             (self.isSwitchMinPressed() and self._should_block_min_switch)
             or (
                 self._should_block_min_position
                 and self.hasReset()
                 and self.getPosition() < self.getMinPosition()
             )
-        ):
-            speed = 0.0
-        elif speed > 0.0 and (
+        )
+
+    def shouldBlockUp(self) -> bool:
+        return (
             (self.isSwitchMaxPressed() and self._should_block_max_switch)
             or (
                 self._should_block_max_position
                 and self.hasReset()
                 and self.getPosition() > self.getMaxPosition()
             )
-        ):
+        )
+
+    def setSpeed(self, speed: float) -> None:
+        if speed < 0.0 and self.shouldBlockDown():
+            speed = 0.0
+        elif speed > 0.0 and self.shouldBlockUp():
             speed = 0.0
 
         self._setMotorOutput(speed)
