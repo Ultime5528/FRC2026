@@ -1,9 +1,10 @@
 import math
 
+import numpy
 from _pytest.python_api import approx
 from hal import AllianceStationID
 from wpilib.simulation import DriverStationSim
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Rotation2d
 
 from modules.shootercalcmodule import (
     ShooterCalcModule,
@@ -28,24 +29,83 @@ from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 #     assert
 
 
-def test_computeRobotRotationToAlign_1():
-    robot = Pose3d(2, 3, 0, Rotation3d(Translation3d(0, 0, 1), 0))
-    offset = Translation3d(-0.1525, -0.271, 0.5)
-    extreme = Translation3d(0.1525, -0.271, 0.5)
-    red_hub = Translation3d(4.625594, 4.034536, 3.057144)
-    angle = computeRobotRotationToAlign(robot, offset, extreme, red_hub)
-    assert angle == approx((-27.0159828199 * math.pi / 180), abs=0.0001)
-
-
 def test_zero_angles():
-    robot = Pose3d(2, 3, 0, Rotation3d())
-    offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d())
-    extreme = Translation3d(0.1525, -0.271, 0.5)
-    red_hub = Translation3d(10, 3 - 0.271, 3.057144)
-    shooter_pose3d = robot.transformBy(offset)
 
-    angle = computeRobotRotationToAlign(robot, offset.translation(), extreme, red_hub)
-    assert angle == approx(0.0, abs=0.0001)
+    robot_pose3d = Pose3d(2, 3, 0, Rotation3d())
+    shooter_offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d())
+    shooter_second_offset = Translation3d(0.1525, -0.271, 0.5)
+    target = Translation3d(10, 3 - 0.271, 3.057144)
 
-    angleSimple = computeRobotRotationToAlignSimple(shooter_pose3d, red_hub)
-    assert angleSimple == approx(0.0, abs=0.0001)
+    angles = numpy.linspace(0, 2 * numpy.pi, 31, endpoint=False)
+
+    for angle in angles:
+
+        rotation = Rotation3d(0, 0, angle)
+
+        rotated_robot_pose3d = robot_pose3d.rotateBy(rotation)
+        rotated_target = target.rotateBy(rotation)
+        rotated_shooter_pose3d = rotated_robot_pose3d.transformBy(shooter_offset)
+
+        angle_correction = computeRobotRotationToAlign(
+            rotated_robot_pose3d,
+            shooter_offset.translation(),
+            shooter_second_offset,
+            rotated_target,
+        )
+        assert (
+            angle_correction == approx(0.0, abs=0.0001)
+            or angle_correction == approx(math.tau, abs=0.0001)
+            or angle_correction == approx(-math.tau, abs=0.0001)
+        )
+
+        angle_correction_simple = computeRobotRotationToAlignSimple(
+            rotated_shooter_pose3d, rotated_target
+        )
+        assert (
+            angle_correction_simple == approx(0.0, abs=0.0001)
+            or angle_correction_simple == approx(math.tau, abs=0.0001)
+            or angle_correction_simple == approx(-math.tau, abs=0.0001)
+        )
+
+
+def _test_counterclockwise_common(added_angle_to_target: float, sign_of_angle):
+
+    robot_pose3d = Pose3d(2, 3, 0, Rotation3d())
+    shooter_offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d())
+    shooter_second_offset = Translation3d(0.1525, -0.271, 0.5)
+    target = Translation3d(10, 3 - 0.271, 3.057144)
+
+    angles = numpy.linspace(0, 2 * numpy.pi, 31, endpoint=False)
+
+    for angle in angles:
+        rotation_robot = Rotation3d(0, 0, angle)
+        rotation_target = Rotation3d(0, 0, angle + added_angle_to_target)
+
+        rotated_robot_pose3d = robot_pose3d.rotateBy(rotation_robot)
+        rotated_target = target.rotateBy(rotation_target)
+        rotated_shooter_pose3d = rotated_robot_pose3d.transformBy(shooter_offset)
+
+        angle_correction = computeRobotRotationToAlign(
+            rotated_robot_pose3d,
+            shooter_offset.translation(),
+            shooter_second_offset,
+            rotated_target,
+        )
+
+        angle_correction_simple = computeRobotRotationToAlignSimple(
+            rotated_shooter_pose3d, rotated_target
+        )
+
+        assert angle_correction * sign_of_angle > 0.0
+        assert angle_correction_simple * sign_of_angle > 0.0
+
+
+def test_counterclockwise():
+    _test_counterclockwise_common(0.01, 1.0)
+    _test_counterclockwise_common(0.1, 1.0)
+    _test_counterclockwise_common(1.0, 1.0)
+    _test_counterclockwise_common(2.0, 1.0)
+    _test_counterclockwise_common(-0.01, -1.0)
+    _test_counterclockwise_common(-0.1, -1.0)
+    _test_counterclockwise_common(-1.0, -1.0)
+    _test_counterclockwise_common(-2.0, -1.0)

@@ -9,6 +9,17 @@ from ultime.linearinterpolator import LinearInterpolator
 from ultime.module import Module
 
 
+def normalizeAngleRadians(angle: float) -> float:
+    angle_normalized = angle % math.tau
+    if angle_normalized >= math.pi:
+        angle_normalized -= math.tau
+    return angle_normalized
+
+
+def computeAngleDifferenceRadians(angle1: float, angle2: float) -> float:
+    return normalizeAngleRadians(angle1 - angle2)
+
+
 def computeRobotRotationToAlignSimple(
     shooter_pose3d: Pose3d,
     hub_position: Translation3d,
@@ -16,7 +27,7 @@ def computeRobotRotationToAlignSimple(
     shooter_to_hub = (hub_position - shooter_pose3d.translation()).toTranslation2d()
     shooter_to_hub_angle = shooter_to_hub.angle().radians()
     shooter_angle = shooter_pose3d.rotation().angle
-    return shooter_to_hub_angle - shooter_angle
+    return computeAngleDifferenceRadians(shooter_to_hub_angle, shooter_angle)
 
 
 def computeRobotRotationToAlign(
@@ -43,7 +54,7 @@ def computeRobotRotationToAlign(
     if abs(C / denominator) > 1 or denominator == 0:
         return 0.0
     else:
-        return math.atan2(B, A) + math.acos(C / denominator)
+        return normalizeAngleRadians(-(math.atan2(B, A) + math.acos(C / denominator)))
 
 
 def computeShooterSpeedToShoot(
