@@ -15,6 +15,7 @@ class Shooter(Subsystem):
     kD = 0.0
     kF = 12.0 / 4400  # 12 volts max divided by max RPM
 
+    speed_indexer_stuck = autoproperty(0.05)
     speed_indexer = autoproperty(0.5)
     speed_feeder = autoproperty(0.5)
     tolerance = autoproperty(100.0)
@@ -33,7 +34,7 @@ class Shooter(Subsystem):
             rev.PersistMode.kNoPersistParameters,
         )
         self._flywheel_controller = self._flywheel.getClosedLoopController()
-        self._encoder = self._flywheel.getEncoder()
+        self._flywheel_encoder = self._flywheel.getEncoder()
 
         self.rpm_current = self.createProperty(0.0)
 
@@ -43,6 +44,8 @@ class Shooter(Subsystem):
         self._indexer = self._indexer = rev.SparkMax(
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
+        self._indexer_encoder = self._indexer.getEncoder()
+
         self._velocity_filter = LinearFilter.movingAverage(25)
 
         self._is_at_velocity = self.createProperty(False)
@@ -65,7 +68,7 @@ class Shooter(Subsystem):
         if is_simulation:
             self.rpm_current = self._flywheel_sim.getVelocity()
         else:
-            self.rpm_current = self._encoder.getVelocity()
+            self.rpm_current = self._flywheel_encoder.getVelocity()
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
@@ -84,3 +87,7 @@ class Shooter(Subsystem):
 
     def isAtVelocity(self):
         return self._is_at_velocity
+
+    def unblockIndexer(self):
+        if self._flywheel_encoder.getVelocity() <= self.speed_indexer_stuck:
+            self._indexer.set(-self.speed_indexer)
