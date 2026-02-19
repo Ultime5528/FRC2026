@@ -11,11 +11,11 @@ from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
-    position_hug_left = autoproperty(0.0)
-    position_unhug_left = autoproperty(1.0)
-    position_hug_right = autoproperty(0.0)
-    position_unhug_right = autoproperty(0.0)
-    delay_hug = autoproperty(2.0)
+    position_hug_left = autoproperty(0.43)
+    position_unhug_left = autoproperty(0.06)
+    position_hug_right = autoproperty(0.05)
+    position_unhug_right = autoproperty(0.47)
+    delay_hug = autoproperty(0.5)
 
     position_conversion_factor = autoproperty(1.0)
     height_max = autoproperty(190.0)
