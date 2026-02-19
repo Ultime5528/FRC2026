@@ -30,6 +30,10 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     assert cmd.isScheduled()
 
     assert shooter._flywheel_controller.getSetpoint() > 0
+
+    robot_controller.wait_until(lambda: shooter.isAtVelocity(), 10.0)
+
+    assert shooter._flywheel_controller.getSetpoint() > 0
     assert shooter._indexer.get() == approx(shooter.speed_indexer)
     assert shooter._feeder.get() == approx(shooter.speed_feeder)
 

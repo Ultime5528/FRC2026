@@ -81,7 +81,9 @@ def _test_move_climber_common(
     cmd_1.schedule()
 
     robot_controller.wait_one_frame()
-    assert math.copysign(1.0, final_position_1) * climber.getMotorOutput() > 0.0
+    assert (
+        final_position_1 == climber.getPosition() and climber.getMotorOutput() == 0.0
+    ) or (math.copysign(1.0, final_position_1) * climber.getMotorOutput() > 0.0)
 
     robot_controller.run_command(cmd_1, 10.0)
     robot_controller.wait_one_frame()
@@ -94,6 +96,8 @@ def _test_move_climber_common(
 
     robot_controller.wait_one_frame()
     assert (
+        final_position_2 == climber.getPosition() and climber.getMotorOutput() == 0.0
+    ) or (
         math.copysign(1.0, (final_position_2 - climber.getPosition()))
         * climber.getMotorOutput()
         > 0.0

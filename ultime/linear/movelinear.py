@@ -39,7 +39,7 @@ class MoveLinear(Command):
         self.subsystem.setSpeed(self.motion.getSpeed())
 
     def isFinished(self):
-        if self.subsystem.hasReset():
+        if not self.subsystem.hasReset():
             return True
         elif self.motion.getSpeed() > 0.0 and self.subsystem.shouldBlockUp():
             return True
