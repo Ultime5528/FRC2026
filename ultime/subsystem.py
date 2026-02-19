@@ -3,7 +3,6 @@ from wpiutil import SendableBuilder
 
 from ultime.alert import AlertCreator
 from ultime.log import Loggable
-from ultime.timethis import tt
 
 
 class Subsystem(Loggable, AlertCreator, commands2.Subsystem):
@@ -34,5 +33,5 @@ class Subsystem(Loggable, AlertCreator, commands2.Subsystem):
             pass
 
         builder.setSmartDashboardType("List")
-        builder.addStringProperty("Current command", tt(currentCommandName), noop)
-        builder.addStringProperty("Default command", tt(defaultCommandName), noop)
+        builder.addStringProperty("Current command", currentCommandName, noop)
+        builder.addStringProperty("Default command", defaultCommandName, noop)
