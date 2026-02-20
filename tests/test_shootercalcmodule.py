@@ -18,15 +18,14 @@ from ultime.tests import RobotTestController
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
 
-# def test_ShooterPower(robot_controller: RobotTestController, robot: Robot):
-#     shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
-#     red_hub = shooter_calc_module.red_hub
-#     robot_controller.startTeleop()
-#     robot_controller.run_command(ResetPose(robot.hardware.drivetrain,Pose2d(2,3,0)),timeout=3.0)
-#     robot_controller.wait(0.2)
-#     angle = shooter_calc_module._getAngleToAlignWithTarget()
-#     rpm = shooter_calc_module.getRPM()
-#     assert
+ def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
+     shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
+     robot_controller.startTeleop()
+     robot_controller.run_command(ResetPose(robot.hardware.drivetrain,Pose2d(2,3,0)),timeout=3.0)
+     robot_controller.wait(0.2)
+     angle = shooter_calc_module._getAngleToAlignWithTarget()
+     rpm = shooter_calc_module.getRPM()
+     assert
 
 
 def test_zero_angles():
