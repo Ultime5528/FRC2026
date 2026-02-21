@@ -1,5 +1,6 @@
 import commands2.sysid
 import wpilib
+from commands2.cmd import sequence
 
 from commands.drivetrain.forwardposition import ForwardPosition
 from subsystems.drivetrain import Drivetrain
@@ -68,28 +69,40 @@ class SysID(Module):
 
         wpilib.SmartDashboard.putData(
             "SysID/QuasistaticForward",
-            self.sys_id_routine.quasistatic(
+            sequence(
+                ForwardPosition(self.drivetrain),
+                self.sys_id_routine.quasistatic(
                 commands2.sysid.SysIdRoutine.Direction.kForward
-            ),
+                ),
+            )
         )
 
         wpilib.SmartDashboard.putData(
             "SysID/QuasistaticReverse",
-            self.sys_id_routine.quasistatic(
-                commands2.sysid.SysIdRoutine.Direction.kReverse
-            ),
+            sequence(
+                ForwardPosition(self.drivetrain),
+                self.sys_id_routine.quasistatic(
+                    commands2.sysid.SysIdRoutine.Direction.kReverse
+                ),
+            )
         )
 
         wpilib.SmartDashboard.putData(
             "SysID/DynamicForward",
-            self.sys_id_routine.dynamic(
-                commands2.sysid.SysIdRoutine.Direction.kForward
-            ),
+            sequence(
+                ForwardPosition(self.drivetrain),
+                self.sys_id_routine.dynamic(
+                    commands2.sysid.SysIdRoutine.Direction.kForward
+                ),
+            )
         )
 
         wpilib.SmartDashboard.putData(
             "SysID/DynamicReverse",
-            self.sys_id_routine.dynamic(
-                commands2.sysid.SysIdRoutine.Direction.kReverse
-            ),
+            sequence(
+                ForwardPosition(self.drivetrain),
+                self.sys_id_routine.dynamic(
+                    commands2.sysid.SysIdRoutine.Direction.kReverse
+                ),
+            )
         )
