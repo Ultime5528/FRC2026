@@ -11,3 +11,12 @@ def pf(current, target, kS, kF, kP):
     error = target - current
     volts = feedforward(target, kS, kF) + kP * error
     return volts
+
+
+def clamp(value, min, max):
+    if value < min:
+        return min
+    elif value > max:
+        return max
+    else:
+        return value
