@@ -9,6 +9,7 @@ class PathFindFollowPath(SequentialCommandGroup):
     def __init__(self, drivetrain: Drivetrain, path: PathPlannerPath):
         super().__init__()
         self.drivetrain = drivetrain
+        self.addRequirements(drivetrain)
         self.path = path
 
         self.addCommands(
