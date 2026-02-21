@@ -1,10 +1,14 @@
 import commands2
 import wpilib
 from commands2 import CommandScheduler
+from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
+from wpimath.geometry import Pose2d
 
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
+from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel
@@ -53,6 +57,13 @@ class DashboardModule(Module):
         putCommandOnDashboard("Drivetrain", DriveRelative.forwards(hardware.drivetrain))
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
+        )
+        path = PathPlannerPath.fromPathFile("Test")
+        putCommandOnDashboard(
+            "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
+        )
+        putCommandOnDashboard(
+            "Drivetrain", PathFindPrecise(hardware.drivetrain, Pose2d(8, 4, 0))
         )
 
         """
