@@ -63,10 +63,10 @@ def computeShooterSpeedToShoot(
     long_shoot_zone: float,
 ) -> float:
 
-    if target_position.distance(shooter_position) >= long_shoot_zone:
+    if shouldUseGuide(shooter_position, target_position, long_shoot_zone):
         shooter_angle = math.radians(60.0)
     else:
-        shooter_angle = 70.0 * (math.pi / 180)
+        shooter_angle = math.radians(70.0)
 
     gravity = 9.80665
 
@@ -160,34 +160,20 @@ class ShooterCalcModule(Module):
             self._getHubPosition(),
         )
 
-    def _shouldUseGuide(self) -> bool:
+    def shouldUseGuide(self) -> bool:
         return shouldUseGuide(
-            Pose3d(self._drivetrain.getPose()).translation(),
+            self._getShooterPose(),
             self._getHubPosition(),
             self.long_zone,
         )
 
     def getRPM(self) -> float:
-        if self._shouldUseGuide():
-            return self._interpolator_for_open_guide.interpolate(
-                computeShooterSpeedToShoot(
-                    self._getShooterPose(), self._getHubPosition(), self.long_zone
-                )
-            )
+        if self.shouldUseGuide():
+            return self._interpolator_for_open_guide.interpolate(self.getRPMRaw())
         else:
-            return self._interpolator_for_closed_guide.interpolate(
-                computeShooterSpeedToShoot(
-                    self._getShooterPose(), self._getHubPosition(), self.long_zone
-                )
-            )
+            return self._interpolator_for_closed_guide.interpolate(self.getRPMRaw())
 
     def getRPMRaw(self) -> float:
-        if self._shouldUseGuide():
-            return computeShooterSpeedToShoot(
-                self._getShooterPose(), self._getHubPosition(), self.long_zone
-            )
-
-        else:
-            return computeShooterSpeedToShoot(
-                self._getShooterPose(), self._getHubPosition(), self.long_zone
-            )
+        return computeShooterSpeedToShoot(
+            self._getShooterPose(), self._getHubPosition(), self.long_zone
+        )
