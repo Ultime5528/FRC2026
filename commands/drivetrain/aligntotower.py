@@ -14,13 +14,9 @@ class AlignToTower(Command):
 
     def execute(self):
         if self.drivetrain.seesTowerLeft():
-            self.drivetrain.driveFromStickInputs(
-                0, self.speed, 0, False
-            )
+            self.drivetrain.driveFromStickInputs(0, self.speed, 0, False)
         elif self.drivetrain.seesTowerRight():
-            self.drivetrain.driveFromStickInputs(
-                0, -self.speed, 0, False
-            )
+            self.drivetrain.driveFromStickInputs(0, -self.speed, 0, False)
         else:
             self.drivetrain.stop()
 
