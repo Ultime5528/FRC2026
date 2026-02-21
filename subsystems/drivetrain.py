@@ -3,9 +3,13 @@ import math
 import wpilib
 import wpimath
 from ntcore import NetworkTableInstance
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import PIDConstants, RobotConfig
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.path import PathPlannerPath, PathConstraints
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase
+from wpilib import RobotBase, DriverStation
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
 from wpimath.kinematics import (
@@ -20,6 +24,7 @@ import ports
 from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
+from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
 from ultime.switch import Switch
@@ -28,6 +33,8 @@ from ultime.switch import Switch
 class Drivetrain(Subsystem):
     width = 0.597
     length = 0.673
+    p_gain_translation = 5.0
+    p_gain_rotation = 5.0
     max_angular_speed = autoproperty(25.0)
     max_speed = autoproperty(5.0)
 
@@ -99,6 +106,39 @@ class Drivetrain(Subsystem):
             NetworkTableInstance.getDefault()
             .getStructTopic("Chassis Speed", ChassisSpeeds)
             .publish()
+        )
+
+        self.pp_holonomic_drive_controller = PPHolonomicDriveController(
+            PIDConstants(self.p_gain_translation, 0.0, 0.0),
+            PIDConstants(self.p_gain_rotation, 0.0, 0.0),
+        )
+
+        """
+        Config used in the path following
+        """
+        config = RobotConfig.fromGUISettings()
+
+        AutoBuilder.configure(
+            self.getPose,
+            self.resetToPose,
+            self.getRobotRelativeChassisSpeeds,
+            lambda speeds, feedforwards: self.driveFromChassisSpeeds(
+                speeds, feedforwards
+            ),
+            self.pp_holonomic_drive_controller,
+            config,
+            self.shouldFlipPath,
+            self,
+        )
+
+        """
+        Config used only when path finding to a pose
+        """
+        self.pathfinding_constraints = PathConstraints(
+            maxVelocityMps=3.0,
+            maxAccelerationMpsSq=1.0,
+            maxAngularVelocityRps=3.1415,
+            maxAngularAccelerationRpsSq=3.1415,
         )
 
         self._estimated_pose: Pose2d = Pose2d()
@@ -173,7 +213,7 @@ class Drivetrain(Subsystem):
             for location in self.swerve_modules.keys()
         }
 
-        if RobotBase.isSimulation():
+        if is_simulation:
             self.sim_yaw = 0
 
     def seesTowerLeft(self) -> bool:
@@ -413,6 +453,23 @@ class Drivetrain(Subsystem):
 
     def getCurrentDrawAmps(self):
         return 0.0
+
+    def shouldFlipPath(self):
+        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
+
+    def getFollowCommand(self, path: PathPlannerPath):
+        return AutoBuilder.followPath(path)
+
+    def getPathFindingCommand(self, pose: Pose2d):
+        # TODO adjust the "goal_end_vel" if wanted for a smoother "AlignPreciseAfterPath"
+        return AutoBuilder.pathfindToPose(
+            pose=pose, constraints=self.pathfinding_constraints, goal_end_vel=0.0
+        )
+
+    def getPathFindingFollowPathCommand(self, path: PathPlannerPath):
+        return AutoBuilder.pathfindThenFollowPath(
+            goal_path=path, pathfinding_constraints=self.pathfinding_constraints
+        )
 
     def logValues(self):
         self.log(
