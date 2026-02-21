@@ -38,3 +38,5 @@ def unhug_test(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(hugger.delay_hug + 0.1)
     assert not cmd.isScheduled()
+
+
