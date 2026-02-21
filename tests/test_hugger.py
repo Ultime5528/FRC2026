@@ -1,7 +1,6 @@
 from commands.hugger.hug import Hug
 from commands.hugger.unhug import Unhug
 from robot import Robot
-from ultime.autoproperty import autoproperty
 from ultime.tests import RobotTestController
 
 

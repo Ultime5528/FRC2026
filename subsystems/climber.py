@@ -1,4 +1,3 @@
-import wpilib
 from rev import SparkMax, SparkMaxSim
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor

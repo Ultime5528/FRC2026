@@ -3,14 +3,14 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
-from commands.hugger.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
-from commands.hugger.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.hugger.hug import Hug
+from commands.hugger.unhug import Unhug
 from commands.pivot.maintainpivot import MaintainPivot
 from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
