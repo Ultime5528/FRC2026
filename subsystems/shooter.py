@@ -88,6 +88,12 @@ class Shooter(Subsystem):
     def isAtVelocity(self):
         return self._is_at_velocity
 
+    def hasSurpassedStuckSpeed(self) -> bool:
+        return self._indexer_encoder.getVelocity() > self.speed_indexer_stuck
+
     def unblockIndexer(self):
-        if self._flywheel_encoder.getVelocity() <= self.speed_indexer_stuck:
+        if self.speed_indexer.hasSurpassedStuckSpeed() and self._flywheel_encoder.getVelocity() <= self.speed_indexer_stuck:
             self._indexer.set(-self.speed_indexer)
+
+    def shootAndSendFuel(self):
+        pass
