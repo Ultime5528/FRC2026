@@ -3,7 +3,10 @@ import math
 from wpilib import DriverStation
 from wpimath.geometry import Translation3d, Pose3d, Rotation3d, Transform3d
 
+from commands.guide import MoveGuide
+from modules import hardware
 from subsystems.drivetrain import Drivetrain
+from subsystems.guide import Guide
 from ultime.autoproperty import autoproperty
 from ultime.linearinterpolator import LinearInterpolator
 from ultime.module import Module
@@ -124,15 +127,23 @@ class ShooterCalcModule(Module):
     def __init__(
         self,
         drivetrain: Drivetrain,
+        guide: MoveGuide,
     ):
         super().__init__()
         self._drivetrain = drivetrain
+        self.guide = guide
         self._interpolator_for_open_guide = LinearInterpolator(
             self.speed_guide_open, self.rpm_guide_open
         )
         self._interpolator_for_closed_guide = LinearInterpolator(
             self.speed_guide_closed, self.rpm_guide_closed
         )
+
+    def robotPeriodic(self) -> None:
+        if self.shouldUseGuide():
+            self.guide.toUsed(Guide())
+        else:
+            self.guide.toUnused(Guide())
 
     def _getShooterPose(self) -> Translation3d:
         shooter_pose = computeShooterPosition(

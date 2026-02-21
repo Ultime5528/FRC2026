@@ -23,6 +23,7 @@ from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
+from modules.shootercalcmodule import ShooterCalcModule
 from ultime.log import Logger
 from ultime.module import Module, ModuleList
 
@@ -69,8 +70,13 @@ class DashboardModule(Module):
         """
         Shooter
         """
-        putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
-        putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
+        putCommandOnDashboard(
+            "Shooter",
+            PrepareShoot(hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)),
+        )
+        putCommandOnDashboard(
+            "Shooter", Shoot(hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide))
+        )
         putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))
 

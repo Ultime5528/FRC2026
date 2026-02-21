@@ -1,6 +1,6 @@
 from _pytest.python_api import approx
 
-from commands.guide.guide import ResetGuide, MoveGuide, _move_properties
+from commands.guide import ResetGuide, MoveGuide, _move_properties
 from robot import Robot
 from ultime.switch import Switch
 from ultime.tests import RobotTestController
