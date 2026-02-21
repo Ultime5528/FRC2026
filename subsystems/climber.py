@@ -32,6 +32,8 @@ class Climber(LinearSubsystem):
             sim_motor_to_distance_factor=80.0,
             sim_gravity=0.0,
         )
+        self._encoder_position: float = 0.0
+        self._switch_pressed: bool = False
 
         self._climber_motor = SparkMax(
             ports.CAN.climber_motor, SparkMax.MotorType.kBrushless
@@ -46,6 +48,10 @@ class Climber(LinearSubsystem):
             self._climber_sim_motor = SparkMaxSim(self._climber_motor, DCMotor.NEO(1))
             self._climber_sim_encoder = self._climber_sim_motor.getRelativeEncoderSim()
 
+    def readInputs(self):
+        self._encoder_position = self._climber_encoder.getPosition()
+        self._switch_pressed = self._switch.isPressed()
+
     def getMinPosition(self) -> float:
         return 0.0
 
@@ -53,13 +59,13 @@ class Climber(LinearSubsystem):
         return self.height_max
 
     def isSwitchMinPressed(self) -> bool:
-        return self._switch.isPressed()
+        return self._switch_pressed
 
     def isSwitchMaxPressed(self) -> bool:
         return False
 
     def getEncoderPosition(self) -> float:
-        return self._climber_encoder.getPosition()
+        return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._climber_sim_encoder.setPosition(position)
@@ -86,16 +92,3 @@ class Climber(LinearSubsystem):
     def unhug(self):
         self._hugger_motor_left.set(self.position_unhug_left)
         self._hugger_motor_right.set(self.position_unhug_right)
-
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-
-        def noop(_):
-            pass
-
-        builder.addBooleanProperty(
-            "ClimberSwitch", (lambda: self._switch.isPressed()), noop
-        )
-        builder.addFloatProperty(
-            "ClimberMotor", (lambda: self._climber_motor.get()), noop
-        )

@@ -16,6 +16,8 @@ class Pivot(LinearSubsystem):
     position_maintain_min = autoproperty(0.5)
     position_maintain_max = autoproperty(6.5)
 
+    position_conversion_factor = autoproperty(1.0)
+
     def __init__(self):
         super().__init__(
             sim_initial_position=1.0,
@@ -28,6 +30,10 @@ class Pivot(LinearSubsystem):
             sim_motor_to_distance_factor=2.0,
             sim_gravity=0.0,
         )
+        self._encoder_position: float = 0.0
+        self._switch_max_pressed: bool = False
+        self._switch_min_pressed: bool = False
+
         self._motor = rev.SparkMax(
             ports.CAN.pivot_motor, rev.SparkMax.MotorType.kBrushless
         )
@@ -40,6 +46,11 @@ class Pivot(LinearSubsystem):
         if RobotBase.isSimulation():
             self._motor_sim = SparkMaxSim(self._motor, DCMotor.NEO(1))
             self._encoder_sim = self._motor_sim.getRelativeEncoderSim()
+
+    def readInputs(self):
+        self._encoder_position = self._encoder.getPosition()
+        self._switch_max_pressed = self._switch_max.isPressed()
+        self._switch_min_pressed = self._switch_min.isPressed()
 
     def maintain(self):
         position = self.getPosition()
@@ -59,10 +70,10 @@ class Pivot(LinearSubsystem):
         return self.max_position
 
     def isSwitchMinPressed(self) -> bool:
-        return self._switch_min.isPressed()
+        return self._switch_min_pressed
 
     def isSwitchMaxPressed(self) -> bool:
-        return self._switch_max.isPressed()
+        return self._switch_max_pressed
 
     def setSimSwitchMinPressed(self, pressed: bool) -> None:
         self._switch_min.setSimValue(pressed)
@@ -71,13 +82,13 @@ class Pivot(LinearSubsystem):
         self._switch_max.setSimValue(pressed)
 
     def getEncoderPosition(self) -> float:
-        return self._encoder.getPosition()
+        return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._encoder_sim.setPosition(position)
 
     def getPositionConversionFactor(self) -> float:
-        return 1.0
+        return self.position_conversion_factor
 
     def _setMotorOutput(self, speed: float) -> None:
         self._motor.set(speed)
