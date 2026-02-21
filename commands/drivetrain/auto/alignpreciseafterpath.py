@@ -17,9 +17,9 @@ class AlignPreciseAfterPath(Command):
         self.drivetrain = drivetrain
         self.addRequirements(drivetrain)
         self.path_or_pose = path_or_pose
-        self.after_path_goal: Pose2d = Pose2d()
-        self.holonomic_drive_controller = self.drivetrain.pp_holonomic_drive_controller
-        self.pathplanner_trajectory = PathPlannerTrajectoryState()
+        self.goal_pose: Pose2d = Pose2d()
+        self.controller = self.drivetrain.pp_holonomic_drive_controller
+        self.goal_state = PathPlannerTrajectoryState()
 
     def initialize(self):
         if isinstance(self.path_or_pose, PathPlannerPath):
@@ -28,18 +28,18 @@ class AlignPreciseAfterPath(Command):
             else:
                 path = self.path_or_pose
 
-            self.after_path_goal = Pose2d(
+            self.goal_pose = Pose2d(
                 path.getPathPoses()[-1].translation(), path.getGoalEndState().rotation
             )
         else:
-            self.after_path_goal = self.path_or_pose
+            self.goal_pose = self.path_or_pose
 
-        self.pathplanner_trajectory.pose = self.after_path_goal
+        self.goal_state.pose = self.goal_pose
 
     def execute(self):
         current_pose = self.drivetrain.getPose()
-        chassis_speed = self.holonomic_drive_controller.calculateRobotRelativeSpeeds(
-            current_pose, self.pathplanner_trajectory
+        chassis_speed = self.controller.calculateRobotRelativeSpeeds(
+            current_pose, self.goal_state
         )
         self.drivetrain.driveFromChassisSpeeds(chassis_speed)
 
@@ -47,11 +47,11 @@ class AlignPreciseAfterPath(Command):
         return (
             self.drivetrain.getPose()
             .translation()
-            .distance(self.after_path_goal.translation())
+            .distance(self.goal_pose.translation())
             < self.distance_threshold
         ) and (
             self.drivetrain.getEstimatedAngle()
-            .relativeTo(self.after_path_goal.rotation())
+            .relativeTo(self.goal_pose.rotation())
             .degrees()
             < self.rotation_threshold
         )
