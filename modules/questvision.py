@@ -1,5 +1,5 @@
 import wpimath
-from wpimath.geometry import Transform3d, Pose3d
+from wpimath.geometry import Pose3d
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
@@ -14,7 +14,7 @@ robot_to_quest_offset = wpimath.geometry.Transform3d(
 )
 
 
-class QuestTagVisionModule(Module):
+class QuestVisionModule(Module):
     std_translation = autoproperty(0.03)
     std_rotation = autoproperty(0.1)
 

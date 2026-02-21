@@ -17,7 +17,7 @@ from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.system.plant import DCMotor
 from wpiutil import Sendable, SendableBuilder
 
-from ultime import swerveconfig
+from ultime.swerve import swerveconfig
 from ultime.timethis import tt
 
 
@@ -28,6 +28,14 @@ class SwerveModule:
         turning_motor_port,
         chassis_angular_offset: float,
     ):
+        self._drive_position_meters: float = 0.0
+        self._drive_velocity_meters_per_sec: float = 0.0
+        self._drive_applied_volts: float = 0.0
+        self._turn_raw_angle_radians: float = 0.0
+        self._turn_applied_volts: float = 0.0
+        self._module_state: SwerveModuleState = SwerveModuleState()
+        self._module_position: SwerveModulePosition = SwerveModulePosition()
+
         self._driving_motor = SparkMax(drive_motor_port, SparkMax.MotorType.kBrushless)
         self._turning_motor = SparkMax(
             turning_motor_port, SparkMax.MotorType.kBrushless
@@ -68,6 +76,27 @@ class SwerveModule:
 
             self.sim_turning_motor = SparkSim(self._turning_motor, DCMotor.NEO550())
             self.sim_encoder_turn = self.sim_turning_motor.getAbsoluteEncoderSim()
+
+    def readInputs(self):
+        self._drive_position_meters = self._driving_encoder.getPosition()
+        self._drive_velocity_meters_per_sec = self._driving_encoder.getVelocity()
+        self._drive_applied_volts = (
+            self._driving_motor.getBusVoltage() * self._driving_motor.getAppliedOutput()
+        )
+
+        self._turn_raw_angle_radians = self._turning_encoder.getPosition()
+        self._turn_applied_volts = (
+            self._turning_motor.getBusVoltage() * self._turning_motor.getAppliedOutput()
+        )
+
+        self._module_state = SwerveModuleState(
+            self._drive_velocity_meters_per_sec,
+            Rotation2d(self._turn_raw_angle_radians - self._chassis_angular_offset),
+        )
+        self._module_position = SwerveModulePosition(
+            self._drive_position_meters,
+            Rotation2d(self._turn_raw_angle_radians - self._chassis_angular_offset),
+        )
 
     def setDriveVoltage(self, voltage: float):
         self._driving_motor.setVoltage(voltage)
@@ -140,30 +169,22 @@ class SwerveModule:
         self.setTurnVoltage(0.0)
 
     def getAngleRandians(self):
-        return self._turning_encoder.getPosition()
+        return self._turn_raw_angle_radians
 
     def getEncoderPosition(self):
-        return self._driving_encoder.getPosition()
+        return self._drive_position_meters
 
     def getVelocity(self):
-        return self._driving_encoder.getVelocity()
+        return self._drive_velocity_meters_per_sec
 
     def getPosition(self) -> SwerveModulePosition:
-        return SwerveModulePosition(
-            self.getEncoderPosition(),
-            Rotation2d(self.getAngleRandians() - self._chassis_angular_offset),
-        )
+        return self._module_position
 
     def getState(self) -> SwerveModuleState:
-        return SwerveModuleState(
-            self.getVelocity(),
-            Rotation2d(self.getAngleRandians() - self._chassis_angular_offset),
-        )
+        return self._module_state
 
     def getDrivingMotorAppliedVoltage(self):
-        return (
-            self._driving_motor.getBusVoltage() * self._driving_motor.getAppliedOutput()
-        )
+        return self._drive_applied_volts
 
     def simulationUpdate(self, period: float):
         # Drive motor simulation
@@ -258,22 +279,22 @@ class SwerveDriveElasticSendable(Sendable):
 
         builder.addDoubleProperty(
             "Front Left Angle",
-            tt(lambda: self.module_fl.getPosition().angle.radians()),
+            tt(lambda: self.module_fl.getAngleRandians()),
             noop,
         )
         builder.addDoubleProperty(
             "Front Right Angle",
-            tt(lambda: self.module_fr.getPosition().angle.radians()),
+            tt(lambda: self.module_fr.getAngleRandians()),
             noop,
         )
         builder.addDoubleProperty(
             "Back Left Angle",
-            tt(lambda: self.module_bl.getPosition().angle.radians()),
+            tt(lambda: self.module_bl.getAngleRandians()),
             noop,
         )
         builder.addDoubleProperty(
             "Back Right Angle",
-            tt(lambda: self.module_br.getPosition().angle.radians()),
+            tt(lambda: self.module_br.getAngleRandians()),
             noop,
         )
 

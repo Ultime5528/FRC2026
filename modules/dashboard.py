@@ -3,11 +3,23 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.climber.hug import Hug
+from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.climber.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
+from commands.feeder.ejectfuel import EjectFuel
+from commands.feeder.grabfuel import GrabFuel
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.pivot.maintainpivot import MaintainPivot
+from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
+from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
+from commands.shooter.prepareshoot import PrepareShoot
+from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
-from modules.questtagvision import QuestTagVisionModule
+from modules.questvision import QuestVisionModule
+from ultime.log import Logger
 from ultime.module import Module, ModuleList
 
 
@@ -15,7 +27,7 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        quest: QuestTagVisionModule,
+        quest: QuestVisionModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
@@ -23,7 +35,7 @@ class DashboardModule(Module):
         self._hardware = hardware
         self._module_list = module_list
         self.setupCopilotCommands(hardware)
-        # self.setupCommands(hardware)
+        self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
@@ -33,7 +45,7 @@ class DashboardModule(Module):
 
     def setupCommands(self, hardware):
         """
-        Groups
+        Drivetrain
         """
         # putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, ))
         putCommandOnDashboard("Drivetrain", DriveRelative.left(hardware.drivetrain))
@@ -43,9 +55,54 @@ class DashboardModule(Module):
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
 
+        """
+        Shooter
+        """
+        putCommandOnDashboard("Shooter", PrepareShoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", Shoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
+        putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))
+
+        """
+        Guide
+        """
+        putCommandOnDashboard("Guide", ManualMoveGuide.up(hardware.guide))
+        putCommandOnDashboard("Guide", ManualMoveGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", ResetGuide.down(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUsed(hardware.guide))
+        putCommandOnDashboard("Guide", MoveGuide.toUnused(hardware.guide))
+
+        """
+        Climber
+        """
+        putCommandOnDashboard("Climber", ManualMoveClimber.up(hardware.climber))
+        putCommandOnDashboard("Climber", ManualMoveClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", ResetClimber.down(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
+        putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
+        putCommandOnDashboard("Climber", Hug(hardware.climber))
+        putCommandOnDashboard("Climber", Unhug(hardware.climber))
+
+        """
+        Feeder
+        """
+        putCommandOnDashboard("Feeder", GrabFuel(hardware.feeder))
+        putCommandOnDashboard("Feeder", EjectFuel(hardware.feeder))
+
+        """
+        Pivot
+        """
+        putCommandOnDashboard("Pivot", MovePivot.toUp(hardware.pivot))
+        putCommandOnDashboard("Pivot", MovePivot.toDown(hardware.pivot))
+        putCommandOnDashboard("Pivot", ResetPivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
+        putCommandOnDashboard("Pivot", MaintainPivot(hardware.pivot))
+
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:
-            wpilib.SmartDashboard.putData(subsystem.getName(), subsystem)
+            Logger.getInstance().addLoggable(subsystem)
 
         wpilib.SmartDashboard.putData("Gyro", self._hardware.drivetrain._gyro)
         wpilib.SmartDashboard.putData(
