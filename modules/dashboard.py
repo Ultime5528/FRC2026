@@ -6,6 +6,7 @@ from wpilib import SmartDashboard
 from commands.climber.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.climber.unhug import Unhug
+from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
@@ -54,6 +55,7 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        putCommandOnDashboard("Drivetrain", AlignToTower(hardware.drivetrain))
 
         """
         Shooter
