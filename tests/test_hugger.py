@@ -1,6 +1,7 @@
 from commands.hugger.hug import Hug
 from commands.hugger.unhug import Unhug
 from robot import Robot
+from ultime.autoproperty import autoproperty
 from ultime.tests import RobotTestController
 
 
@@ -12,10 +13,11 @@ def test_ports(robot: Robot):
 
 def test_settings(robot: Robot):
     hugger = robot.hardware.hugger
-    assert hugger.position_hug_left == 0.0
-    assert hugger.position_hug_right == 0.0
-    assert hugger.position_unhug_left == 1.0
-    assert hugger.position_unhug_right == 0.0
+    assert hugger.position_hug_left == 0.43
+    assert hugger.position_unhug_left == 0.06
+    assert hugger.position_hug_right == 0.05
+    assert hugger.position_unhug_right == 0.47
+    assert hugger.delay_hug == 0.5
 
 
 def test_hug(robot_controller: RobotTestController, robot: Robot):
