@@ -32,7 +32,7 @@ class ManualShoot(ManualPrepareShoot):
 
 
 class _ManualShootProperties:
-    speed_rpm = autoproperty(4000.0, subtable=ManualShoot.__name__)
+    speed_rpm = autoproperty(3000.0, subtable=ManualShoot.__name__)
 
 
 manual_shoot_properties = _ManualShootProperties()
