@@ -1,31 +1,40 @@
-import math
-
 import numpy
 from _pytest.python_api import approx
-from hal import AllianceStationID
-from wpilib.simulation import DriverStationSim
 from wpimath.geometry import Pose2d, Rotation2d
+from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
+from commands.drivetrain.resetpose import ResetPose
 from modules.shootercalcmodule import (
     ShooterCalcModule,
     computeRobotRotationToAlign,
-    computeShooterPosition,
     computeRobotRotationToAlignSimple,
 )
-from commands.drivetrain.resetpose import ResetPose
 from robot import Robot
 from ultime.tests import RobotTestController
-from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
 
- def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
-     shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
-     robot_controller.startTeleop()
-     robot_controller.run_command(ResetPose(robot.hardware.drivetrain,Pose2d(2,3,0)),timeout=3.0)
-     robot_controller.wait(0.2)
-     angle = shooter_calc_module._getAngleToAlignWithTarget()
-     rpm = shooter_calc_module.getRPM()
-     assert
+def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
+    shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
+    robot_controller.startTeleop()
+    robot_controller.run_command(
+        ResetPose(robot.hardware.drivetrain, Pose2d(2, 3, 0)), timeout=3.0
+    )
+    robot_controller.wait(0.2)
+    angle = shooter_calc_module.getAngleToAlignWithTarget()
+    angle_simple = shooter_calc_module.getAngleToAlignWithTargetSimple()
+    robot_controller.run_command(
+        ResetPose(
+            robot.hardware.drivetrain,
+            Pose2d(
+                robot.hardware.drivetrain.getPose().translation(), Rotation2d(angle)
+            ),
+        ),
+        timeout=3.0,
+    )
+    rpm = shooter_calc_module.getRPMRaw()
+    assert rpm == approx(11.1779781175, abs=0.01)
+    assert angle == approx(0.13114722400913124732706041777946, abs=0.005)
+    assert angle_simple == approx(0.13114722400913124732706041777946, abs=0.005)
 
 
 def test_zero_angles():

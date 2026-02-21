@@ -91,7 +91,10 @@ def computeShooterSpeedToShoot(
 def shouldUseGuide(
     robot_pose: Translation3d, target_pose: Translation3d, long_shoot_zone: float
 ) -> bool:
-    if target_pose.distance(robot_pose) >= long_shoot_zone:
+    if (
+        target_pose.toTranslation2d().distance(robot_pose.toTranslation2d())
+        >= long_shoot_zone
+    ):
         return True
     else:
         return False
@@ -132,7 +135,10 @@ class ShooterCalcModule(Module):
         )
 
     def _getShooterPose(self) -> Translation3d:
-        return computeShooterPosition(self._drivetrain.getPose(), self.shooter_offset)
+        shooter_pose = computeShooterPosition(
+            Pose3d(self._drivetrain.getPose()), self.shooter_offset
+        )
+        return shooter_pose
 
     def _getHubPosition(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
@@ -142,21 +148,27 @@ class ShooterCalcModule(Module):
 
     def getAngleToAlignWithTarget(self) -> float:
         return computeRobotRotationToAlign(
-            self._drivetrain.getPose(),
+            Pose3d(self._drivetrain.getPose()),
             self.shooter_offset.translation(),
             self.shooter_extremity,
             self._getHubPosition(),
         )
 
+    def getAngleToAlignWithTargetSimple(self) -> float:
+        return computeRobotRotationToAlignSimple(
+            Pose3d(self._getShooterPose(), self.shooter_offset.rotation()),
+            self._getHubPosition(),
+        )
+
     def _shouldUseGuide(self) -> bool:
         return shouldUseGuide(
-            self._drivetrain.getPose().translation(),
+            Pose3d(self._drivetrain.getPose()).translation(),
             self._getHubPosition(),
             self.long_zone,
         )
 
     def getRPM(self) -> float:
-        if self.shouldUseGuide():
+        if self._shouldUseGuide():
             return self._interpolator_for_open_guide.interpolate(
                 computeShooterSpeedToShoot(
                     self._getShooterPose(), self._getHubPosition(), self.long_zone
@@ -167,4 +179,15 @@ class ShooterCalcModule(Module):
                 computeShooterSpeedToShoot(
                     self._getShooterPose(), self._getHubPosition(), self.long_zone
                 )
+            )
+
+    def getRPMRaw(self) -> float:
+        if self._shouldUseGuide():
+            return computeShooterSpeedToShoot(
+                self._getShooterPose(), self._getHubPosition(), self.long_zone
+            )
+
+        else:
+            return computeShooterSpeedToShoot(
+                self._getShooterPose(), self._getHubPosition(), self.long_zone
             )
