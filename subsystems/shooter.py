@@ -19,12 +19,12 @@ class Shooter(Subsystem):
     kF = autoproperty(0.00222222)
 
     speed_feeder = autoproperty(0.5)
-    speed_rpm_indexer = autoproperty(0.5)
+    speed_rpm_indexer = autoproperty(600.0)
     tolerance = autoproperty(100.0)
 
-    kS_indexer = autoproperty(0.1)
-    kF_indexer = autoproperty(0.0)
-    kP_indexer = autoproperty(0.0)
+    kS_indexer = autoproperty(0.2)
+    kF_indexer = autoproperty(0.0018)
+    kP_indexer = autoproperty(0.002)
 
     def __init__(self):
         super().__init__()
@@ -72,7 +72,7 @@ class Shooter(Subsystem):
         self.log("rpm_target", rpm)
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
-    def sendFuel(self, rpm):
+    def sendFuel(self):
         volts_indexer = pf(
             self.indexer_current_rpm,
             self.speed_rpm_indexer,
@@ -80,7 +80,7 @@ class Shooter(Subsystem):
             self.kF_indexer,
             self.kP_indexer,
         )
-        self._indexer.setVoltage(self.speed_indexer)
+        self._indexer.setVoltage(volts_indexer)
         self._feeder.set(self.speed_feeder)
 
     def stopFuel(self):
@@ -88,6 +88,8 @@ class Shooter(Subsystem):
         self._feeder.set(0.0)
 
     def readInputs(self):
+        self.indexer_current_rpm = self._indexer_encoder.getVelocity()
+
         if is_simulation:
             self.flywheel_current_rpm = self._flywheel_sim.getVelocity()
         else:
