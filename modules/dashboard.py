@@ -9,8 +9,8 @@ from commands.climber.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.climber.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
-from commands.drivetrain.followpathprecise import FollowPathPrecise
-from commands.drivetrain.pathfindprecise import PathFindPrecise
+from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
+from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel

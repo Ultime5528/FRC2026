@@ -466,6 +466,11 @@ class Drivetrain(Subsystem):
             pose=pose, constraints=self.pathfinding_constraints, goal_end_vel=0.0
         )
 
+    def getPathFindingFollowPathCommand(self, path: PathPlannerPath):
+        return AutoBuilder.pathfindThenFollowPath(
+            goal_path=path, pathfinding_constraints=self.pathfinding_constraints
+        )
+
     def logValues(self):
         self.log(
             "speed_goal",

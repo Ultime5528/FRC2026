@@ -1,7 +1,7 @@
 from commands2 import SequentialCommandGroup
 from wpimath.geometry import Pose2d
 
-from commands.drivetrain.alignpreciseafterpath import AlignPreciseAfterPath
+from commands.drivetrain.auto.alignpreciseafterpath import AlignPreciseAfterPath
 from subsystems.drivetrain import Drivetrain
 
 
