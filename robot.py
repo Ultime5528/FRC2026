@@ -8,7 +8,7 @@ from modules.hardware import HardwareModule
 from modules.logging import LoggingModule
 from modules.propertysavechecker import PropertySaveCheckerModule
 from modules.questvision import QuestVisionModule
-from modules.sysid import SysID
+from modules.sysidmodule import SysIDModule
 from ultime.modulerobot import ModuleRobot
 
 
@@ -37,4 +37,4 @@ class Robot(ModuleRobot):
         self.logging = self.addModule(LoggingModule())
         self.property_save_checker = self.addModule(PropertySaveCheckerModule())
 
-        self.sys_id = self.addModule(SysID(self.hardware.drivetrain))
+        self.sys_id = self.addModule(SysIDModule(self.hardware.drivetrain))

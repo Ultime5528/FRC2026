@@ -7,7 +7,7 @@ from subsystems.drivetrain import Drivetrain
 from ultime.module import Module
 
 
-class SysID(Module):
+class SysIDModule(Module):
     def __init__(self, drivetrain: Drivetrain):
         super().__init__()
         self.drivetrain = drivetrain
@@ -72,9 +72,9 @@ class SysID(Module):
             sequence(
                 ForwardPosition(self.drivetrain),
                 self.sys_id_routine.quasistatic(
-                commands2.sysid.SysIdRoutine.Direction.kForward
+                    commands2.sysid.SysIdRoutine.Direction.kForward
                 ),
-            )
+            ),
         )
 
         wpilib.SmartDashboard.putData(
@@ -84,7 +84,7 @@ class SysID(Module):
                 self.sys_id_routine.quasistatic(
                     commands2.sysid.SysIdRoutine.Direction.kReverse
                 ),
-            )
+            ),
         )
 
         wpilib.SmartDashboard.putData(
@@ -94,7 +94,7 @@ class SysID(Module):
                 self.sys_id_routine.dynamic(
                     commands2.sysid.SysIdRoutine.Direction.kForward
                 ),
-            )
+            ),
         )
 
         wpilib.SmartDashboard.putData(
@@ -104,5 +104,5 @@ class SysID(Module):
                 self.sys_id_routine.dynamic(
                     commands2.sysid.SysIdRoutine.Direction.kReverse
                 ),
-            )
+            ),
         )
