@@ -2,105 +2,112 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/Ultime5528/FRC2026/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                         |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|--------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| commands/\_\_init\_\_.py                     |        0 |        0 |        0 |        0 |    100% |           |
-| commands/climber/\_\_init\_\_.py             |        0 |        0 |        0 |        0 |    100% |           |
-| commands/climber/maintainclimber.py          |        9 |        4 |        0 |        0 |     56% |  9-11, 14 |
-| commands/climber/move.py                     |       44 |       10 |        0 |        0 |     77% |27-32, 36-41, 45-50, 53 |
-| commands/drivetrain/\_\_init\_\_.py          |        0 |        0 |        0 |        0 |    100% |           |
-| commands/drivetrain/drive.py                 |       54 |       34 |       14 |        0 |     29% |13-17, 21-24, 37-42, 45, 48-87, 90 |
-| commands/drivetrain/driverelative.py         |       37 |       18 |        0 |        0 |     51% |11-13, 17-19, 23-25, 29-31, 34-37, 40, 43 |
-| commands/drivetrain/resetgyro.py             |       20 |       11 |        2 |        0 |     41% |11-14, 17-25, 30 |
-| commands/drivetrain/resetpose.py             |       13 |        6 |        0 |        0 |     54% |9-12, 15, 18 |
-| commands/feeder/\_\_init\_\_.py              |        0 |        0 |        0 |        0 |    100% |           |
-| commands/feeder/ejectfuel.py                 |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
-| commands/feeder/grabfuel.py                  |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
-| commands/guide.py                            |       38 |        7 |        0 |        0 |     82% |29-34, 38-43, 46 |
-| commands/hugger/\_\_init\_\_.py              |        0 |        0 |        0 |        0 |    100% |           |
-| commands/hugger/hug.py                       |       17 |        8 |        0 |        0 |     53% |9-12, 15, 18, 21, 24 |
-| commands/hugger/unhug.py                     |       17 |        8 |        0 |        0 |     53% |9-12, 15, 18, 21, 24 |
-| commands/pivot/\_\_init\_\_.py               |        0 |        0 |        0 |        0 |    100% |           |
-| commands/pivot/maintainpivot.py              |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
-| commands/pivot/move.py                       |       38 |        7 |        0 |        0 |     82% |29-34, 38-43, 46 |
-| commands/shooter/\_\_init\_\_.py             |        0 |        0 |        0 |        0 |    100% |           |
-| commands/shooter/manualshoot.py              |       25 |       11 |        2 |        0 |     52% |8-10, 13, 16, 19, 24, 27-31 |
-| commands/shooter/prepareshoot.py             |       16 |        9 |        2 |        0 |     39% |7-10, 13-14, 17, 20-21 |
-| commands/shooter/shoot.py                    |       17 |       10 |        2 |        0 |     37% |7-9, 12-18, 21, 24 |
-| conftest.py                                  |        1 |        0 |        0 |        0 |    100% |           |
-| modules/\_\_init\_\_.py                      |        0 |        0 |        0 |        0 |    100% |           |
-| modules/autonomous.py                        |       34 |       15 |        4 |        0 |     50% |20, 25-49, 52, 55-61, 64-65 |
-| modules/control.py                           |       12 |        7 |        0 |        0 |     42% |     11-27 |
-| modules/dashboard.py                         |       91 |       63 |       12 |        0 |     27% |34-41, 44, 51-105, 108-125, 131-148 |
-| modules/hardware.py                          |       37 |       19 |        0 |        0 |     49% |20-39, 42, 45-46 |
-| modules/logging.py                           |       24 |       13 |        4 |        0 |     39% |12, 19-28, 31, 35-41 |
-| modules/propertysavechecker.py               |       36 |       26 |       16 |        0 |     19% |13-27, 30-48 |
-| modules/questvision.py                       |       38 |       22 |        2 |        0 |     40% |22-25, 28-37, 44, 47, 50-64 |
-| modules/tagvision.py                         |       34 |       34 |        6 |        0 |      0% |      1-60 |
-| ports.py                                     |       32 |        0 |        0 |        0 |    100% |           |
-| properties.py                                |       85 |       72 |       18 |        1 |     14% |17-24, 34-58, 62-78, 82-127, 131-158 |
-| robot.py                                     |       21 |       10 |        0 |        0 |     52% |     17-37 |
-| subsystems/\_\_init\_\_.py                   |        0 |        0 |        0 |        0 |    100% |           |
-| subsystems/climber.py                        |       48 |       23 |        4 |        0 |     48% |19-40, 43, 46, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76-82 |
-| subsystems/drivetrain.py                     |      167 |      117 |       12 |        0 |     28% |42-177, 180, 183, 186, 203-214, 219-244, 252, 255, 258, 261, 267-268, 276-285, 293-302, 307-310, 315-326, 329-349, 352-375, 378-385, 391, 394, 411-412, 415, 418-422 |
-| subsystems/feeder.py                         |       16 |        5 |        0 |        0 |     69% |13-14, 19, 22, 25 |
-| subsystems/guide.py                          |       47 |       23 |        2 |        0 |     49% |18-40, 43-44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77 |
-| subsystems/hugger.py                         |       20 |        7 |        0 |        0 |     65% |16-18, 21-22, 25-26 |
-| subsystems/pivot.py                          |       52 |       24 |        4 |        0 |     50% |20-42, 45-50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86 |
-| subsystems/shooter.py                        |       61 |       35 |        4 |        0 |     40% |24-47, 50-52, 59-63, 66-67, 70-71, 74-77, 80, 86-89, 92, 95 |
-| tests/\_\_init\_\_.py                        |        0 |        0 |        0 |        0 |    100% |           |
-| tests/test\_climber.py                       |      136 |      112 |        0 |        0 |     18% |19-21, 25-28, 32-55, 66-108, 114-115, 128-129, 142-143, 156-157, 170-171, 184-185, 198-199, 212-213, 226-227, 238-257, 263-301, 307-320 |
-| tests/test\_common.py                        |        1 |        0 |        0 |        0 |    100% |           |
-| tests/test\_guide.py                         |       48 |       35 |        0 |        0 |     27% |10-13, 17-20, 24-42, 53-69, 73, 84, 95, 108 |
-| tests/test\_hugger.py                        |       27 |       19 |        0 |        0 |     30% |8-10, 14-19, 23-29, 33-39 |
-| tests/test\_shooter.py                       |       57 |       47 |        0 |        0 |     18% |11-13, 17-42, 48-68, 74-93 |
-| ultime/\_\_init\_\_.py                       |        0 |        0 |        0 |        0 |    100% |           |
-| ultime/affinecontroller.py                   |       77 |       77 |        2 |        0 |      0% |     1-122 |
-| ultime/alert.py                              |       89 |       53 |       14 |        0 |     35% |19-20, 24, 27, 32-34, 37, 40, 43-53, 64-71, 74-85, 88, 91-100, 103, 106, 110-116, 130-132, 135-136, 139 |
-| ultime/auto.py                               |        5 |        5 |        0 |        0 |      0% |       1-7 |
-| ultime/autoproperty.py                       |       57 |       36 |       22 |        1 |     28% |33-35, 39, 52-105 |
-| ultime/axistrigger.py                        |        8 |        8 |        2 |        0 |      0% |      1-16 |
-| ultime/command.py                            |       71 |       47 |        4 |        0 |     32% |15-19, 23-51, 56-58, 61, 64, 85-90, 94, 97-101, 104, 107, 110-111, 114-115 |
-| ultime/coroutinecommand.py                   |       27 |       27 |        6 |        0 |      0% |      1-41 |
-| ultime/dynamicmotion.py                      |       55 |       55 |       14 |        0 |      0% |     1-175 |
-| ultime/gyro.py                               |      124 |       69 |        2 |        0 |     44% |21, 26-27, 42, 45, 48, 51-53, 58-64, 67, 70, 73, 76, 81-85, 88, 91, 94, 97, 104-115, 120, 125, 130, 133, 136-137, 140-155, 164-168, 171, 174, 177, 180, 185-194, 197, 200, 203-204, 207-208, 211, 214 |
-| ultime/immutable.py                          |        6 |        2 |        0 |        0 |     67% |      3, 8 |
-| ultime/linear/\_\_init\_\_.py                |        0 |        0 |        0 |        0 |    100% |           |
-| ultime/linear/linearsubsystem.py             |       98 |       63 |       16 |        0 |     31% |21-37, 40-44, 48, 52, 56, 60, 64, 68, 71, 75, 78, 84, 88, 92, 96, 99, 106, 113-118, 121-131, 134-158 |
-| ultime/linear/manualmovelinear.py            |       27 |       13 |        0 |        0 |     52% |10-12, 16-18, 21-24, 27, 30, 33 |
-| ultime/linear/movelinear.py                  |       32 |       21 |        8 |        0 |     28% |18-24, 27, 37-39, 42-49, 52-57 |
-| ultime/linear/resetlinear.py                 |       41 |       26 |       10 |        0 |     29% |10-12, 16-18, 21-25, 28, 31-42, 45-48, 51 |
-| ultime/linearinterpolator.py                 |       25 |       25 |        6 |        0 |      0% |      1-36 |
-| ultime/log.py                                |      103 |       71 |       26 |        0 |     25% |10-11, 18, 21-27, 30-31, 37, 40-42, 45-56, 67-91, 96-102, 105-107, 110, 113-115, 120, 123-124, 127, 135, 138-143, 146, 150, 153-154, 157-158, 161 |
-| ultime/module.py                             |       81 |       21 |       20 |        2 |     77% |15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 88, 97, 109->108 |
-| ultime/modulerobot.py                        |      149 |      107 |       46 |        0 |     22% |28-33, 36-128, 131-141, 144, 147-148, 151-154, 157, 160-163, 166, 169, 172, 175, 178, 181, 184, 187, 190, 193, 196, 199, 202, 205, 208 |
-| ultime/proxy.py                              |       19 |        0 |        2 |        0 |    100% |           |
-| ultime/questnav/\_\_init\_\_.py              |        0 |        0 |        0 |        0 |    100% |           |
-| ultime/questnav/generated/\_\_init\_\_.py    |        0 |        0 |        0 |        0 |    100% |           |
-| ultime/questnav/generated/commands\_pb2.py   |       23 |       10 |        2 |        1 |     56% |     33-44 |
-| ultime/questnav/generated/data\_pb2.py       |       19 |        6 |        2 |        1 |     67% |     33-40 |
-| ultime/questnav/generated/geometry2d\_pb2.py |       28 |       28 |        2 |        0 |      0% |      7-44 |
-| ultime/questnav/generated/geometry3d\_pb2.py |       26 |       14 |        2 |        1 |     46% |     29-42 |
-| ultime/questnav/questnav.py                  |      116 |       92 |       20 |        0 |     18% |86-118, 148-227, 258-289, 298, 314, 325-326, 335, 344, 355-356, 371, 392 |
-| ultime/subsystem.py                          |       27 |       18 |        4 |        0 |     29% |11, 14, 17-38 |
-| ultime/swerve/\_\_init\_\_.py                |        0 |        0 |        0 |        0 |    100% |           |
-| ultime/swerve/swerve.py                      |      132 |      101 |        8 |        0 |     22% |31-78, 81-96, 102, 105, 110-136, 139, 146-161, 164-165, 168-169, 172, 175, 178, 181, 184, 187, 191-213, 225-230, 233-314 |
-| ultime/swerve/swerveconfig.py                |       67 |        0 |        0 |        0 |    100% |           |
-| ultime/switch.py                             |       54 |        5 |       32 |        5 |     88% |32->35, 35->exit, 53, 57, 67, 70, 73 |
-| ultime/tests/\_\_init\_\_.py                 |        9 |        0 |        0 |        0 |    100% |           |
-| ultime/tests/test\_alert.py                  |       39 |       34 |        0 |        0 |     13% |8-42, 50-73 |
-| ultime/tests/test\_commands.py               |       53 |       26 |       26 |        0 |     49% |46-77, 81-103 |
-| ultime/tests/test\_modules.py                |       48 |        1 |        0 |        0 |     98% |        17 |
-| ultime/tests/test\_properties.py             |        3 |        0 |        0 |        0 |    100% |           |
-| ultime/tests/test\_proxy.py                  |       27 |        0 |        0 |        0 |    100% |           |
-| ultime/tests/test\_subsystems.py             |       17 |        0 |        8 |        0 |    100% |           |
-| ultime/tests/test\_switch.py                 |       33 |        0 |        0 |        0 |    100% |           |
-| ultime/tests/test\_timethis.py               |        3 |        0 |        0 |        0 |    100% |           |
-| ultime/tests/utils.py                        |       76 |       44 |       10 |        0 |     44% |28-29, 37, 40-44, 47-51, 54-58, 61-65, 68-70, 73-74, 77-85, 88-96, 101-102 |
-| ultime/timethis.py                           |       63 |       47 |       16 |        0 |     20% |17-45, 53-57, 61-93, 97-100 |
-| ultime/trapezoidalmotion.py                  |       98 |       82 |       42 |        0 |     11% |20-23, 39-63, 76-94, 97-153, 159-162, 165-197, 200-203, 206-207, 210 |
-| ultime/vision.py                             |       91 |       91 |       28 |        0 |      0% |     1-154 |
-| **TOTAL**                                    | **3655** | **2214** |  **512** |   **12** | **36%** |           |
+| Name                                              |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
+|-------------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
+| commands/\_\_init\_\_.py                          |        0 |        0 |        0 |        0 |    100% |           |
+| commands/climber/\_\_init\_\_.py                  |        0 |        0 |        0 |        0 |    100% |           |
+| commands/climber/maintainclimber.py               |        9 |        4 |        0 |        0 |     56% |  9-11, 14 |
+| commands/climber/move.py                          |       44 |       10 |        0 |        0 |     77% |27-32, 36-41, 45-50, 53 |
+| commands/drivetrain/\_\_init\_\_.py               |        0 |        0 |        0 |        0 |    100% |           |
+| commands/drivetrain/auto/\_\_init\_\_.py          |        0 |        0 |        0 |        0 |    100% |           |
+| commands/drivetrain/auto/alignpreciseafterpath.py |       32 |       18 |        4 |        0 |     39% |16-22, 25-37, 40-44, 47 |
+| commands/drivetrain/auto/followpathprecise.py     |       11 |        5 |        0 |        0 |     55% |     10-15 |
+| commands/drivetrain/auto/pathfindfollowpath.py    |       11 |        5 |        0 |        0 |     55% |     10-15 |
+| commands/drivetrain/auto/pathfindprecise.py       |       11 |        5 |        0 |        0 |     55% |     10-15 |
+| commands/drivetrain/drive.py                      |       54 |       34 |       14 |        0 |     29% |13-17, 21-24, 37-42, 45, 48-87, 90 |
+| commands/drivetrain/driverelative.py              |       37 |       18 |        0 |        0 |     51% |11-13, 17-19, 23-25, 29-31, 34-37, 40, 43 |
+| commands/drivetrain/forwardposition.py            |       20 |        9 |        0 |        0 |     55% |12-15, 18, 21, 24, 27-28 |
+| commands/drivetrain/resetgyro.py                  |       20 |       11 |        2 |        0 |     41% |11-14, 17-25, 30 |
+| commands/drivetrain/resetpose.py                  |       13 |        6 |        0 |        0 |     54% |9-12, 15, 18 |
+| commands/feeder/\_\_init\_\_.py                   |        0 |        0 |        0 |        0 |    100% |           |
+| commands/feeder/ejectfuel.py                      |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
+| commands/feeder/grabfuel.py                       |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
+| commands/guide.py                                 |       38 |        7 |        0 |        0 |     82% |29-34, 38-43, 46 |
+| commands/hugger/\_\_init\_\_.py                   |        0 |        0 |        0 |        0 |    100% |           |
+| commands/hugger/hug.py                            |       17 |        8 |        0 |        0 |     53% |9-12, 15, 18, 21, 24 |
+| commands/hugger/unhug.py                          |       17 |        8 |        0 |        0 |     53% |9-12, 15, 18, 21, 24 |
+| commands/pivot/\_\_init\_\_.py                    |        0 |        0 |        0 |        0 |    100% |           |
+| commands/pivot/maintainpivot.py                   |       13 |        6 |        0 |        0 |     54% |7-9, 12, 15, 18 |
+| commands/pivot/move.py                            |       38 |        7 |        0 |        0 |     82% |29-34, 38-43, 46 |
+| commands/shooter/\_\_init\_\_.py                  |        0 |        0 |        0 |        0 |    100% |           |
+| commands/shooter/manualshoot.py                   |       25 |       11 |        2 |        0 |     52% |8-10, 13, 16, 19, 24, 27-31 |
+| commands/shooter/prepareshoot.py                  |       16 |        9 |        2 |        0 |     39% |7-10, 13-14, 17, 20-21 |
+| commands/shooter/shoot.py                         |       17 |       10 |        2 |        0 |     37% |7-9, 12-18, 21, 24 |
+| conftest.py                                       |        1 |        0 |        0 |        0 |    100% |           |
+| modules/\_\_init\_\_.py                           |        0 |        0 |        0 |        0 |    100% |           |
+| modules/autonomous.py                             |       28 |       12 |        4 |        0 |     50% |17, 22-28, 31-37, 40-41 |
+| modules/control.py                                |       12 |        7 |        0 |        0 |     42% |     11-27 |
+| modules/dashboard.py                              |       98 |       66 |       12 |        0 |     29% |38-45, 48, 55-116, 119-136, 142-159 |
+| modules/hardware.py                               |       37 |       19 |        0 |        0 |     49% |20-39, 42, 45-46 |
+| modules/logging.py                                |       24 |       13 |        4 |        0 |     39% |12, 19-28, 31, 35-41 |
+| modules/propertysavechecker.py                    |       36 |       26 |       16 |        0 |     19% |13-27, 30-48 |
+| modules/questvision.py                            |       38 |       22 |        2 |        0 |     40% |22-25, 28-37, 44, 47, 50-64 |
+| modules/sysidmodule.py                            |       16 |        8 |        0 |        0 |     50% |    12-100 |
+| modules/tagvision.py                              |       34 |       34 |        6 |        0 |      0% |      1-60 |
+| ports.py                                          |       32 |        0 |        0 |        0 |    100% |           |
+| properties.py                                     |       85 |       72 |       18 |        1 |     14% |17-24, 34-58, 62-78, 82-127, 131-158 |
+| robot.py                                          |       23 |       11 |        0 |        0 |     52% |     18-40 |
+| subsystems/\_\_init\_\_.py                        |        0 |        0 |        0 |        0 |    100% |           |
+| subsystems/climber.py                             |       48 |       23 |        4 |        0 |     48% |19-40, 43, 46, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76-82 |
+| subsystems/drivetrain.py                          |      188 |      127 |       12 |        0 |     30% |49-217, 220, 223, 226, 243-254, 259-284, 292, 295, 298, 301, 307-308, 316-325, 333-342, 347-350, 355-366, 369-389, 392-415, 418-425, 431, 434, 451-452, 455, 458, 461, 465, 470, 475-479 |
+| subsystems/feeder.py                              |       16 |        5 |        0 |        0 |     69% |13-14, 19, 22, 25 |
+| subsystems/guide.py                               |       47 |       23 |        2 |        0 |     49% |18-40, 43-44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77 |
+| subsystems/hugger.py                              |       20 |        7 |        0 |        0 |     65% |16-18, 21-22, 25-26 |
+| subsystems/pivot.py                               |       52 |       24 |        4 |        0 |     50% |20-42, 45-50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86 |
+| subsystems/shooter.py                             |       61 |       35 |        4 |        0 |     40% |24-47, 50-52, 59-63, 66-67, 70-71, 74-77, 80, 86-89, 92, 95 |
+| tests/\_\_init\_\_.py                             |        0 |        0 |        0 |        0 |    100% |           |
+| tests/test\_climber.py                            |      136 |      112 |        0 |        0 |     18% |19-21, 25-28, 32-55, 66-108, 114-115, 128-129, 142-143, 156-157, 170-171, 184-185, 198-199, 212-213, 226-227, 238-257, 263-301, 307-320 |
+| tests/test\_common.py                             |        1 |        0 |        0 |        0 |    100% |           |
+| tests/test\_guide.py                              |       48 |       35 |        0 |        0 |     27% |10-13, 17-20, 24-42, 53-69, 73, 84, 95, 108 |
+| tests/test\_hugger.py                             |       27 |       19 |        0 |        0 |     30% |8-10, 14-19, 23-29, 33-39 |
+| tests/test\_shooter.py                            |       57 |       47 |        0 |        0 |     18% |11-13, 17-42, 48-68, 74-93 |
+| ultime/\_\_init\_\_.py                            |        0 |        0 |        0 |        0 |    100% |           |
+| ultime/affinecontroller.py                        |       77 |       77 |        2 |        0 |      0% |     1-122 |
+| ultime/alert.py                                   |       89 |       53 |       14 |        0 |     35% |19-20, 24, 27, 32-34, 37, 40, 43-53, 64-71, 74-85, 88, 91-100, 103, 106, 110-116, 130-132, 135-136, 139 |
+| ultime/auto.py                                    |        5 |        5 |        0 |        0 |      0% |       1-7 |
+| ultime/autoproperty.py                            |       57 |       36 |       22 |        1 |     28% |33-35, 39, 52-105 |
+| ultime/axistrigger.py                             |        8 |        8 |        2 |        0 |      0% |      1-16 |
+| ultime/command.py                                 |       71 |       47 |        4 |        0 |     32% |15-19, 23-51, 56-58, 61, 64, 85-90, 94, 97-101, 104, 107, 110-111, 114-115 |
+| ultime/coroutinecommand.py                        |       27 |       27 |        6 |        0 |      0% |      1-41 |
+| ultime/dynamicmotion.py                           |       55 |       55 |       14 |        0 |      0% |     1-175 |
+| ultime/gyro.py                                    |      124 |       69 |        2 |        0 |     44% |21, 26-27, 42, 45, 48, 51-53, 58-64, 67, 70, 73, 76, 81-85, 88, 91, 94, 97, 104-115, 120, 125, 130, 133, 136-137, 140-155, 164-168, 171, 174, 177, 180, 185-194, 197, 200, 203-204, 207-208, 211, 214 |
+| ultime/immutable.py                               |        6 |        2 |        0 |        0 |     67% |      3, 8 |
+| ultime/linear/\_\_init\_\_.py                     |        0 |        0 |        0 |        0 |    100% |           |
+| ultime/linear/linearsubsystem.py                  |       98 |       63 |       16 |        0 |     31% |21-37, 40-44, 48, 52, 56, 60, 64, 68, 71, 75, 78, 84, 88, 92, 96, 99, 106, 113-118, 121-131, 134-158 |
+| ultime/linear/manualmovelinear.py                 |       27 |       13 |        0 |        0 |     52% |10-12, 16-18, 21-24, 27, 30, 33 |
+| ultime/linear/movelinear.py                       |       32 |       21 |        8 |        0 |     28% |18-24, 27, 37-39, 42-49, 52-57 |
+| ultime/linear/resetlinear.py                      |       41 |       26 |       10 |        0 |     29% |10-12, 16-18, 21-25, 28, 31-42, 45-48, 51 |
+| ultime/linearinterpolator.py                      |       25 |       25 |        6 |        0 |      0% |      1-36 |
+| ultime/log.py                                     |      103 |       71 |       26 |        0 |     25% |10-11, 18, 21-27, 30-31, 37, 40-42, 45-56, 67-91, 96-102, 105-107, 110, 113-115, 120, 123-124, 127, 135, 138-143, 146, 150, 153-154, 157-158, 161 |
+| ultime/module.py                                  |       81 |       21 |       20 |        2 |     77% |15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 88, 97, 109->108 |
+| ultime/modulerobot.py                             |      149 |      107 |       46 |        0 |     22% |28-33, 36-128, 131-141, 144, 147-148, 151-154, 157, 160-163, 166, 169, 172, 175, 178, 181, 184, 187, 190, 193, 196, 199, 202, 205, 208 |
+| ultime/proxy.py                                   |       19 |        0 |        2 |        0 |    100% |           |
+| ultime/questnav/\_\_init\_\_.py                   |        0 |        0 |        0 |        0 |    100% |           |
+| ultime/questnav/generated/\_\_init\_\_.py         |        0 |        0 |        0 |        0 |    100% |           |
+| ultime/questnav/generated/commands\_pb2.py        |       23 |       10 |        2 |        1 |     56% |     33-44 |
+| ultime/questnav/generated/data\_pb2.py            |       19 |        6 |        2 |        1 |     67% |     33-40 |
+| ultime/questnav/generated/geometry2d\_pb2.py      |       28 |       28 |        2 |        0 |      0% |      7-44 |
+| ultime/questnav/generated/geometry3d\_pb2.py      |       26 |       14 |        2 |        1 |     46% |     29-42 |
+| ultime/questnav/questnav.py                       |      116 |       92 |       20 |        0 |     18% |86-118, 148-227, 258-289, 298, 314, 325-326, 335, 344, 355-356, 371, 392 |
+| ultime/subsystem.py                               |       27 |       18 |        4 |        0 |     29% |11, 14, 17-38 |
+| ultime/swerve/\_\_init\_\_.py                     |        0 |        0 |        0 |        0 |    100% |           |
+| ultime/swerve/swerve.py                           |      132 |      101 |        8 |        0 |     22% |31-78, 81-96, 102, 105, 110-136, 139, 146-161, 164-165, 168-169, 172, 175, 178, 181, 184, 187, 191-213, 225-230, 233-314 |
+| ultime/swerve/swerveconfig.py                     |       67 |        0 |        0 |        0 |    100% |           |
+| ultime/switch.py                                  |       54 |        5 |       32 |        5 |     88% |32->35, 35->exit, 53, 57, 67, 70, 73 |
+| ultime/tests/\_\_init\_\_.py                      |        9 |        0 |        0 |        0 |    100% |           |
+| ultime/tests/test\_alert.py                       |       39 |       34 |        0 |        0 |     13% |8-42, 50-73 |
+| ultime/tests/test\_commands.py                    |       53 |       26 |       26 |        0 |     49% |46-77, 81-103 |
+| ultime/tests/test\_modules.py                     |       48 |        1 |        0 |        0 |     98% |        17 |
+| ultime/tests/test\_properties.py                  |        3 |        0 |        0 |        0 |    100% |           |
+| ultime/tests/test\_proxy.py                       |       27 |        0 |        0 |        0 |    100% |           |
+| ultime/tests/test\_subsystems.py                  |       17 |        0 |        8 |        0 |    100% |           |
+| ultime/tests/test\_switch.py                      |       33 |        0 |        0 |        0 |    100% |           |
+| ultime/tests/test\_timethis.py                    |        3 |        0 |        0 |        0 |    100% |           |
+| ultime/tests/utils.py                             |       76 |       44 |       10 |        0 |     44% |28-29, 37, 40-44, 47-51, 54-58, 61-65, 68-70, 73-74, 77-85, 88-96, 101-102 |
+| ultime/timethis.py                                |       63 |       47 |       16 |        0 |     20% |17-45, 53-57, 61-93, 97-100 |
+| ultime/trapezoidalmotion.py                       |       98 |       82 |       42 |        0 |     11% |20-23, 39-63, 76-94, 97-153, 159-162, 165-197, 200-203, 206-207, 210 |
+| ultime/vision.py                                  |       91 |       91 |       28 |        0 |      0% |     1-154 |
+| **TOTAL**                                         | **3780** | **2275** |  **516** |   **12** | **37%** |           |
 
 
 ## Setup coverage badge
