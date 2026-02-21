@@ -4,14 +4,14 @@ from _pytest.python_api import approx
 from commands2 import Command
 from rev import SparkBase
 
-from commands.climber.hug import Hug
-from commands.climber.move import (
+from commands import Hug
+from commands import (
     ResetClimber,
     MoveClimber,
     _move_properties,
     ManualMoveClimber,
 )
-from commands.climber.unhug import Unhug
+from commands import Unhug
 from robot import Robot
 from ultime.switch import Switch
 from ultime.tests import RobotTestController

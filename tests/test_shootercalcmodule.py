@@ -3,7 +3,7 @@ from _pytest.python_api import approx
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
-from commands.drivetrain.resetpose import ResetPose
+from commands import ResetPose
 from modules.shootercalcmodule import (
     ShooterCalcModule,
     computeRobotRotationToAlign,

@@ -1,4 +1,4 @@
-from commands.drivetrain.driverelative import DriveRelative
+from commands import DriveRelative
 from modules.hardware import HardwareModule
 from ultime.module import Module
 

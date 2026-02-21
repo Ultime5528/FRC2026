@@ -1,8 +1,8 @@
 import commands2
 from wpilib import PowerDistribution
 
-from commands.drivetrain.drive import DriveField
-from commands.pivot.maintainpivot import MaintainPivot
+from commands import DriveField
+from commands import MaintainPivot
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder

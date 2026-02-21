@@ -1,8 +1,8 @@
 from pytest import approx
 
-from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
-from commands.shooter.prepareshoot import PrepareShoot
-from commands.shooter.shoot import Shoot
+from commands import ManualShoot, manual_shoot_properties
+from commands import PrepareShoot
+from commands import Shoot
 from robot import Robot
 from ultime.tests import RobotTestController
 
