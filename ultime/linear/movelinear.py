@@ -39,12 +39,14 @@ class MoveLinear(Command):
         self.subsystem.setSpeed(self.motion.getSpeed())
 
     def isFinished(self):
-        if self.motion.getSpeed() > 0.0 and self.subsystem.isSwitchMaxPressed():
+        if not self.subsystem.hasReset():
             return True
-        elif self.motion.getSpeed() < 0.0 and self.subsystem.isSwitchMinPressed():
+        elif self.motion.getSpeed() > 0.0 and self.subsystem.shouldBlockUp():
+            return True
+        elif self.motion.getSpeed() < 0.0 and self.subsystem.shouldBlockDown():
             return True
 
-        return self.motion.isFinished() or not self.subsystem.hasReset()
+        return self.motion.isFinished()
 
     def end(self, interrupted: bool):
         if not self.subsystem.hasReset():
