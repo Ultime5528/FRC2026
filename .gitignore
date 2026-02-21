@@ -163,3 +163,5 @@ networktables.json.bck
 
 .deploy_cfg
 logs/
+
+.wpilib/wpilib_preferences.json
