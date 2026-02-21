@@ -1,4 +1,5 @@
 import rev
+import wpilib
 from rev import SparkMaxSim
 from wpimath.filter import LinearFilter
 from wpimath.system.plant import DCMotor
@@ -10,13 +11,16 @@ from ultime.subsystem import Subsystem
 
 
 class Shooter(Subsystem):
+
     kP = 0.1
     kI = 0.0
     kD = 0.0
     kF = 12.0 / 4400  # 12 volts max divided by max RPM
 
-    speed_indexer_stuck = autoproperty(0.05)
+    speed_indexer_stuck = autoproperty(0.1)
+    speed_indexer_to_unstuck = autoproperty(-0.3)
     speed_indexer = autoproperty(0.5)
+    delay_indexer_unstuck = autoproperty(2.0)
     speed_feeder = autoproperty(0.5)
     tolerance = autoproperty(100.0)
 
@@ -50,6 +54,10 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
+        self._has_surpassed_stuck_speed = False
+        self._is_in_unstuck_mode = False
+        self._unstuck_timer = wpilib.Timer()
+
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
 
@@ -61,8 +69,29 @@ class Shooter(Subsystem):
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
-        self._indexer.set(self.speed_indexer)
+
+        if not self._is_in_unstuck_mode:
+            self._has_surpassed_stuck_speed = self._indexer_encoder.getVelocity() > self.speed_indexer_stuck
+
+        if self._is_in_unstuck_mode and not self._unstuck_timer.isRunning():
+            self._unstuck_timer.restart()
+
+        if self._is_in_unstuck_mode and self._unstuck_timer.isRunning():
+            if self._unstuck_timer.hasElapsed(self.delay_indexer_unstuck):
+                self._has_surpassed_stuck_speed = False
+                self._is_in_unstuck_mode = False
+                self._unstuck_timer.stop()
+
+        if self._is_in_unstuck_mode:
+            self._indexer.set(self.speed_indexer_to_unstuck)
+        else:
+            self._indexer.set(self.speed_indexer)
+
         self._feeder.set(self.speed_feeder)
+
+    def stopFuel(self):
+        self._indexer.set(0.0)
+        self._feeder.set(0.0)
 
     def readInputs(self):
         if is_simulation:
@@ -88,12 +117,6 @@ class Shooter(Subsystem):
     def isAtVelocity(self):
         return self._is_at_velocity
 
-    def hasSurpassedStuckSpeed(self) -> bool:
-        return self._indexer_encoder.getVelocity() > self.speed_indexer_stuck
-
-    def unblockIndexer(self):
-        if self.speed_indexer.hasSurpassedStuckSpeed() and self._flywheel_encoder.getVelocity() <= self.speed_indexer_stuck:
-            self._indexer.set(-self.speed_indexer)
-
-    def shootAndSendFuel(self):
-        pass
+    def setToUnstuck(self):
+        self._has_surpassed_stuck_speed = False
+        self._is_in_unstuck_mode = False

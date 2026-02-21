@@ -8,12 +8,16 @@ class Shoot(Command):
         self.shooter = shooter
         self.addRequirements(self.shooter)
 
-    def execute(self):
-        speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
-        self.shooter.shoot(speed_rpm)
+        self.shooter.setToUnstuck()
+
+        def execute(self):
+            speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
+            self.shooter.shoot(speed_rpm)
 
         if self.shooter.isAtVelocity():
             self.shooter.sendFuel()
+        else:
+            self.shooter.stopFuel()
 
     def isFinished(self) -> bool:
         return False
