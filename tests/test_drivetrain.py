@@ -1,5 +1,6 @@
 import commands2.button
 import wpilib.simulation
+from _pytest.python_api import approx
 from commands2.button import CommandGenericHID
 from pyfrc.util import yesno
 
@@ -76,14 +77,24 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     # tests the robot moving plus the slow trigger
     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
     xbox_remote.setLeftX(1)
-    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
+    xbox_remote.setLeftY(1)
+    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
 
-    init_pose = drivetrain.getPose().translation()
-    reset_cmd = ResetPose(drivetrain, Pose2d())
-    robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
+    init_pose = drivetrain.getPose()
+    assert abs(init_pose.x) == approx(65.0, abs=1.0)
+    assert abs(init_pose.y) == approx(65.0, abs=1.0)
+    testing = init_pose.rotation().degrees()
+    assert init_pose.rotation().degrees() == approx(0.0, abs=6.0)
+
     xbox_remote.setRightBumperButton(True)
     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-    xbox_remote.setLeftX(1)
-    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
-    fin_pose = drivetrain.getPose().translation()
-    assert fin_pose.x < init_pose.x
+    xbox_remote.setLeftX(-1)
+    xbox_remote.setLeftY(-1)
+    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
+
+    fin_pose = drivetrain.getPose()
+    assert abs(fin_pose.x) == approx(52.857832, abs=1.0)
+    assert abs(fin_pose.y) == approx(51.7757360, abs=1.0)
+    assert fin_pose.rotation().degrees == approx(0.0, abs=6.0)
+
+    assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 3), abs=10.0)
