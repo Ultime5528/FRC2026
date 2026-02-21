@@ -12,9 +12,6 @@ from modules.hardware import HardwareModule
 from ultime.command import WaitCommand
 from ultime.module import Module
 
-p_gain_translation = 5.0
-p_gain_rotation = 5.0
-
 
 def registerNamedCommand(command: Command):
     NamedCommands.registerCommand(command.getName(), command)
@@ -27,29 +24,8 @@ class AutonomousModule(Module):
 
         self.auto_command: Optional[commands2.Command] = None
 
-        config = RobotConfig.fromGUISettings()
-
-        AutoBuilder.configure(
-            hardware.drivetrain.getPose,
-            hardware.drivetrain.resetToPose,
-            hardware.drivetrain.getRobotRelativeChassisSpeeds,
-            lambda speeds, feedforwards: hardware.drivetrain.driveFromChassisSpeeds(
-                speeds, feedforwards
-            ),
-            PPHolonomicDriveController(
-                PIDConstants(p_gain_translation, 0.0, 0.0),
-                PIDConstants(p_gain_rotation, 0.0, 0.0),
-            ),
-            config,
-            self.shouldFlipPath,
-            hardware.drivetrain,
-        )
-
         self.auto_chooser = SendableChooser()
         self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
-
-    def shouldFlipPath(self):
-        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
     def autonomousInit(self):
         self.hardware.drivetrain.swerve_odometry.resetPose(

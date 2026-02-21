@@ -14,6 +14,8 @@ class Shoot(Command):
 
         if self.shooter.isAtVelocity():
             self.shooter.sendFuel()
+        else:
+            self.shooter.stopFuel()
 
     def isFinished(self) -> bool:
         return False

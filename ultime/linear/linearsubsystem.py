@@ -13,6 +13,8 @@ class LinearSubsystem(Subsystem):
         should_reset_max: bool,
         should_block_min_position: bool,
         should_block_max_position: bool,
+        should_block_min_switch: bool,
+        should_block_max_switch: bool,
         sim_motor_to_distance_factor: float = 1.0,
         sim_gravity: float = 0.0,
     ):
@@ -25,6 +27,8 @@ class LinearSubsystem(Subsystem):
         self._should_reset_max = should_reset_max
         self._should_block_min_position = should_block_min_position
         self._should_block_max_position = should_block_max_position
+        self._should_block_min_switch = should_block_min_switch
+        self._should_block_max_switch = should_block_max_switch
 
         self._sim_initial_position = sim_initial_position
         self._sim_position = sim_initial_position
@@ -38,7 +42,6 @@ class LinearSubsystem(Subsystem):
         self.log("min_switch_pressed", self.isSwitchMinPressed())
         self.log("max_switch_pressed", self.isSwitchMaxPressed())
         self.log("motor_output", self.getMotorOutput())
-        self.log("has_reset", self.hasReset())
 
     @abstractmethod
     def getMinPosition(self) -> float:
@@ -92,24 +95,24 @@ class LinearSubsystem(Subsystem):
     def setSimSwitchMaxPressed(self, pressed: bool) -> None:
         raise NotImplementedError()
 
+    def shouldBlockDown(self) -> bool:
+        return (self.isSwitchMinPressed() and self._should_block_min_switch) or (
+            self._should_block_min_position
+            and self.hasReset()
+            and self.getPosition() < self.getMinPosition()
+        )
+
+    def shouldBlockUp(self) -> bool:
+        return (self.isSwitchMaxPressed() and self._should_block_max_switch) or (
+            self._should_block_max_position
+            and self.hasReset()
+            and self.getPosition() > self.getMaxPosition()
+        )
+
     def setSpeed(self, speed: float) -> None:
-        if speed < 0.0 and (
-            self.isSwitchMinPressed()
-            or (
-                self._should_block_min_position
-                and self.hasReset()
-                and self.getPosition() < self.getMinPosition()
-            )
-        ):
+        if speed < 0.0 and self.shouldBlockDown():
             speed = 0.0
-        elif speed > 0.0 and (
-            self.isSwitchMaxPressed()
-            or (
-                self._should_block_max_position
-                and self.hasReset()
-                and self.getPosition() > self.getMaxPosition()
-            )
-        ):
+        elif speed > 0.0 and self.shouldBlockUp():
             speed = 0.0
 
         self._setMotorOutput(speed)
