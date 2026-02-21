@@ -72,10 +72,15 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard(
             "Shooter",
-            PrepareShoot(hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)),
+            PrepareShoot(
+                hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)
+            ),
         )
         putCommandOnDashboard(
-            "Shooter", Shoot(hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide))
+            "Shooter",
+            Shoot(
+                hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)
+            ),
         )
         putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))

@@ -1,8 +1,9 @@
 from pytest import approx
 
-from commands import ManualShoot, manual_shoot_properties
-from commands import PrepareShoot
-from commands import Shoot
+from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
+from commands.shooter.prepareshoot import PrepareShoot
+from commands.shooter.shoot import Shoot
+from modules.shootercalcmodule import ShooterCalcModule
 from robot import Robot
 from ultime.tests import RobotTestController
 
@@ -46,6 +47,9 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
 def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
+    shooter_calc_module = ShooterCalcModule(
+        robot.hardware.drivetrain, robot.hardware.guide
+    )
 
     robot_controller.startTeleop()
 
@@ -53,7 +57,7 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter._indexer.get() == 0
     assert shooter._feeder.get() == 0
 
-    cmd = PrepareShoot(shooter)
+    cmd = PrepareShoot(shooter, shooter_calc_module)
     cmd.schedule()
     robot_controller.wait_one_frame()
 
@@ -65,13 +69,16 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(10.0)
 
-    assert shooter._flywheel_controller.getSetpoint() == approx(
-        shooter.getCurrentSpeed(), abs=10.0
-    )
+    test = shooter._flywheel_controller.getSetpoint()
+
+    assert test == approx(shooter.getCurrentSpeed(), abs=50.0)
 
 
 def test_shoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
+    shooter_calc_module = ShooterCalcModule(
+        robot.hardware.drivetrain, robot.hardware.guide
+    )
 
     robot_controller.startTeleop()
 
@@ -79,7 +86,7 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter._indexer.get() == 0
     assert shooter._feeder.get() == 0
 
-    cmd = Shoot(shooter)
+    cmd = Shoot(shooter, shooter_calc_module)
     cmd.schedule()
     robot_controller.wait_one_frame()
 

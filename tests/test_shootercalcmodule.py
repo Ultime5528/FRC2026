@@ -3,7 +3,7 @@ from _pytest.python_api import approx
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
-from commands import ResetPose
+from commands.drivetrain.resetpose import ResetPose
 from modules.shootercalcmodule import (
     ShooterCalcModule,
     computeRobotRotationToAlign,
@@ -14,7 +14,9 @@ from ultime.tests import RobotTestController
 
 
 def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
-    shooter_calc_module = ShooterCalcModule(robot.hardware.drivetrain)
+    shooter_calc_module = ShooterCalcModule(
+        robot.hardware.drivetrain, robot.hardware.guide
+    )
     robot_controller.startTeleop()
     robot_controller.run_command(
         ResetPose(robot.hardware.drivetrain, Pose2d(2, 3, 0)), timeout=3.0
