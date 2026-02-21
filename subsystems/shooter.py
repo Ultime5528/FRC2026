@@ -19,8 +19,8 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    speed_indexer_stuck = autoproperty(0.1)
-    speed_indexer_to_unstuck = autoproperty(-0.3)
+    rpm_indexer_stuck = autoproperty(50)
+    rpm_indexer_to_unstuck = autoproperty(-200)
     delay_indexer_unstuck = autoproperty(2.0)
     speed_feeder = autoproperty(0.5)
     speed_rpm_indexer = autoproperty(1000.0)
@@ -57,12 +57,13 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._has_surpassed_stuck_speed = False
+        self._has_surpassed_stuck_rpm = False
         self._is_in_unstuck_mode = False
         self._unstuck_timer = wpilib.Timer()
 
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
+            self._indexer_sim = SparkMaxSim(self._indexer, DCMotor.NEO(1))
 
     def updatePIDFConfig(self):
         self._config = rev.SparkMaxConfig()
@@ -81,30 +82,30 @@ class Shooter(Subsystem):
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
-        volts_indexer = pf(
-            self.indexer_current_rpm,
-            self.speed_rpm_indexer,
-            self.kS_indexer,
-            self.kF_indexer,
-            self.kP_indexer,
-        )
 
         if not self._is_in_unstuck_mode:
-            self._has_surpassed_stuck_speed = self._indexer_encoder.getVelocity() > self.speed_indexer_stuck
+            self._has_surpassed_stuck_rpm = self.indexer_current_rpm > self.rpm_indexer_stuck
 
         if self._is_in_unstuck_mode and not self._unstuck_timer.isRunning():
             self._unstuck_timer.restart()
 
         if self._is_in_unstuck_mode and self._unstuck_timer.isRunning():
             if self._unstuck_timer.hasElapsed(self.delay_indexer_unstuck):
-                self._has_surpassed_stuck_speed = False
+                self._has_surpassed_stuck_rpm = False
                 self._is_in_unstuck_mode = False
                 self._unstuck_timer.stop()
 
         if self._is_in_unstuck_mode:
-            self._indexer.set(self.speed_indexer_to_unstuck)
+            self._indexer.setVoltage(self.volts_indexer_to_unstuck)
         else:
-        self._indexer.setVoltage(volts_indexer)
+            volts_indexer = pf(
+                self.indexer_current_rpm,
+                self.speed_rpm_indexer,
+                self.kS_indexer,
+                self.kF_indexer,
+                self.kP_indexer,
+            )
+            self._indexer.setVoltage(volts_indexer)
 
         self._feeder.set(self.speed_feeder)
 
@@ -113,18 +114,24 @@ class Shooter(Subsystem):
         self._feeder.set(0.0)
 
     def readInputs(self):
-        self.indexer_current_rpm = self._indexer_encoder.getVelocity()
+        if is_simulation:
+            self.indexer_current_rpm = self._indexer_sim.getVelocity()
+        else:
+            self.indexer_current_rpm = self._indexer_encoder.getVelocity()
 
         if is_simulation:
             self.flywheel_current_rpm = self._flywheel_sim.getVelocity()
         else:
-            self.flywheel_current_rpm = self._encoder.getVelocity()
+            self.flywheel_current_rpm = self._flywheel_encoder.getVelocity()
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
             self._flywheel_controller.getSetpoint() * 0.01
             + self._flywheel_sim.getVelocity() * 0.99
         )
+        if self._is_at_velocity:
+            self._indexer_sim.setVelocity(self.speed_rpm_indexer * 0.01
+                                          + self._indexer_sim.getVelocity() * 0.99)
 
     def stop(self):
         self._flywheel.stopMotor()
@@ -139,5 +146,5 @@ class Shooter(Subsystem):
         return self._is_at_velocity
 
     def setToUnstuck(self):
-        self._has_surpassed_stuck_speed = False
+        self._has_surpassed_stuck_rpm = False
         self._is_in_unstuck_mode = False
