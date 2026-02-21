@@ -162,7 +162,7 @@ class SwerveModule:
 
     def runCharacterization(self, output: float):
         self.setDriveVoltage(output)
-        self.setTurnPosition(Rotation2d())
+        self.setTurnPosition(Rotation2d(self._chassis_angular_offset))
 
     def stop(self):
         self.setDriveVoltage(0.0)
