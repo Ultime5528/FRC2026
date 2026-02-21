@@ -16,7 +16,7 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    speed_indexer = autoproperty(-0.15)
+    speed_indexer = autoproperty(0.15)
     speed_feeder = autoproperty(0.3)
     tolerance = autoproperty(100.0)
 
@@ -35,9 +35,10 @@ class Shooter(Subsystem):
         self._feeder = rev.SparkMax(
             ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
         )
-        self._indexer = self._indexer = rev.SparkMax(
+        self._indexer = rev.SparkMax(
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
+        self._indexer.setInverted(True)
         self._velocity_filter = LinearFilter.movingAverage(25)
 
         self._is_at_velocity = self.createProperty(False)
@@ -64,6 +65,10 @@ class Shooter(Subsystem):
     def sendFuel(self):
         self._indexer.set(self.speed_indexer)
         self._feeder.set(self.speed_feeder)
+
+    def stopFuel(self):
+        self._indexer.set(0.0)
+        self._feeder.set(0.0)
 
     def readInputs(self):
         if is_simulation:

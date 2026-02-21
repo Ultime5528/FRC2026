@@ -10,7 +10,6 @@ from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
-
     position_conversion_factor = autoproperty(1.0)
     speed_maintain = autoproperty(0.04)
     position_min = autoproperty(0.0)

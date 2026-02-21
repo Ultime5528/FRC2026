@@ -25,11 +25,14 @@ class ManualShoot(ManualPrepareShoot):
 
     def execute(self):
         super().execute()
-        self.shooter.sendFuel()
+        if self.shooter.isAtVelocity():
+            self.shooter.sendFuel()
+        else:
+            self.shooter.stopFuel()
 
 
 class _ManualShootProperties:
-    speed_rpm = autoproperty(2900.0, subtable=ManualShoot.__name__)
+    speed_rpm = autoproperty(4000.0, subtable=ManualShoot.__name__)
 
 
 manual_shoot_properties = _ManualShootProperties()

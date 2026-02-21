@@ -7,11 +7,11 @@ from ultime.subsystem import Subsystem
 
 class Hugger(Subsystem):
 
-    position_hug_left = autoproperty(0.0)
-    position_unhug_left = autoproperty(1.0)
-    position_hug_right = autoproperty(0.0)
-    position_unhug_right = autoproperty(0.0)
-    delay_hug = autoproperty(2.0)
+    position_hug_left = autoproperty(0.43)
+    position_unhug_left = autoproperty(0.06)
+    position_hug_right = autoproperty(0.05)
+    position_unhug_right = autoproperty(0.47)
+    delay_hug = autoproperty(0.5)
 
     def __init__(self):
         super().__init__()
