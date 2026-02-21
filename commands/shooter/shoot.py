@@ -10,9 +10,9 @@ class Shoot(Command):
 
         self.shooter.setToUnstuck()
 
-        def execute(self):
-            speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
-            self.shooter.shoot(speed_rpm)
+    def execute(self):
+        speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
+        self.shooter.shoot(speed_rpm)
 
         if self.shooter.isAtVelocity():
             self.shooter.sendFuel()
