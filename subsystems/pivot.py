@@ -10,11 +10,11 @@ from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(0.2)
+    speed_maintain = autoproperty(0.0)
     min_position = autoproperty(0.0)
-    max_position = autoproperty(5.0)
-    position_maintain_min = autoproperty(0.0)
-    position_maintain_max = autoproperty(5.0)
+    max_position = autoproperty(6.35)
+    position_maintain_min = autoproperty(0.5)
+    position_maintain_max = autoproperty(6.5)
 
     def __init__(self):
         super().__init__(
@@ -23,6 +23,8 @@ class Pivot(LinearSubsystem):
             should_reset_max=True,
             should_block_min_position=True,
             should_block_max_position=False,
+            should_block_min_switch=True,
+            should_block_max_switch=True,
             sim_motor_to_distance_factor=2.0,
             sim_gravity=0.0,
         )

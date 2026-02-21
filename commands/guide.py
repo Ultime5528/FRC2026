@@ -53,28 +53,28 @@ class MoveGuide(MoveLinear):
 
 
 class _PropertiesManual:
-    speed_up = autoproperty(0.25, subtable=ManualMoveGuide.__name__)
-    speed_down = autoproperty(-0.25, subtable=ManualMoveGuide.__name__)
+    speed_up = autoproperty(0.1, subtable=ManualMoveGuide.__name__)
+    speed_down = autoproperty(-0.1, subtable=ManualMoveGuide.__name__)
 
 
 _manual_move_properties = _PropertiesManual()
 
 
 class _PropertiesReset:
-    speed_up = autoproperty(0.25, subtable=ResetGuide.__name__)
-    speed_down = autoproperty(-0.25, subtable=ResetGuide.__name__)
+    speed_up = autoproperty(0.15, subtable=ResetGuide.__name__)
+    speed_down = autoproperty(-0.15, subtable=ResetGuide.__name__)
 
 
 _reset_properties = _PropertiesReset()
 
 
 class _PropertiesMove:
-    speed_min = autoproperty(0.10, subtable=MoveGuide.__name__)
-    speed_max = autoproperty(0.40, subtable=MoveGuide.__name__)
+    speed_min = autoproperty(0.1, subtable=MoveGuide.__name__)
+    speed_max = autoproperty(0.2, subtable=MoveGuide.__name__)
     accel = autoproperty(5.0, subtable=MoveGuide.__name__)
 
-    position_unused = autoproperty(0.1, subtable=MoveGuide.__name__)
-    position_used = autoproperty(0.5, subtable=MoveGuide.__name__)
+    position_unused = autoproperty(-5.0, subtable=MoveGuide.__name__)
+    position_used = autoproperty(3.0, subtable=MoveGuide.__name__)
 
 
 _move_properties = _PropertiesMove()
