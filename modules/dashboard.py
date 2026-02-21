@@ -1,21 +1,25 @@
 import commands2
 import wpilib
 from commands2 import CommandScheduler
+from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
+from wpimath.geometry import Pose2d
 
-from commands import Hug
-from commands import ManualMoveClimber, ResetClimber, MoveClimber
-from commands import Unhug
-from commands import DriveRelative
-from commands import ResetGyro
-from commands import EjectFuel
-from commands import GrabFuel
-from commands.guide.guide import ManualMoveGuide, ResetGuide, MoveGuide
-from commands import MaintainPivot
-from commands import MovePivot, ResetPivot, ManualMovePivot
-from commands import ManualShoot, ManualPrepareShoot
-from commands import PrepareShoot
-from commands import Shoot
+from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
+from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
+from commands.drivetrain.resetgyro import ResetGyro
+from commands.feeder.ejectfuel import EjectFuel
+from commands.feeder.grabfuel import GrabFuel
+from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.hugger.hug import Hug
+from commands.hugger.unhug import Unhug
+from commands.pivot.maintainpivot import MaintainPivot
+from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
+from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
+from commands.shooter.prepareshoot import PrepareShoot
+from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -54,6 +58,13 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        path = PathPlannerPath.fromPathFile("Test")
+        putCommandOnDashboard(
+            "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
+        )
+        putCommandOnDashboard(
+            "Drivetrain", PathFindPrecise(hardware.drivetrain, Pose2d(8, 4, 0))
+        )
 
         """
         Shooter
@@ -81,8 +92,12 @@ class DashboardModule(Module):
         putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
-        putCommandOnDashboard("Climber", Hug(hardware.climber))
-        putCommandOnDashboard("Climber", Unhug(hardware.climber))
+
+        """
+        Hugger
+        """
+        putCommandOnDashboard("Hugger", Hug(hardware.hugger))
+        putCommandOnDashboard("Hugger", Unhug(hardware.hugger))
 
         """
         Feeder
