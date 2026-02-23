@@ -93,7 +93,7 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     fin_pose = drivetrain.getPose()
     assert abs(fin_pose.x) == approx(52.0, abs=3.0)
     assert abs(fin_pose.y) == approx(52.0, abs=3.0)
-    assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 5), abs=10.0)
+    assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 5), abs=3.0)
 
     robot_controller.run_command(
         ResetGyro(drivetrain, robot.quest_vision).withTimeout(0.1), 0.3
