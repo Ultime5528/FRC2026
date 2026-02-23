@@ -1,5 +1,4 @@
 import rev
-
 import ports
 from ultime.autoproperty import autoproperty
 from ultime.subsystem import Subsystem

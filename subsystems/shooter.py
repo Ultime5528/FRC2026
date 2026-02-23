@@ -35,10 +35,10 @@ class Shooter(Subsystem):
         self._feeder = rev.SparkMax(
             ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
         )
-        self._indexer = rev.SparkMax(
+        self.indexer = rev.SparkMax(
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
-        self._indexer.setInverted(True)
+        self.indexer.setInverted(True)
         self._velocity_filter = LinearFilter.movingAverage(25)
 
         self._is_at_velocity = self.createProperty(False)
@@ -63,11 +63,11 @@ class Shooter(Subsystem):
         self._is_at_velocity = abs(average - rpm) < self.tolerance
 
     def sendFuel(self):
-        self._indexer.set(self.speed_indexer)
+        self.indexer.set(self.speed_indexer)
         self._feeder.set(self.speed_feeder)
 
     def stopFuel(self):
-        self._indexer.set(0.0)
+        self.indexer.set(0.0)
         self._feeder.set(0.0)
 
     def readInputs(self):
@@ -75,6 +75,9 @@ class Shooter(Subsystem):
             self.rpm_current = self._flywheel_sim.getVelocity()
         else:
             self.rpm_current = self._encoder.getVelocity()
+
+    def mix(self):
+        self.indexer.set(self.speed_indexer)
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
@@ -85,7 +88,7 @@ class Shooter(Subsystem):
     def stop(self):
         self._flywheel.stopMotor()
         self._feeder.stopMotor()
-        self._indexer.stopMotor()
+        self.indexer.stopMotor()
         self._is_at_velocity = False
 
     def getCurrentSpeed(self) -> float:

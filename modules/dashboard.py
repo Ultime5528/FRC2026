@@ -102,7 +102,7 @@ class DashboardModule(Module):
         """
         Feeder
         """
-        putCommandOnDashboard("Feeder", GrabFuel(hardware.feeder))
+        putCommandOnDashboard("Feeder", GrabFuel(hardware.feeder, hardware.shooter))
         putCommandOnDashboard("Feeder", EjectFuel(hardware.feeder))
 
         """
