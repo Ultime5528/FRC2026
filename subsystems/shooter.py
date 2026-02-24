@@ -110,24 +110,10 @@ class Shooter(Subsystem):
                 self.indexer_state = IndexerState.Stuck
                 self._timer.restart()
             else:
-                volts_indexer = pf(
-                    self.indexer_current_rpm,
-                    self.speed_rpm_indexer,
-                    self.kS_indexer,
-                    self.kF_indexer,
-                    self.kP_indexer,
-                )
-                self._indexer.setVoltage(volts_indexer)
+                self._setIndexerVolage(self.speed_rpm_indexer)
 
         if self.indexer_state == IndexerState.Stuck:
-            volts_indexer = pf(
-                self.indexer_current_rpm,
-                self.rpm_indexer_to_unstuck,
-                self.kS_indexer,
-                self.kF_indexer,
-                self.kP_indexer,
-            )
-            self._indexer.setVoltage(volts_indexer)
+            self._setIndexerVolage(self.rpm_indexer_to_unstuck)
 
             if self._timer.hasElapsed(self.delay_indexer_unstuck):
                 self.indexer_state = IndexerState.On
@@ -136,6 +122,16 @@ class Shooter(Subsystem):
     def stopFuel(self):
         self._indexer.set(0.0)
         self._feeder.set(0.0)
+
+    def _setIndexerVolage(self, target_rpm: float) -> None:
+        volts_indexer = pf(
+            self.indexer_current_rpm,
+            target_rpm,
+            self.kS_indexer,
+            self.kF_indexer,
+            self.kP_indexer,
+        )
+        self._indexer.setVoltage(volts_indexer)
 
     def readInputs(self):
         if is_simulation:
@@ -154,11 +150,14 @@ class Shooter(Subsystem):
             + self._flywheel_sim.getVelocity() * 0.99
         )
         if self._is_at_velocity and self.indexer_state == IndexerState.On:
-            self._indexer_sim.setVelocity(
-                self.speed_rpm_indexer * 0.01 + self._indexer_sim.getVelocity() * 0.99
-            )
+            self._updateIndexerSimVelocity(self.speed_rpm_indexer)
         elif self.indexer_state == IndexerState.Stuck:
-            self._indexer_sim.setVelocity(self.rpm_indexer_to_unstuck)
+            self._updateIndexerSimVelocity(self.rpm_indexer_to_unstuck)
+
+    def _updateIndexerSimVelocity(self, target_rpm: float) -> None:
+        self._indexer_sim.setVelocity(
+            target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
+        )
 
     def stop(self):
         self._flywheel.stopMotor()

@@ -121,13 +121,17 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(shooter.delay_indexer_unstuck * 0.5)
     assert shooter.indexer_state == IndexerState.Stuck
-    assert shooter.indexer_current_rpm == shooter.rpm_indexer_to_unstuck
+    assert shooter.indexer_current_rpm == approx(
+        shooter.rpm_indexer_to_unstuck, abs=rpm_indexer_tolerance
+    )
     assert shooter.isAtVelocity()
 
     robot_controller.wait(shooter.delay_indexer_unstuck * 0.5)
     robot_controller.wait_one_frame()
     assert shooter.indexer_state == IndexerState.On
-    assert shooter.indexer_current_rpm == shooter.rpm_indexer_to_unstuck
+    assert shooter.indexer_current_rpm == approx(
+        shooter.rpm_indexer_to_unstuck, abs=rpm_indexer_tolerance
+    )
 
     robot_controller.wait_one_frame()
     assert shooter.indexer_state == IndexerState.On
