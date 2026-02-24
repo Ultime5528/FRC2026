@@ -12,9 +12,7 @@ from wpimath.geometry import Transform3d
 from ultime.alert import AlertType
 from ultime.module import Module
 
-april_tag_field_layout = AprilTagFieldLayout.loadField(
-    AprilTagField.k2025ReefscapeWelded
-)
+april_tag_field_layout = AprilTagFieldLayout.loadField(AprilTagField.k2026RebuiltWelded)
 
 
 class VisionMode(Enum):
@@ -82,6 +80,10 @@ class AbsoluteVision(Vision):
         self.updateEstimationStdDevs(self.estimated_pose, frame.getTargets())
         return self.estimated_pose
 
+    def getAllUnreadEstimatedPoses(self):
+        for frame in self._cam.getAllUnreadResults():
+            yield self.getEstimatedPose(frame)
+
     def updateEstimationStdDevs(
         self, estimated_pose: EstimatedRobotPose, targets: List[PhotonTrackedTarget]
     ):
@@ -128,7 +130,7 @@ class AbsoluteVision(Vision):
     def getEstimationStdDevs(self) -> List[float]:
         return self.std_devs
 
-    def getEstimatedPoseTimeStamp(self):
+    def  getEstimatedPoseTimeStamp(self):
         if self.estimated_pose:
             return self.estimated_pose.timestampSeconds
 
@@ -144,10 +146,7 @@ class AbsoluteVision(Vision):
         else:
             return []
 
-    def initSendable(self, builder):
-        super().initSendable(builder)
-
-        def noop(x):
-            pass
-
-        builder.addIntegerArrayProperty("UsedTagIDs", self.getUsedTagIDs, noop)
+    def logValues(self):
+        self.log("used_tags_IDs", self.getUsedTagIDs())
+        self.log("estimated_pose", self.estimated_pose)
+        self.log("estimation_std_devs", self.getEstimationStdDevs())

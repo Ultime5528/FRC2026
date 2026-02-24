@@ -119,6 +119,9 @@ class DashboardModule(Module):
         for subsystem in self._hardware.subsystems:
             Logger.getInstance().addLoggable(subsystem)
 
+        for module in self._module_list.modules:
+            Logger.getInstance().addLoggable(module)
+
         wpilib.SmartDashboard.putData("Gyro", self._hardware.drivetrain._gyro)
         wpilib.SmartDashboard.putData(
             "CommandScheduler", CommandScheduler.getInstance()

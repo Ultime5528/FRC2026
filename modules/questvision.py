@@ -45,21 +45,10 @@ class QuestVisionModule(Module):
     def reset(self, pose: Pose3d):
         self.questnav.setPose(pose)
 
-    def initSendable(self, builder):
-        super().initSendable(builder)
-
-        def noop(x):
-            pass
-
-        builder.addFloatProperty("X", lambda: self.getEstimatedPose().x, noop)
-        builder.addFloatProperty("Y", lambda: self.getEstimatedPose().y, noop)
-        builder.addFloatProperty("Z", lambda: self.getEstimatedPose().z, noop)
-        builder.addFloatProperty(
-            "roll", lambda: self.getEstimatedPose().rotation().x, noop
-        )
-        builder.addFloatProperty(
-            "pitch", lambda: self.getEstimatedPose().rotation().y, noop
-        )
-        builder.addFloatProperty(
-            "yaw", lambda: self.getEstimatedPose().rotation().z, noop
-        )
+    def logValues(self):
+        self.log("x", self.getEstimatedPose().x)
+        self.log("y", self.getEstimatedPose().y)
+        self.log("z", self.getEstimatedPose().z)
+        self.log("roll", self.getEstimatedPose().rotation().x)
+        self.log("pitch", self.getEstimatedPose().rotation().y)
+        self.log("yaw", self.getEstimatedPose().rotation().z)
