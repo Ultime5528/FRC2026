@@ -3,6 +3,7 @@ import math
 from wpilib import DriverStation
 from wpimath.geometry import Translation3d, Pose3d, Rotation3d, Transform3d
 
+
 from commands.guide import MoveGuide
 from modules import hardware
 from subsystems.drivetrain import Drivetrain
@@ -127,7 +128,7 @@ class ShooterCalcModule(Module):
     def __init__(
         self,
         drivetrain: Drivetrain,
-        guide: MoveGuide,
+        guide: Guide,
     ):
         super().__init__()
         self._drivetrain = drivetrain
@@ -141,9 +142,9 @@ class ShooterCalcModule(Module):
 
     def robotPeriodic(self) -> None:
         if self.shouldUseGuide():
-            self.guide.toUsed(Guide())
+            MoveGuide.toUsed(self.guide)
         else:
-            self.guide.toUnused(Guide())
+            MoveGuide.toUnused(self.guide)
 
     def _getShooterPose(self) -> Translation3d:
         shooter_pose = computeShooterPosition(

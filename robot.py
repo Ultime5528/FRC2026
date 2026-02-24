@@ -8,6 +8,7 @@ from modules.hardware import HardwareModule
 from modules.logging import LoggingModule
 from modules.propertysavechecker import PropertySaveCheckerModule
 from modules.questvision import QuestVisionModule
+from modules.shootercalcmodule import ShooterCalcModule
 from ultime.modulerobot import ModuleRobot
 
 
@@ -27,6 +28,8 @@ class Robot(ModuleRobot):
         self.autonomous = self.addModule(AutonomousModule(self.hardware))
 
         self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+
+        self.shooter_calc_module = self.addModule(ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide))
 
         self.dashboard = self.addModule(
             DashboardModule(
