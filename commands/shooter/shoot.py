@@ -8,8 +8,6 @@ class Shoot(Command):
         self.shooter = shooter
         self.addRequirements(self.shooter)
 
-        self.shooter.setToUnstuck()
-
     def execute(self):
         speed_rpm = 666.6  # mettre la valeur du calcul d'hayder
         self.shooter.shoot(speed_rpm)

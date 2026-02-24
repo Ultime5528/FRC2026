@@ -65,7 +65,6 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._is_stuck = False
         self._timer = wpilib.Timer()
 
         self.indexer_state = IndexerState.Off
@@ -121,7 +120,14 @@ class Shooter(Subsystem):
                 self._indexer.setVoltage(volts_indexer)
 
         if self.indexer_state == IndexerState.Stuck:
-            self._indexer.set(self.rpm_indexer_to_unstuck)
+            volts_indexer = pf(
+                self.indexer_current_rpm,
+                self.rpm_indexer_to_unstuck,
+                self.kS_indexer,
+                self.kF_indexer,
+                self.kP_indexer,
+            )
+            self._indexer.setVoltage(volts_indexer)
 
             if self._timer.hasElapsed(self.delay_indexer_unstuck):
                 self.indexer_state = IndexerState.On
@@ -147,10 +153,12 @@ class Shooter(Subsystem):
             self._flywheel_controller.getSetpoint() * 0.01
             + self._flywheel_sim.getVelocity() * 0.99
         )
-        if self._is_at_velocity:
+        if self._is_at_velocity and self.indexer_state == IndexerState.On:
             self._indexer_sim.setVelocity(
                 self.speed_rpm_indexer * 0.01 + self._indexer_sim.getVelocity() * 0.99
             )
+        elif self.indexer_state == IndexerState.Stuck:
+            self._indexer_sim.setVelocity(self.rpm_indexer_to_unstuck)
 
     def stop(self):
         self._flywheel.stopMotor()
@@ -164,7 +172,3 @@ class Shooter(Subsystem):
 
     def isAtVelocity(self):
         return self._is_at_velocity
-
-    def setToUnstuck(self):
-        self._has_surpassed_stuck_rpm = False
-        self._is_stuck = False

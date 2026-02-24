@@ -1,11 +1,10 @@
-import wpilib
 from pytest import approx
 
 from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from robot import Robot
-from subsystems.shooter import IndexerState, Shooter
+from subsystems.shooter import IndexerState
 from ultime.tests import RobotTestController
 
 
@@ -72,7 +71,7 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     )
 
 
-def test_shoot_carl(robot_controller: RobotTestController, robot: Robot):
+def test_shoot(robot_controller: RobotTestController, robot: Robot):
 
     shooter = robot.hardware.shooter
 
@@ -100,12 +99,18 @@ def test_shoot_carl(robot_controller: RobotTestController, robot: Robot):
     assert shooter.indexer_current_rpm <= shooter.rpm_indexer_stuck_threshold
     assert shooter.isAtVelocity()
 
-    robot_controller.wait_until(lambda: shooter.indexer_current_rpm > (shooter.rpm_indexer_stuck_threshold * 2), 10.0)
+    robot_controller.wait_until(
+        lambda: shooter.indexer_current_rpm > (shooter.rpm_indexer_stuck_threshold * 2),
+        10.0,
+    )
     assert shooter.indexer_state == IndexerState.On
     assert shooter.indexer_current_rpm > shooter.rpm_indexer_stuck_threshold
     assert shooter.isAtVelocity()
 
-    robot_controller.wait_until(lambda: shooter._timer.hasElapsed(shooter.delay_indexer_to_stuck_threshold), 10.0)
+    robot_controller.wait_until(
+        lambda: shooter._timer.hasElapsed(shooter.delay_indexer_to_stuck_threshold),
+        10.0,
+    )
 
     shooter._indexer_sim.setVelocity(0.0)
     robot_controller.wait_one_frame()
@@ -116,14 +121,28 @@ def test_shoot_carl(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait(shooter.delay_indexer_unstuck * 0.5)
     assert shooter.indexer_state == IndexerState.Stuck
-    assert shooter.indexer_current_rpm == approx(shooter.rpm_indexer_to_unstuck, abs=rpm_indexer_tolerance)
+    assert shooter.indexer_current_rpm == shooter.rpm_indexer_to_unstuck
     assert shooter.isAtVelocity()
 
     robot_controller.wait(shooter.delay_indexer_unstuck * 0.5)
     robot_controller.wait_one_frame()
     assert shooter.indexer_state == IndexerState.On
-    assert shooter.indexer_current_rpm > shooter.rpm_indexer_stuck_threshold
+    assert shooter.indexer_current_rpm == shooter.rpm_indexer_to_unstuck
+
+    robot_controller.wait_one_frame()
+    assert shooter.indexer_state == IndexerState.On
+    assert shooter.indexer_current_rpm > shooter.rpm_indexer_to_unstuck
     assert shooter.isAtVelocity()
 
-    assert shooter._indexer.get() > 0.0
+    robot_controller.wait_until(
+        lambda: shooter.indexer_current_rpm
+        == approx(shooter.speed_rpm_indexer, abs=rpm_indexer_tolerance),
+        10.0,
+    )
+    assert shooter.indexer_state == IndexerState.On
+    assert shooter.indexer_current_rpm == approx(
+        shooter.speed_rpm_indexer, abs=rpm_indexer_tolerance
+    )
+    assert shooter.isAtVelocity()
+
     assert shooter._feeder.get() == approx(shooter.speed_feeder)
