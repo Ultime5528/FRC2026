@@ -43,13 +43,13 @@ class Shooter(Subsystem):
         self.updatePIDFConfig()
 
         self._indexer.setInverted(True)
-        self._indexer_config = rev.SparkMaxConfig()
-        self._indexer_config.voltageCompensation(12.0)
-        self._indexer.configure(
-            self._indexer_config,
-            rev.ResetMode.kResetSafeParameters,
-            rev.PersistMode.kNoPersistParameters,
-        )
+        # self._indexer_config = rev.SparkMaxConfig()
+        # self._indexer_config.voltageCompensation(12.0)
+        # self._indexer.configure(
+        #     self._indexer_config,
+        #     rev.ResetMode.kResetSafeParameters,
+        #     rev.PersistMode.kNoPersistParameters,
+        # )
 
         self._flywheel_controller = self._flywheel.getClosedLoopController()
         self._encoder = self._flywheel.getEncoder()
@@ -59,7 +59,7 @@ class Shooter(Subsystem):
 
         self.indexer_current_rpm = self.createProperty(0.0)
 
-        self._velocity_filter = LinearFilter.movingAverage(25)
+        self._velocity_filter = LinearFilter.movingAverage(10)
 
         self._is_at_velocity = self.createProperty(False)
 
@@ -86,21 +86,25 @@ class Shooter(Subsystem):
         self.log("rpm_target", rpm)
 
         error = average - rpm
+        self._is_at_velocity = abs(error) <= self.tolerance
 
-        if error > self.tolerance:
-            self._is_at_velocity = False
-            voltage = 0.0
-        elif error < -self.tolerance:
-            self._is_at_velocity = False
-            voltage = 12.0
-        else:
-            self._is_at_velocity = True
-            ff_volts = feedforward(rpm, self.kS_shooter, self.kF)
-            if error < rpm:
-                voltage = ff_volts + (12 - ff_volts) * ((-error) / self.tolerance)
-            else:
-                voltage = ff_volts * (1 - (error / self.tolerance))
-            voltage = clamp(voltage, 0.0, 12.0)
+        # if error > self.tolerance:
+        #     self._is_at_velocity = False
+        #     voltage = 0.0
+        # else:
+        ff = feedforward(rpm, self.kS_shooter, self.kF)
+        voltage = pf(average, rpm, self.kS_shooter, self.kF, self.kP)
+
+        # if error < -self.tolerance:
+        #     self._is_at_velocity = False
+        #     voltage = ff_volts
+        # elif error < 0:
+        #     self._is_at_velocity = True
+        #     voltage = ff_volts + (12 - ff_volts) * ((-error) / self.tolerance)
+        # else:
+        #     self._is_at_velocity = True
+        #     voltage = ff_volts * (1 - (error / self.tolerance))
+        voltage = min(ff, voltage)
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)

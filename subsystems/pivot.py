@@ -1,3 +1,5 @@
+import math
+
 import rev
 from rev import SparkMaxSim
 from wpilib import RobotBase
@@ -5,16 +7,22 @@ from wpimath._controls._controls.plant import DCMotor
 
 import ports
 from ultime.autoproperty import autoproperty
+from ultime.control import pf, clamp
 from ultime.linear.linearsubsystem import LinearSubsystem
 from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(0.0)
+    speed_maintain = autoproperty(50.0)
     min_position = autoproperty(0.0)
     max_position = autoproperty(6.35)
     position_maintain_min = autoproperty(0.5)
     position_maintain_max = autoproperty(6.5)
+
+    kS = autoproperty(0.1)
+    kF = autoproperty(0.005)
+    kP = autoproperty(0.0001)
+    kG = autoproperty(0.0)
 
     def __init__(self):
         super().__init__(
@@ -28,6 +36,8 @@ class Pivot(LinearSubsystem):
             sim_motor_to_distance_factor=2.0,
             sim_gravity=0.0,
         )
+        self._motor_current_rpm = self.createProperty(0.0)
+
         self._motor = rev.SparkMax(
             ports.CAN.pivot_motor, rev.SparkMax.MotorType.kBrushless
         )
@@ -45,9 +55,12 @@ class Pivot(LinearSubsystem):
         position = self.getPosition()
 
         if self.position_maintain_min <= position <= self.position_maintain_max:
-            self._motor.set(self.speed_maintain)
+            self._setMotorOutput(self.speed_maintain)
         else:
             self._motor.stopMotor()
+
+    def readInputs(self):
+        self._motor_current_rpm = self._encoder.getVelocity()
 
     def stop(self):
         self._motor.stopMotor()
@@ -79,8 +92,17 @@ class Pivot(LinearSubsystem):
     def getPositionConversionFactor(self) -> float:
         return 1.0
 
-    def _setMotorOutput(self, speed: float) -> None:
-        self._motor.set(speed)
+    def _setMotorOutput(self, rpm: float) -> None:
+        voltage = pf(self.getMotorCurrentRPM(), rpm, self.kS, self.kF, self.kP)
+        if self.hasReset():
+            angle = (
+                clamp(self.getPosition() / self.getMaxPosition(), 0.0, 1.0) * (math.pi/2)
+            )
+            voltage += math.cos(angle) * self.kG
+        self._motor.setVoltage(voltage)
+
+    def getMotorCurrentRPM(self):
+        return self._motor_current_rpm
 
     def getMotorOutput(self) -> float:
-        return self._motor.get()
+        return self._motor.getBusVoltage() * self._motor.getAppliedOutput()
