@@ -123,7 +123,7 @@ class Shooter(Subsystem):
         if self.indexer_state == IndexerState.Stuck:
             self._indexer.set(self.rpm_indexer_to_unstuck)
 
-            if self._timer > self.delay_indexer_unstuck:
+            if self._timer.hasElapsed(self.delay_indexer_unstuck):
                 self.indexer_state = IndexerState.On
                 self._timer.restart()
 
