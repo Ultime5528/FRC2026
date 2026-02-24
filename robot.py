@@ -30,7 +30,9 @@ class Robot(ModuleRobot):
 
         self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
 
-        self.shooter_calc_module = self.addModule(ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide))
+        self.shooter_calc_module = self.addModule(
+            ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
+        )
 
         self.dashboard = self.addModule(
             DashboardModule(
