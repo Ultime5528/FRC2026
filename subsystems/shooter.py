@@ -1,15 +1,22 @@
+from enum import Enum, auto
+
 import rev
 import wpilib
 from rev import SparkMaxSim
 from wpimath.filter import LinearFilter
 from wpimath.system.plant import DCMotor
-from wpimath.units import kilogram_square_meters
 
 import ports
 from ultime.autoproperty import autoproperty
-from ultime.control import feedforward, pf
+from ultime.control import pf
 from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
+
+
+class IndexerState(Enum):
+    Off = auto()
+    On = auto()
+    Stuck = auto()
 
 
 class Shooter(Subsystem):
@@ -19,9 +26,10 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    rpm_indexer_stuck = autoproperty(50)
+    rpm_indexer_stuck_threshold = autoproperty(50)
     rpm_indexer_to_unstuck = autoproperty(-200)
     delay_indexer_unstuck = autoproperty(2.0)
+    delay_indexer_to_stuck_threshold = autoproperty(1.0)
     speed_feeder = autoproperty(0.5)
     speed_rpm_indexer = autoproperty(1000.0)
     tolerance = autoproperty(100.0)
@@ -57,9 +65,10 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._has_surpassed_stuck_rpm = False
-        self._is_in_unstuck_mode = False
-        self._unstuck_timer = wpilib.Timer()
+        self._is_stuck = False
+        self._timer = wpilib.Timer()
+
+        self.indexer_state = IndexerState.Off
 
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
@@ -74,6 +83,10 @@ class Shooter(Subsystem):
             rev.PersistMode.kNoPersistParameters,
         )
 
+    def logValues(self):
+        super().logValues()
+        self.log("indexer_state", str(self.indexer_state))
+
     def shoot(self, rpm):
         self._flywheel_controller.setSetpoint(rpm, rev.SparkMax.ControlType.kVelocity)
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
@@ -83,31 +96,36 @@ class Shooter(Subsystem):
 
     def sendFuel(self):
 
-        if not self._is_in_unstuck_mode:
-            self._has_surpassed_stuck_rpm = self.indexer_current_rpm > self.rpm_indexer_stuck
-
-        if self._is_in_unstuck_mode and not self._unstuck_timer.isRunning():
-            self._unstuck_timer.restart()
-
-        if self._is_in_unstuck_mode and self._unstuck_timer.isRunning():
-            if self._unstuck_timer.hasElapsed(self.delay_indexer_unstuck):
-                self._has_surpassed_stuck_rpm = False
-                self._is_in_unstuck_mode = False
-                self._unstuck_timer.stop()
-
-        if self._is_in_unstuck_mode:
-            self._indexer.setVoltage(self.volts_indexer_to_unstuck)
-        else:
-            volts_indexer = pf(
-                self.indexer_current_rpm,
-                self.speed_rpm_indexer,
-                self.kS_indexer,
-                self.kF_indexer,
-                self.kP_indexer,
-            )
-            self._indexer.setVoltage(volts_indexer)
-
         self._feeder.set(self.speed_feeder)
+
+        if self.indexer_state == IndexerState.Off:
+            self.indexer_state = IndexerState.On
+            self._timer.restart()
+
+        if self.indexer_state == IndexerState.On:
+
+            if (
+                self._timer.hasElapsed(self.delay_indexer_to_stuck_threshold)
+                and self.indexer_current_rpm < self.rpm_indexer_stuck_threshold
+            ):
+                self.indexer_state = IndexerState.Stuck
+                self._timer.restart()
+            else:
+                volts_indexer = pf(
+                    self.indexer_current_rpm,
+                    self.speed_rpm_indexer,
+                    self.kS_indexer,
+                    self.kF_indexer,
+                    self.kP_indexer,
+                )
+                self._indexer.setVoltage(volts_indexer)
+
+        if self.indexer_state == IndexerState.Stuck:
+            self._indexer.set(self.rpm_indexer_to_unstuck)
+
+            if self._timer > self.delay_indexer_unstuck:
+                self.indexer_state = IndexerState.On
+                self._timer.restart()
 
     def stopFuel(self):
         self._indexer.set(0.0)
@@ -130,14 +148,16 @@ class Shooter(Subsystem):
             + self._flywheel_sim.getVelocity() * 0.99
         )
         if self._is_at_velocity:
-            self._indexer_sim.setVelocity(self.speed_rpm_indexer * 0.01
-                                          + self._indexer_sim.getVelocity() * 0.99)
+            self._indexer_sim.setVelocity(
+                self.speed_rpm_indexer * 0.01 + self._indexer_sim.getVelocity() * 0.99
+            )
 
     def stop(self):
         self._flywheel.stopMotor()
         self._feeder.stopMotor()
         self._indexer.stopMotor()
         self._is_at_velocity = False
+        self.indexer_state = IndexerState.Off
 
     def getCurrentSpeed(self) -> float:
         return self.flywheel_current_rpm
@@ -147,4 +167,4 @@ class Shooter(Subsystem):
 
     def setToUnstuck(self):
         self._has_surpassed_stuck_rpm = False
-        self._is_in_unstuck_mode = False
+        self._is_stuck = False
