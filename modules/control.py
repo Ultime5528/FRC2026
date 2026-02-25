@@ -1,4 +1,8 @@
 from commands.drivetrain.driverelative import DriveRelative
+from commands.feeder.grabfuel import GrabFuel
+from commands.feeder.ejectfuel import EjectFuel
+from commands.pivot.move import MovePivot
+from commands.shooter.shoot import Shoot
 from modules.hardware import HardwareModule
 from ultime.module import Module
 
@@ -27,3 +31,15 @@ class ControlModule(Module):
         """
         Copilot's panel
         """
+
+        #Intake
+        hardware.panel_2.povUp().onTrue(MovePivot.toDown(hardware.pivot))
+
+        hardware.panel_2.povDown().onTrue(MovePivot.toUp(hardware.pivot))
+
+        hardware.panel_2.povRight().onTrue(GrabFuel(hardware.feeder))
+
+        #Shooter
+        hardware.panel_2.povLeft().onTrue(Shoot(hardware.shooter))
+
+
