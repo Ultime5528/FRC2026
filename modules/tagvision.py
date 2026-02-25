@@ -2,7 +2,6 @@ import wpimath
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
-from ultime.timethis import tt
 from ultime.vision import AbsoluteVision, VisionMode
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
@@ -53,8 +52,8 @@ class TagVisionModule(AbsoluteVision):
         def noop(x):
             pass
 
-        builder.addIntegerProperty("number_tags_used", tt(self.getNumberTagsUsed), noop)
+        builder.addIntegerProperty("number_tags_used", self.getNumberTagsUsed, noop)
         builder.addDoubleProperty(
-            "first_tag_ambiguity", tt(self.getFirstTagAmbiguity), noop
+            "first_tag_ambiguity", self.getFirstTagAmbiguity, noop
         )
-        builder.addFloatArrayProperty("std_devs", tt(self.getEstimationStdDevs), noop)
+        builder.addFloatArrayProperty("std_devs", self.getEstimationStdDevs, noop)
