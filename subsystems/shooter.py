@@ -46,6 +46,10 @@ class Shooter(Subsystem):
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
+        self.updatePIDFConfig()
+        self._flywheel_controller = self._flywheel.getClosedLoopController()
+        self._flywheel_encoder = self._flywheel.getEncoder()
+        self.flywheel_current_rpm = self.createProperty(0.0)
 
         self._feeder = rev.SparkMax(
             ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
@@ -55,16 +59,11 @@ class Shooter(Subsystem):
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
 
-        self.updatePIDFConfig()
-
         self._indexer.setInverted(True)
         self.indexer_current_rpm = self.createProperty(0.0)
 
-        self._flywheel_controller = self._flywheel.getClosedLoopController()
-        self._encoder = self._flywheel.getEncoder()
         self._indexer_encoder = self._indexer.getEncoder()
 
-        self.flywheel_current_rpm = self.createProperty(0.0)
 
         self._velocity_filter = LinearFilter.movingAverage(25)
 
