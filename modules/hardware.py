@@ -28,13 +28,12 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.climber = self.addSubsystem(Climber())
-        self.climber.setDefaultCommand(MaintainClimber(self.climber))
         self.hugger = self.addSubsystem(Hugger())
         self.guide = self.addSubsystem(Guide())
         self.shooter = self.addSubsystem(Shooter())
         self.feeder = self.addSubsystem(Feeder())
         self.pivot = self.addSubsystem(Pivot())
-        self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
+        #self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
 
