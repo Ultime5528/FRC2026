@@ -8,6 +8,7 @@ from commands.pivot.move import MovePivot
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
 from modules.hardware import HardwareModule
+from robot import Robot
 from ultime.module import Module
 
 
@@ -57,7 +58,9 @@ class ControlModule(Module):
 
         # ResetGyro
 
-        hardware.panel_2.button(2).onTrue(ResetGyro(hardware.drivetrain, hardware.controller.v))
+        hardware.panel_2.button(2).onTrue(ResetGyro(hardware.drivetrain, hardware.))
+
+        # ResetAll
 
 
 

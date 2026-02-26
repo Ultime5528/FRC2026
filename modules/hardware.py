@@ -38,6 +38,8 @@ class HardwareModule(Module):
 
         self.pdp = PowerDistribution()
 
+        self.quest_visio
+
     def teleopInit(self) -> None:
         self.shooter.updatePIDFConfig()
 
