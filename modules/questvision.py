@@ -5,7 +5,6 @@ from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
 from ultime.questnav import questnav
-from ultime.timethis import tt
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_quest_offset = wpimath.geometry.Transform3d(
@@ -52,15 +51,15 @@ class QuestVisionModule(Module):
         def noop(x):
             pass
 
-        builder.addFloatProperty("X", tt(lambda: self.getEstimatedPose().x), noop)
-        builder.addFloatProperty("Y", tt(lambda: self.getEstimatedPose().y), noop)
-        builder.addFloatProperty("Z", tt(lambda: self.getEstimatedPose().z), noop)
+        builder.addFloatProperty("X", lambda: self.getEstimatedPose().x, noop)
+        builder.addFloatProperty("Y", lambda: self.getEstimatedPose().y, noop)
+        builder.addFloatProperty("Z", lambda: self.getEstimatedPose().z, noop)
         builder.addFloatProperty(
-            "roll", tt(lambda: self.getEstimatedPose().rotation().x), noop
+            "roll", lambda: self.getEstimatedPose().rotation().x, noop
         )
         builder.addFloatProperty(
-            "pitch", tt(lambda: self.getEstimatedPose().rotation().y), noop
+            "pitch", lambda: self.getEstimatedPose().rotation().y, noop
         )
         builder.addFloatProperty(
-            "yaw", tt(lambda: self.getEstimatedPose().rotation().z), noop
+            "yaw", lambda: self.getEstimatedPose().rotation().z, noop
         )

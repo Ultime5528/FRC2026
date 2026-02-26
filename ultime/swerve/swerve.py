@@ -18,7 +18,6 @@ from wpimath.system.plant import DCMotor
 from wpiutil import Sendable, SendableBuilder
 
 from ultime.swerve import swerveconfig
-from ultime.timethis import tt
 
 
 class SwerveModule:
@@ -162,7 +161,7 @@ class SwerveModule:
 
     def runCharacterization(self, output: float):
         self.setDriveVoltage(output)
-        self.setTurnPosition(Rotation2d())
+        self.setTurnPosition(Rotation2d(self._chassis_angular_offset))
 
     def stop(self):
         self.setDriveVoltage(0.0)
@@ -237,78 +236,78 @@ class SwerveDriveElasticSendable(Sendable):
 
         builder.addDoubleProperty(
             "Front Left Voltage",
-            tt(lambda: self.module_fl.getDrivingMotorAppliedVoltage()),
+            lambda: self.module_fl.getDrivingMotorAppliedVoltage(),
             noop,
         )
         builder.addDoubleProperty(
             "Front Right Voltage",
-            tt(lambda: self.module_fr.getDrivingMotorAppliedVoltage()),
+            lambda: self.module_fr.getDrivingMotorAppliedVoltage(),
             noop,
         )
         builder.addDoubleProperty(
             "Back Left Voltage",
-            tt(lambda: self.module_bl.getDrivingMotorAppliedVoltage()),
+            lambda: self.module_bl.getDrivingMotorAppliedVoltage(),
             noop,
         )
         builder.addDoubleProperty(
             "Back Right Voltage",
-            tt(lambda: self.module_br.getDrivingMotorAppliedVoltage()),
+            lambda: self.module_br.getDrivingMotorAppliedVoltage(),
             noop,
         )
 
         builder.addDoubleProperty(
             "Back Left Desired Velocity",
-            tt(lambda: self.module_bl.desired_velocity),
+            lambda: self.module_bl.desired_velocity,
             noop,
         )
         builder.addDoubleProperty(
             "Front Left Desired Velocity",
-            tt(lambda: self.module_bl.desired_velocity),
+            lambda: self.module_bl.desired_velocity,
             noop,
         )
         builder.addDoubleProperty(
             "Front Right Desired Velocity",
-            tt(lambda: self.module_bl.desired_velocity),
+            lambda: self.module_bl.desired_velocity,
             noop,
         )
         builder.addDoubleProperty(
             "Back Right Desired Velocity",
-            tt(lambda: self.module_bl.desired_velocity),
+            lambda: self.module_bl.desired_velocity,
             noop,
         )
 
         builder.addDoubleProperty(
             "Front Left Angle",
-            tt(lambda: self.module_fl.getAngleRandians()),
+            lambda: self.module_fl.getAngleRandians(),
             noop,
         )
         builder.addDoubleProperty(
             "Front Right Angle",
-            tt(lambda: self.module_fr.getAngleRandians()),
+            lambda: self.module_fr.getAngleRandians(),
             noop,
         )
         builder.addDoubleProperty(
             "Back Left Angle",
-            tt(lambda: self.module_bl.getAngleRandians()),
+            lambda: self.module_bl.getAngleRandians(),
             noop,
         )
         builder.addDoubleProperty(
             "Back Right Angle",
-            tt(lambda: self.module_br.getAngleRandians()),
+            lambda: self.module_br.getAngleRandians(),
             noop,
         )
 
         builder.addDoubleProperty(
-            "Back Left Velocity", tt(self.module_bl.getVelocity), noop
+            "Back Left Velocity", self.module_bl.getVelocity, noop
         )
         builder.addDoubleProperty(
-            "Front Left Velocity", tt(self.module_fl.getVelocity), noop
+            "Front Left Velocity", self.module_fl.getVelocity, noop
         )
         builder.addDoubleProperty(
-            "Front Right Velocity", tt(self.module_fr.getVelocity), noop
+            "Front Right Velocity", self.module_fr.getVelocity, noop
         )
         builder.addDoubleProperty(
-            "Back Right Velocity", tt(self.module_br.getVelocity), noop
+            "Back Right Velocity", self.module_br.getVelocity, noop
         )
 
-        builder.addDoubleProperty("Robot Angle", tt(self.get_robot_angle_radians), noop)
+        builder.addDoubleProperty("Robot Angle", self.get_robot_angle_radians, noop)
