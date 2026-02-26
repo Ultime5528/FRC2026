@@ -39,16 +39,6 @@ class TagVisionModule(AbsoluteVision):
     def getName(self) -> str:
         return super().getName() + "_" + self.name
 
-    def robotPeriodic(self) -> None:
-        super().robotPeriodic()
-        for estimated_pose in self.getAllUnreadEstimatedPoses():
-            if estimated_pose:
-                time_stamp = self.getEstimatedPoseTimeStamp()
-                std_devs = self.getEstimationStdDevs()
-                self.drivetrain.addVisionMeasurement(
-                    estimated_pose.estimatedPose.toPose2d(), time_stamp, std_devs
-                )
-
     def getNumberTagsUsed(self) -> int:
         return len(self.getUsedTags())
 

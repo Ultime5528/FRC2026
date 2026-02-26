@@ -1,3 +1,5 @@
+from typing import Generator, List
+
 import wpimath
 from wpimath.geometry import Pose3d
 
@@ -23,24 +25,14 @@ class QuestVisionModule(Module):
         self.questnav = questnav.QuestNav()
         self.estimated_pose = Pose3d()
 
-    def robotPeriodic(self) -> None:
-        super().robotPeriodic()
-        poseFrames = self.questnav.getAllUnreadPoseFrames()
-
-        for poseFrame in poseFrames:
+    def getAllUnreadEstimatedPosesWithStdDevsWithTimeStamp(self) -> Generator[tuple[Pose3d, List[float], float]]:
+        for poseFrame in self.questnav.getAllUnreadPoseFrames():
             self.estimated_pose = poseFrame.quest_pose_3d
             self.estimated_pose = self.estimated_pose.transformBy(
                 robot_to_quest_offset.inverse()
             )
             time_stamp = poseFrame.data_timestamp
-            self.drivetrain.addVisionMeasurement(
-                self.estimated_pose.toPose2d(),
-                time_stamp,
-                [self.std_translation, self.std_translation, self.std_rotation],
-            )
-
-    def getEstimatedPose(self):
-        return self.estimated_pose
+            yield self.estimated_pose, [self.std_translation, self.std_translation, self.std_rotation], time_stamp
 
     def reset(self, pose: Pose3d):
         self.questnav.setPose(pose)
