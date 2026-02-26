@@ -33,7 +33,7 @@ def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
         ),
         timeout=3.0,
     )
-    rpm = shooter_calc_module.getRPMRaw()
+    rpm = shooter_calc_module.getSpeedRaw()
     assert rpm == approx(11.1779781175, abs=0.01)
     assert angle == approx(0.13114722400913124732706041777946, abs=0.005)
     assert angle_simple == approx(0.13114722400913124732706041777946, abs=0.005)

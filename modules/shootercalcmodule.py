@@ -141,10 +141,12 @@ class ShooterCalcModule(Module):
         )
 
     def robotPeriodic(self) -> None:
-        if self.shouldUseGuide():
-            MoveGuide.toUsed(self.guide)
-        else:
-            MoveGuide.toUnused(self.guide)
+        self.guide_usage = self.shouldUseGuide()
+        if self.shouldUseGuide() != self.guide_usage:
+            if self.shouldUseGuide():
+                MoveGuide.toUsed(self.guide).schedule()
+            else:
+                MoveGuide.toUnused(self.guide).schedule()
 
     def _getShooterPose(self) -> Translation3d:
         shooter_pose = computeShooterPosition(
@@ -181,11 +183,11 @@ class ShooterCalcModule(Module):
 
     def getRPM(self) -> float:
         if self.shouldUseGuide():
-            return self._interpolator_for_open_guide.interpolate(self.getRPMRaw())
+            return self._interpolator_for_open_guide.interpolate(self.getSpeedRaw())
         else:
-            return self._interpolator_for_closed_guide.interpolate(self.getRPMRaw())
+            return self._interpolator_for_closed_guide.interpolate(self.getSpeedRaw())
 
-    def getRPMRaw(self) -> float:
+    def getSpeedRaw(self) -> float:
         return computeShooterSpeedToShoot(
             self._getShooterPose(), self._getHubPosition(), self.long_zone
         )
