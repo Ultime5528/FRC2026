@@ -133,6 +133,7 @@ class ShooterCalcModule(Module):
         super().__init__()
         self._drivetrain = drivetrain
         self.guide = guide
+        self.guide_usage = None
         self._interpolator_for_open_guide = LinearInterpolator(
             self.speed_guide_open, self.rpm_guide_open
         )
@@ -141,12 +142,16 @@ class ShooterCalcModule(Module):
         )
 
     def robotPeriodic(self) -> None:
-        self.guide_usage = self.shouldUseGuide()
-        if self.shouldUseGuide() != self.guide_usage:
-            if self.shouldUseGuide():
-                MoveGuide.toUsed(self.guide).schedule()
-            else:
-                MoveGuide.toUnused(self.guide).schedule()
+        current_usage = self.shouldUseGuide()
+
+        if self.guide_usage is not None:
+            if current_usage != self.guide_usage:
+                if current_usage:
+                    MoveGuide.toUsed(self.guide).schedule()
+                else:
+                    MoveGuide.toUnused(self.guide).schedule()
+
+        self.guide_usage = current_usage
 
     def _getShooterPose(self) -> Translation3d:
         shooter_pose = computeShooterPosition(
