@@ -111,10 +111,10 @@ class Shooter(Subsystem):
                 self.indexer_state = IndexerState.Stuck
                 self._timer.restart()
             else:
-                self._setIndexerVolage(self.indexer_rpm)
+                self._setIndexerRPM(self.indexer_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
-            self._setIndexerVolage(self.indexer_rpm_unstuck)
+            self._setIndexerRPM(self.indexer_rpm_unstuck)
 
             if self._timer.hasElapsed(self.indexer_delay_unstuck):
                 self.indexer_state = IndexerState.On
@@ -124,7 +124,7 @@ class Shooter(Subsystem):
         self._indexer.set(0.0)
         self._feeder.set(0.0)
 
-    def _setIndexerVolage(self, target_rpm: float) -> None:
+    def _setIndexerRPM(self, target_rpm: float) -> None:
         volts_indexer = pf(
             self.indexer_current_rpm,
             target_rpm,
