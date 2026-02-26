@@ -26,12 +26,13 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    rpm_indexer_stuck_threshold = autoproperty(50)
-    rpm_indexer_to_unstuck = autoproperty(-200)
-    delay_indexer_unstuck = autoproperty(2.0)
-    delay_indexer_to_stuck_threshold = autoproperty(1.0)
-    speed_feeder = autoproperty(0.5)
-    speed_rpm_indexer = autoproperty(1000.0)
+    indexer_rpm = autoproperty(1000.0)
+    indexer_rpm_stuck_threshold = autoproperty(50.0)
+    indexer_rpm_unstuck = autoproperty(-200.0)
+    indexer_delay_unstuck = autoproperty(2.0)
+    indexer_delay_stuck_threshold = autoproperty(1.0)
+
+    feeder_speed = autoproperty(0.5)
     tolerance = autoproperty(100.0)
 
     kS_indexer = autoproperty(0.2)
@@ -95,7 +96,7 @@ class Shooter(Subsystem):
 
     def sendFuel(self):
 
-        self._feeder.set(self.speed_feeder)
+        self._feeder.set(self.feeder_speed)
 
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
@@ -104,18 +105,18 @@ class Shooter(Subsystem):
         if self.indexer_state == IndexerState.On:
 
             if (
-                self._timer.hasElapsed(self.delay_indexer_to_stuck_threshold)
-                and self.indexer_current_rpm < self.rpm_indexer_stuck_threshold
+                self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
+                and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
             ):
                 self.indexer_state = IndexerState.Stuck
                 self._timer.restart()
             else:
-                self._setIndexerVolage(self.speed_rpm_indexer)
+                self._setIndexerVolage(self.indexer_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
-            self._setIndexerVolage(self.rpm_indexer_to_unstuck)
+            self._setIndexerVolage(self.indexer_rpm_unstuck)
 
-            if self._timer.hasElapsed(self.delay_indexer_unstuck):
+            if self._timer.hasElapsed(self.indexer_delay_unstuck):
                 self.indexer_state = IndexerState.On
                 self._timer.restart()
 
@@ -150,9 +151,9 @@ class Shooter(Subsystem):
             + self._flywheel_sim.getVelocity() * 0.99
         )
         if self._is_at_velocity and self.indexer_state == IndexerState.On:
-            self._updateIndexerSimVelocity(self.speed_rpm_indexer)
+            self._updateIndexerSimVelocity(self.indexer_rpm)
         elif self.indexer_state == IndexerState.Stuck:
-            self._updateIndexerSimVelocity(self.rpm_indexer_to_unstuck)
+            self._updateIndexerSimVelocity(self.indexer_rpm_unstuck)
 
     def _updateIndexerSimVelocity(self, target_rpm: float) -> None:
         self._indexer_sim.setVelocity(
