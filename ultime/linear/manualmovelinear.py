@@ -27,12 +27,7 @@ def createManualMoveClass(speed_up: FloatProperty, speed_down: FloatProperty):
             self.subsystem.setSpeed(self.speed())
 
         def isFinished(self) -> bool:
-            return (
-                self.speed() < 0.0
-                and self.subsystem.isSwitchMinPressed()
-                or self.speed() > 0.0
-                and self.subsystem.isSwitchMaxPressed()
-            )
+            return False
 
         def end(self, interrupted: bool):
             self.subsystem.setSpeed(0.0)
