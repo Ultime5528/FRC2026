@@ -47,7 +47,6 @@ class Shooter(Subsystem):
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self.updatePIDFConfig()
-        self._flywheel_controller = self._flywheel.getClosedLoopController()
         self._flywheel_encoder = self._flywheel.getEncoder()
         self.flywheel_current_rpm = self.createProperty(0.0)
 
@@ -64,7 +63,6 @@ class Shooter(Subsystem):
 
         self._indexer_encoder = self._indexer.getEncoder()
 
-
         self._velocity_filter = LinearFilter.movingAverage(25)
 
         self._is_at_velocity = self.createProperty(False)
@@ -76,6 +74,7 @@ class Shooter(Subsystem):
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
             self._indexer_sim = SparkMaxSim(self._indexer, DCMotor.NEO(1))
+            self._flywheel_last_rpm_sim = 0.0
 
     def updatePIDFConfig(self):
         self._config = rev.SparkMaxConfig()
@@ -110,6 +109,9 @@ class Shooter(Subsystem):
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
+
+        if is_simulation:
+            self._flywheel_last_rpm_sim = rpm
 
     def sendFuel(self):
 
@@ -164,8 +166,7 @@ class Shooter(Subsystem):
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
-            self._flywheel_controller.getSetpoint() * 0.01
-            + self._flywheel_sim.getVelocity() * 0.99
+            self._flywheel_last_rpm_sim * 0.1 + self._flywheel_sim.getVelocity() * 0.9
         )
         if self._is_at_velocity and self.indexer_state == IndexerState.On:
             self._updateIndexerSimVelocity(self.indexer_rpm)
@@ -183,6 +184,9 @@ class Shooter(Subsystem):
         self._indexer.stopMotor()
         self._is_at_velocity = False
         self.indexer_state = IndexerState.Off
+
+        if is_simulation:
+            self._flywheel_last_rpm_sim = 0.0
 
     def getCurrentSpeed(self) -> float:
         return self.flywheel_current_rpm

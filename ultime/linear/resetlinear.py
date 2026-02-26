@@ -17,7 +17,12 @@ def createResetLinearClass(speed_up: FloatProperty, speed_down: FloatProperty):
             cmd.setName(cmd.getName() + ".down")
             return cmd
 
-        def __init__(self, subsystem: LinearSubsystem, speed_1: FloatProperty, speed_2: FloatProperty):
+        def __init__(
+            self,
+            subsystem: LinearSubsystem,
+            speed_1: FloatProperty,
+            speed_2: FloatProperty,
+        ):
             super().__init__()
             self.subsystem = subsystem
             self.addRequirements(subsystem)

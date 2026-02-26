@@ -1,7 +1,14 @@
 import math
 
 import rev
-from rev import SparkMaxSim, SparkMaxConfig, SparkMax, ResetMode, PersistMode, SparkBaseConfig
+from rev import (
+    SparkMaxSim,
+    SparkMaxConfig,
+    SparkMax,
+    ResetMode,
+    PersistMode,
+    SparkBaseConfig,
+)
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
@@ -52,7 +59,9 @@ class Pivot(LinearSubsystem):
             PersistMode.kPersistParameters,
         )
         self._encoder = self._motor.getEncoder()
-        self._switch_min = Switch(Switch.Type.NormallyClosed, ports.DIO.pivot_switch_min)
+        self._switch_min = Switch(
+            Switch.Type.NormallyClosed, ports.DIO.pivot_switch_min
+        )
         self._switch_max = Switch(Switch.Type.NormallyOpen, ports.DIO.pivot_switch_max)
 
         if is_simulation:
