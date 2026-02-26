@@ -1,14 +1,22 @@
+from enum import Enum, auto
+
 import rev
+import wpilib
 from rev import SparkMaxSim
 from wpimath.filter import LinearFilter
 from wpimath.system.plant import DCMotor
-from wpimath.units import kilogram_square_meters
 
 import ports
 from ultime.autoproperty import autoproperty
-from ultime.control import feedforward, pf, clamp
+from ultime.control import pf, feedforward
 from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
+
+
+class IndexerState(Enum):
+    Off = auto()
+    On = auto()
+    Stuck = auto()
 
 
 class Shooter(Subsystem):
@@ -19,9 +27,14 @@ class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     kF = autoproperty(0.00222222)
 
-    speed_feeder = autoproperty(0.5)
-    speed_rpm_indexer = autoproperty(1400.0)
-    tolerance = autoproperty(1000.0)
+    indexer_rpm = autoproperty(1400.0)
+    indexer_rpm_stuck_threshold = autoproperty(50.0)
+    indexer_rpm_unstuck = autoproperty(-200.0)
+    indexer_delay_unstuck = autoproperty(2.0)
+    indexer_delay_stuck_threshold = autoproperty(1.0)
+
+    feeder_speed = autoproperty(0.5)
+    tolerance = autoproperty(100.0)
 
     kS_indexer = autoproperty(0.2)
     kF_indexer = autoproperty(0.002)
@@ -33,9 +46,11 @@ class Shooter(Subsystem):
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
+
         self._feeder = rev.SparkMax(
             ports.CAN.shooter_feeder, rev.SparkMax.MotorType.kBrushless
         )
+
         self._indexer = rev.SparkMax(
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
@@ -43,13 +58,7 @@ class Shooter(Subsystem):
         self.updatePIDFConfig()
 
         self._indexer.setInverted(True)
-        # self._indexer_config = rev.SparkMaxConfig()
-        # self._indexer_config.voltageCompensation(12.0)
-        # self._indexer.configure(
-        #     self._indexer_config,
-        #     rev.ResetMode.kResetSafeParameters,
-        #     rev.PersistMode.kNoPersistParameters,
-        # )
+        self.indexer_current_rpm = self.createProperty(0.0)
 
         self._flywheel_controller = self._flywheel.getClosedLoopController()
         self._encoder = self._flywheel.getEncoder()
@@ -57,14 +66,17 @@ class Shooter(Subsystem):
 
         self.flywheel_current_rpm = self.createProperty(0.0)
 
-        self.indexer_current_rpm = self.createProperty(0.0)
-
-        self._velocity_filter = LinearFilter.movingAverage(10)
+        self._velocity_filter = LinearFilter.movingAverage(25)
 
         self._is_at_velocity = self.createProperty(False)
 
+        self._timer = wpilib.Timer()
+
+        self.indexer_state = IndexerState.Off
+
         if is_simulation:
             self._flywheel_sim = SparkMaxSim(self._flywheel, DCMotor.NEO(1))
+            self._indexer_sim = SparkMaxSim(self._indexer, DCMotor.NEO(1))
 
     def updatePIDFConfig(self):
         self._config = rev.SparkMaxConfig()
@@ -75,6 +87,10 @@ class Shooter(Subsystem):
             rev.ResetMode.kResetSafeParameters,
             rev.PersistMode.kNoPersistParameters,
         )
+
+    def logValues(self):
+        super().logValues()
+        self.log("indexer_state", str(self.indexer_state))
 
     def reset(self):
         self._velocity_filter.reset()
@@ -88,54 +104,78 @@ class Shooter(Subsystem):
         error = average - rpm
         self._is_at_velocity = abs(error) <= self.tolerance
 
-        # if error > self.tolerance:
-        #     self._is_at_velocity = False
-        #     voltage = 0.0
-        # else:
         ff = feedforward(rpm, self.kS_shooter, self.kF)
         voltage = pf(average, rpm, self.kS_shooter, self.kF, self.kP)
 
-        # if error < -self.tolerance:
-        #     self._is_at_velocity = False
-        #     voltage = ff_volts
-        # elif error < 0:
-        #     self._is_at_velocity = True
-        #     voltage = ff_volts + (12 - ff_volts) * ((-error) / self.tolerance)
-        # else:
-        #     self._is_at_velocity = True
-        #     voltage = ff_volts * (1 - (error / self.tolerance))
         voltage = min(ff, voltage)
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
 
     def sendFuel(self):
-        volts_indexer = pf(
-            self.indexer_current_rpm,
-            self.speed_rpm_indexer,
-            self.kS_indexer,
-            self.kF_indexer,
-            self.kP_indexer,
-        )
-        self._indexer.setVoltage(volts_indexer)
-        self._feeder.set(self.speed_feeder)
+
+        self._feeder.set(self.feeder_speed)
+
+        if self.indexer_state == IndexerState.Off:
+            self.indexer_state = IndexerState.On
+            self._timer.restart()
+
+        if self.indexer_state == IndexerState.On:
+
+            if (
+                self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
+                and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
+            ):
+                self.indexer_state = IndexerState.Stuck
+                self._timer.restart()
+            else:
+                self._setIndexerRPM(self.indexer_rpm)
+
+        if self.indexer_state == IndexerState.Stuck:
+            self._setIndexerRPM(self.indexer_rpm_unstuck)
+
+            if self._timer.hasElapsed(self.indexer_delay_unstuck):
+                self.indexer_state = IndexerState.On
+                self._timer.restart()
 
     def stopFuel(self):
         self._indexer.set(0.0)
         self._feeder.set(0.0)
 
+    def _setIndexerRPM(self, target_rpm: float) -> None:
+        volts_indexer = pf(
+            self.indexer_current_rpm,
+            target_rpm,
+            self.kS_indexer,
+            self.kF_indexer,
+            self.kP_indexer,
+        )
+        self._indexer.setVoltage(volts_indexer)
+
     def readInputs(self):
-        self.indexer_current_rpm = self._indexer_encoder.getVelocity()
+        if is_simulation:
+            self.indexer_current_rpm = self._indexer_sim.getVelocity()
+        else:
+            self.indexer_current_rpm = self._indexer_encoder.getVelocity()
 
         if is_simulation:
             self.flywheel_current_rpm = self._flywheel_sim.getVelocity()
         else:
-            self.flywheel_current_rpm = self._encoder.getVelocity()
+            self.flywheel_current_rpm = self._flywheel_encoder.getVelocity()
 
     def simulationPeriodic(self):
         self._flywheel_sim.setVelocity(
             self._flywheel_controller.getSetpoint() * 0.01
             + self._flywheel_sim.getVelocity() * 0.99
+        )
+        if self._is_at_velocity and self.indexer_state == IndexerState.On:
+            self._updateIndexerSimVelocity(self.indexer_rpm)
+        elif self.indexer_state == IndexerState.Stuck:
+            self._updateIndexerSimVelocity(self.indexer_rpm_unstuck)
+
+    def _updateIndexerSimVelocity(self, target_rpm: float) -> None:
+        self._indexer_sim.setVelocity(
+            target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
         )
 
     def stop(self):
@@ -143,6 +183,7 @@ class Shooter(Subsystem):
         self._feeder.stopMotor()
         self._indexer.stopMotor()
         self._is_at_velocity = False
+        self.indexer_state = IndexerState.Off
 
     def getCurrentSpeed(self) -> float:
         return self.flywheel_current_rpm
