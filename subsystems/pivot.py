@@ -14,16 +14,16 @@ from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(50.0)
+    speed_maintain = autoproperty(1.0)
     min_position = autoproperty(0.0)
-    max_position = autoproperty(6.35)
-    position_maintain_min = autoproperty(-4.0)
+    max_position = autoproperty(5.0)
+    position_maintain_min = autoproperty(-1.0)
     position_maintain_max = autoproperty(6.5)
 
-    kS = autoproperty(0.2)
+    kS = autoproperty(0.3)
     kF = autoproperty(0.002)
     kP = autoproperty(0.0001)
-    kG = autoproperty(0.0)
+    kG = autoproperty(0.5)
 
     def __init__(self):
         super().__init__(
@@ -103,12 +103,15 @@ class Pivot(LinearSubsystem):
         return 1.0
 
     def _setMotorOutput(self, rpm: float) -> None:
-        voltage = pf(self.getMotorCurrentRPM(), rpm, self.kS, self.kF, self.kP)
-        if self.hasReset():
-            angle = clamp(self.getPosition() / self.getMaxPosition(), 0.0, 1.0) * (
-                math.pi / 2
-            )
-            voltage += math.cos(angle) * self.kG
+        if rpm != 0.0:
+            voltage = pf(self.getMotorCurrentRPM(), rpm, self.kS, self.kF, self.kP)
+            if self.hasReset():
+                angle = clamp(self.getPosition() / self.getMaxPosition(), 0.0, 1.0) * (
+                    math.pi / 2
+                )
+                voltage += math.cos(angle) * self.kG
+        else:
+            voltage = 0.0
         self._motor.setVoltage(voltage)
 
     def getMotorCurrentRPM(self):

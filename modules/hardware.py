@@ -33,7 +33,7 @@ class HardwareModule(Module):
         self.shooter = self.addSubsystem(Shooter())
         self.feeder = self.addSubsystem(Feeder())
         self.pivot = self.addSubsystem(Pivot())
-        #self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
+        self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
 
