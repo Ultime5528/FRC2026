@@ -1,6 +1,6 @@
 import sys
 from enum import Enum, auto
-from typing import List
+from typing import List, Generator
 from typing import Optional
 
 from photonlibpy import PhotonPoseEstimator, EstimatedRobotPose
@@ -60,7 +60,6 @@ class RelativeVision(Vision):
 class AbsoluteVision(Vision):
     def __init__(self, camera_name: str, camera_offset: Transform3d):
         super().__init__(camera_name=camera_name)
-
         self.camera_pose_estimator = PhotonPoseEstimator(
             april_tag_field_layout,
             camera_offset,
@@ -77,16 +76,17 @@ class AbsoluteVision(Vision):
             self.estimated_pose = (
                 self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
             )
-        self.updateEstimationStdDevs(self.estimated_pose, frame.getTargets())
         return self.estimated_pose
 
-    def getAllUnreadEstimatedPoses(self):
+    def getAllUnreadEstimatedPosesWithStdDevs(self) -> Generator[tuple[EstimatedRobotPose, List[float]]]:
         for frame in self._cam.getAllUnreadResults():
-            yield self.getEstimatedPose(frame)
+            estimated_pose = self.getEstimatedPose(frame)
+            std_devs = self.getEstimationStdDevs(self.estimated_pose, frame.getTargets())
+            yield estimated_pose, std_devs
 
-    def updateEstimationStdDevs(
+    def getEstimationStdDevs(
         self, estimated_pose: EstimatedRobotPose, targets: List[PhotonTrackedTarget]
-    ):
+    ) -> list[float]:
         if estimated_pose is None:
             self.std_devs = [4, 4, 8]
         else:
@@ -126,13 +126,7 @@ class AbsoluteVision(Vision):
                     self.std_devs = [
                         val * (1 + (av_dist * av_dist / 30)) for val in self.std_devs
                     ]
-
-    def getEstimationStdDevs(self) -> List[float]:
         return self.std_devs
-
-    def  getEstimatedPoseTimeStamp(self):
-        if self.estimated_pose:
-            return self.estimated_pose.timestampSeconds
 
     def getUsedTagIDs(self) -> list[int]:
         if self.estimated_pose:
