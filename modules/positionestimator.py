@@ -14,6 +14,8 @@ from ultime.module import Module
 class PositionEstimator(Module):
     drivetrain_speed_threshold = autoproperty(0.2)
     drivetrain_speed_rotation_threshold = autoproperty(5.0)
+    want_multiple_quest_rest = autoproperty(False)
+    multiple_reset_distance_threshold = autoproperty(0.05)
 
     def __init__(
         self,
@@ -41,9 +43,6 @@ class PositionEstimator(Module):
         self.camera_front_connected = self.camera_front.isConnected()
         self.camera_back_connected = self.camera_back.isConnected()
 
-        self.best_pose: Pose2d = Pose3d()
-        self.best_std = [1000, 1000, 1000]
-
         drivetrain_under_speed = self.drivetrain.isUnderSpeed(
             self.drivetrain_speed_threshold,
             self.drivetrain_speed_threshold,
@@ -51,6 +50,11 @@ class PositionEstimator(Module):
         )
 
         if self.quest_has_reset and self.quest_connected:
+            if self.want_multiple_quest_rest and drivetrain_under_speed:
+                dist = math.hypot(math.fabs(self.best_pose.x - self.drivetrain.getPose().x), math.fabs(self.best_pose.y - self.drivetrain.getPose().y))
+                if dist > self.multiple_reset_distance_threshold and dist < self.multiple_reset_distance_threshold * 2:
+                    self.quest_nav.resetToPose(self.best_pose)
+
             for (
                 quest_data
             ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
@@ -61,52 +65,57 @@ class PositionEstimator(Module):
                     self.drivetrain.addVisionMeasurement(
                         quest_pose, quest_time, quest_std
                     )
-        else:
-            if self.camera_front_connected:
-                for (
-                    camera_front_data
-                ) in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
-                    if camera_front_data[0] is not None:
-                        camera_front_pose = camera_front_data[0].estimatedPose
-                        camera_front_time = camera_front_data[0].timestampSeconds
-                        camera_front_std = camera_front_data[1]
 
-                        dist_estimated = math.hypot(
-                            camera_front_std[0], camera_front_std[1]
-                        )
-                        dist_best = math.hypot(self.best_std[0], self.best_std[1])
-                        if dist_estimated < dist_best:
-                            self.best_pose = camera_front_pose
-                            self.best_std = camera_front_std
+        self.best_pose: Pose2d = Pose3d()
+        self.best_std = [1000, 1000, 1000]
 
+        if self.camera_front_connected:
+            for (
+                camera_front_data
+            ) in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
+                if camera_front_data[0] is not None:
+                    camera_front_pose = camera_front_data[0].estimatedPose
+                    camera_front_time = camera_front_data[0].timestampSeconds
+                    camera_front_std = camera_front_data[1]
+
+                    dist_estimated = math.hypot(
+                        camera_front_std[0], camera_front_std[1]
+                    )
+                    dist_best = math.hypot(self.best_std[0], self.best_std[1])
+                    if dist_estimated < dist_best:
+                        self.best_pose = camera_front_pose
+                        self.best_std = camera_front_std
+
+                    if not self.quest_has_reset:
                         self.drivetrain.addVisionMeasurement(
                             camera_front_pose.toPose2d(),
                             camera_front_time,
                             camera_front_std,
                         )
 
-            if self.camera_back_connected:
-                for (
-                    camera_back_data
-                ) in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
-                    if camera_back_data[0] is not None:
-                        camera_back_pose = camera_back_data[0].estimatedPose
-                        camera_back_time = camera_back_data[0].timestampSeconds
-                        camera_back_std = camera_back_data[1]
+        if self.camera_back_connected:
+            for (
+                camera_back_data
+            ) in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
+                if camera_back_data[0] is not None:
+                    camera_back_pose = camera_back_data[0].estimatedPose
+                    camera_back_time = camera_back_data[0].timestampSeconds
+                    camera_back_std = camera_back_data[1]
 
-                        dist_estimated = math.hypot(
-                            camera_back_std[0], camera_back_std[1]
-                        )
-                        dist_best = math.hypot(self.best_std[0], self.best_std[1])
-                        if dist_estimated < dist_best:
-                            self.best_pose = camera_back_pose
-                            self.best_std = camera_back_std
+                    dist_estimated = math.hypot(
+                        camera_back_std[0], camera_back_std[1]
+                    )
+                    dist_best = math.hypot(self.best_std[0], self.best_std[1])
+                    if dist_estimated < dist_best:
+                        self.best_pose = camera_back_pose
+                        self.best_std = camera_back_std
 
+                    if not self.quest_has_reset:
                         self.drivetrain.addVisionMeasurement(
                             camera_back_pose.toPose2d(),
                             camera_back_time,
                             camera_back_std,
                         )
 
-            if drivetrain_under_speed:
-                self.quest_nav.resetToPose(self.best_pose)
+        if not self.quest_has_reset and drivetrain_under_speed:
+            self.quest_nav.resetToPose(self.best_pose)
