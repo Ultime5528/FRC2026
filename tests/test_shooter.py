@@ -57,7 +57,9 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
         robot.hardware.drivetrain, robot.hardware.guide
     )
 
-    rpm_flywheel = 666.6  # TODO mettre la valeur du calcul d'hayder
+    rpm_flywheel = (
+        shooter_calc_module.getRPM()
+    )  # TODO mettre la valeur du calcul d'hayder
     rpm_flywheel_tolerance = rpm_flywheel * 0.01
 
     robot_controller.startTeleop()
