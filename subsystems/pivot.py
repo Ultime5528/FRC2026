@@ -112,7 +112,7 @@ class Pivot(LinearSubsystem):
         return 1.0
 
     def _setMotorOutput(self, rpm: float) -> None:
-        if rpm != 0.0:
+        if abs(rpm) > 1e-6:
             voltage = pf(self.getMotorCurrentRPM(), rpm, self.kS, self.kF, self.kP)
             if self.hasReset():
                 angle = clamp(self.getPosition() / self.getMaxPosition(), 0.0, 1.0) * (
