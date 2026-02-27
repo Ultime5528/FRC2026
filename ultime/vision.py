@@ -7,7 +7,7 @@ from photonlibpy import PhotonPoseEstimator, EstimatedRobotPose
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.targeting import PhotonTrackedTarget, PhotonPipelineResult
 from robotpy_apriltag import AprilTagFieldLayout, AprilTagField
-from wpimath.geometry import Transform3d
+from wpimath.geometry import Transform3d, Pose3d, Rotation3d
 
 from ultime.alert import AlertType
 from ultime.module import Module
@@ -34,6 +34,9 @@ class Vision(Module):
 
     def robotPeriodic(self) -> None:
         self.alert_vision_offline.set(not self._cam.isConnected())
+
+    def isConnected(self) -> bool:
+        return self._cam.isConnected()
 
 
 class RelativeVision(Vision):
@@ -64,11 +67,10 @@ class AbsoluteVision(Vision):
             april_tag_field_layout,
             camera_offset,
         )
-        self.estimated_pose: EstimatedRobotPose = None
+        self.estimated_pose: EstimatedRobotPose = EstimatedRobotPose(Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()])
         self.std_devs = [4, 4, 8]
 
     def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose:
-        self.estimated_pose = None
         self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(
             frame
         )
@@ -76,21 +78,29 @@ class AbsoluteVision(Vision):
             self.estimated_pose = (
                 self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
             )
-        return self.estimated_pose
 
-    def getAllUnreadEstimatedPosesWithStdDevs(self) -> Generator[tuple[EstimatedRobotPose, List[float]]]:
+        if self.estimated_pose:
+            return self.estimated_pose
+        else:
+            return EstimatedRobotPose(Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()])
+
+    def getAllUnreadEstimatedPosesWithStdDevs(
+        self,
+    ) -> Generator[tuple[EstimatedRobotPose, List[float]]]:
         for frame in self._cam.getAllUnreadResults():
             estimated_pose = self.getEstimatedPose(frame)
-            std_devs = self.getEstimationStdDevs(self.estimated_pose, frame.getTargets())
+            std_devs = self.getEstimationStdDevs(
+                self.estimated_pose, frame.getTargets()
+            )
             yield estimated_pose, std_devs
 
     def getEstimationStdDevs(
         self, estimated_pose: EstimatedRobotPose, targets: List[PhotonTrackedTarget]
     ) -> list[float]:
         if estimated_pose is None:
-            self.std_devs = [4, 4, 8]
+            self.std_devs = [4.0, 4.0, 8.0]
         else:
-            self.std_devs = [4, 4, 8]
+            self.std_devs = [4.0, 4.0, 8.0]
             num_tags = 0
             av_dist = 0
 
@@ -109,12 +119,12 @@ class AbsoluteVision(Vision):
                     )
 
             if num_tags == 0:
-                self.std_devs = [4, 4, 8]
+                self.std_devs = [4.0, 4.0, 8.0]
             else:
                 av_dist /= num_tags
 
                 if num_tags > 1:
-                    self.std_devs = [0.5, 0.5, 1]
+                    self.std_devs = [0.5, 0.5, 1.0]
 
                 if num_tags == 1 and av_dist > 4:
                     self.std_devs = [
@@ -134,13 +144,5 @@ class AbsoluteVision(Vision):
         else:
             return []
 
-    def getUsedTags(self) -> list[PhotonTrackedTarget]:
-        if self.estimated_pose:
-            return self.estimated_pose.targetsUsed
-        else:
-            return []
-
     def logValues(self):
         self.log("used_tags_IDs", self.getUsedTagIDs())
-        self.log("estimated_pose", self.estimated_pose)
-        self.log("estimation_std_devs", self.getEstimationStdDevs())

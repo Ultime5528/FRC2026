@@ -36,24 +36,5 @@ class TagVisionModule(AbsoluteVision):
         self.mode = VisionMode.Absolute
         self.drivetrain = drivetrain
 
-    def getName(self) -> str:
-        return super().getName() + "_" + self.name
-
-    def getNumberTagsUsed(self) -> int:
-        return len(self.getUsedTags())
-
-    def getFirstTagAmbiguity(self) -> float:
-        """
-        Get the ambiguity of the first tag used, -1.0 if no tag is seen.
-        """
-        used_tags = self.getUsedTags()
-
-        if used_tags:
-            return used_tags[0].getPoseAmbiguity()
-
-        return -1.0
-
-    def logValues(self):
-        super().logValues()
-        self.log("number_tag_used", self.getNumberTagsUsed())
-        self.log("first_tag_ambiguity", self.getFirstTagAmbiguity())
+    # def getName(self) -> str:
+    # return super().getName() + "_" + self.name

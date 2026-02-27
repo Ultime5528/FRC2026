@@ -15,7 +15,8 @@ class Subsystem(Loggable, AlertCreator, commands2.Subsystem):
 
     def logValues(self):
         super().logValues()
-        self.log("Current command", self.getCurrentCommand().getName())
+        if self.getCurrentCommand():
+            self.log("Current command", self.getCurrentCommand().getName())
 
     def setDefaultCommand(self, command: Command) -> None:
         super().setDefaultCommand(command)
