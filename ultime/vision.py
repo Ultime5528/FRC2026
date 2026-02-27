@@ -67,7 +67,9 @@ class AbsoluteVision(Vision):
             april_tag_field_layout,
             camera_offset,
         )
-        self.estimated_pose: EstimatedRobotPose = EstimatedRobotPose(Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()])
+        self.estimated_pose: EstimatedRobotPose = EstimatedRobotPose(
+            Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()]
+        )
         self.std_devs = [4, 4, 8]
 
     def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose:
@@ -82,7 +84,9 @@ class AbsoluteVision(Vision):
         if self.estimated_pose:
             return self.estimated_pose
         else:
-            return EstimatedRobotPose(Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()])
+            return EstimatedRobotPose(
+                Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()]
+            )
 
     def getAllUnreadEstimatedPosesWithStdDevs(
         self,
