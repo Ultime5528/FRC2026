@@ -38,6 +38,9 @@ class Vision(Module):
     def isConnected(self) -> bool:
         return self._cam.isConnected()
 
+    def getName(self) -> str:
+        return super().getName() + "_" + self.camera_name
+
 
 class RelativeVision(Vision):
     def __init__(self, camera_name: str):

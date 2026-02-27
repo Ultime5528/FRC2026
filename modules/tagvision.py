@@ -32,9 +32,5 @@ class TagVisionModule(AbsoluteVision):
 
     def __init__(self, name: str, transform: Transform3d, drivetrain: Drivetrain):
         super().__init__(camera_name=name, camera_offset=transform)
-        self.name = name
         self.mode = VisionMode.Absolute
         self.drivetrain = drivetrain
-
-    # def getName(self) -> str:
-    # return super().getName() + "_" + self.name
