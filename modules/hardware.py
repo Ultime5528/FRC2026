@@ -28,7 +28,6 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.climber = self.addSubsystem(Climber())
-        self.climber.setDefaultCommand(MaintainClimber(self.climber))
         self.hugger = self.addSubsystem(Hugger())
         self.guide = self.addSubsystem(Guide())
         self.shooter = self.addSubsystem(Shooter())
@@ -37,9 +36,6 @@ class HardwareModule(Module):
         self.pivot.setDefaultCommand(MaintainPivot(self.pivot))
 
         self.pdp = PowerDistribution()
-
-    def teleopInit(self) -> None:
-        self.shooter.updatePIDFConfig()
 
     def addSubsystem[T: Subsystem](self, subsystem: T) -> T:
         self.subsystems.append(subsystem)
