@@ -27,7 +27,7 @@ def apply_linear_deadzone(_input, deadzone):
 class DriveField(Command):
     rotation_deadzone = autoproperty(0.3)
     rotate_speed = autoproperty(0.00375)
-    speed_rate = autoproperty(3.0)
+    slow_speed_multiplier = autoproperty(0.33)
 
     def __init__(
         self,
@@ -80,9 +80,9 @@ class DriveField(Command):
             y_speed *= -1
 
         if self.xbox_remote.rightBumper():
-            x_speed /= self.speed_rate
-            y_speed /= self.speed_rate
-            rot_speed /= self.speed_rate
+            x_speed *= self.slow_speed_multiplier
+            y_speed *= self.slow_speed_multiplier
+            rot_speed *= self.slow_speed_multiplier
 
         self.drivetrain.driveFromStickInputs(x_speed, y_speed, rot_speed, True)
 
