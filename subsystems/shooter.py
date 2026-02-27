@@ -20,25 +20,22 @@ class IndexerState(Enum):
 
 
 class Shooter(Subsystem):
-    kP = autoproperty(0.0)
-    kI = autoproperty(0.0)
-    kD = autoproperty(0.0)
-    kS_shooter = autoproperty(0.2)
     # 12 volts max divided by max RPM
-    kF = autoproperty(0.00222222)
+    flywheel_kF = autoproperty(0.00222222)
+    flywheel_kP = autoproperty(0.0)
+    flywheel_kS = autoproperty(0.2)
+    shooter_tolerance = autoproperty(100.0)
 
     indexer_rpm = autoproperty(1400.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
     indexer_delay_unstuck = autoproperty(2.0)
     indexer_delay_stuck_threshold = autoproperty(1.0)
+    indexer_kS = autoproperty(0.2)
+    indexer_kF = autoproperty(0.002)
+    indexer_kP = autoproperty(0.001)
 
     feeder_speed = autoproperty(0.5)
-    tolerance = autoproperty(100.0)
-
-    kS_indexer = autoproperty(0.2)
-    kF_indexer = autoproperty(0.002)
-    kP_indexer = autoproperty(0.001)
 
     def __init__(self):
         super().__init__()
@@ -46,7 +43,13 @@ class Shooter(Subsystem):
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
-        self.updatePIDFConfig()
+        self._config = rev.SparkMaxConfig()
+        self._config.voltageCompensation(12.0)
+        self._flywheel.configure(
+            self._config,
+            rev.ResetMode.kResetSafeParameters,
+            rev.PersistMode.kNoPersistParameters,
+        )
         self._flywheel_encoder = self._flywheel.getEncoder()
         self.flywheel_current_rpm = self.createProperty(0.0)
 
@@ -57,7 +60,6 @@ class Shooter(Subsystem):
         self._indexer = rev.SparkMax(
             ports.CAN.shooter_indexer, rev.SparkMax.MotorType.kBrushless
         )
-
         self._indexer.setInverted(True)
         self.indexer_current_rpm = self.createProperty(0.0)
 
@@ -76,16 +78,6 @@ class Shooter(Subsystem):
             self._indexer_sim = SparkMaxSim(self._indexer, DCMotor.NEO(1))
             self._flywheel_last_rpm_sim = 0.0
 
-    def updatePIDFConfig(self):
-        self._config = rev.SparkMaxConfig()
-        self._config.voltageCompensation(12.0)
-        self._config.closedLoop.pidf(self.kP, self.kI, self.kD, self.kF)
-        self._flywheel.configure(
-            self._config,
-            rev.ResetMode.kResetSafeParameters,
-            rev.PersistMode.kNoPersistParameters,
-        )
-
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
@@ -100,10 +92,10 @@ class Shooter(Subsystem):
         self.log("rpm_target", rpm)
 
         error = average - rpm
-        self._is_at_velocity = abs(error) <= self.tolerance
+        self._is_at_velocity = abs(error) <= self.shooter_tolerance
 
-        ff = feedforward(rpm, self.kS_shooter, self.kF)
-        voltage = pf(average, rpm, self.kS_shooter, self.kF, self.kP)
+        ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
+        voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
 
         voltage = min(ff, voltage)
 
@@ -114,7 +106,6 @@ class Shooter(Subsystem):
             self._flywheel_last_rpm_sim = rpm
 
     def sendFuel(self):
-
         self._feeder.set(self.feeder_speed)
 
         if self.indexer_state == IndexerState.Off:
@@ -122,7 +113,6 @@ class Shooter(Subsystem):
             self._timer.restart()
 
         if self.indexer_state == IndexerState.On:
-
             if (
                 self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
                 and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
@@ -142,14 +132,15 @@ class Shooter(Subsystem):
     def stopFuel(self):
         self._indexer.set(0.0)
         self._feeder.set(0.0)
+        self.indexer_state = IndexerState.Off
 
     def _setIndexerRPM(self, target_rpm: float) -> None:
         volts_indexer = pf(
             self.indexer_current_rpm,
             target_rpm,
-            self.kS_indexer,
-            self.kF_indexer,
-            self.kP_indexer,
+            self.indexer_kS,
+            self.indexer_kF,
+            self.indexer_kP,
         )
         self._indexer.setVoltage(volts_indexer)
 
