@@ -15,7 +15,7 @@ class PositionEstimator(Module):
     drivetrain_speed_threshold = autoproperty(0.2)
     drivetrain_speed_rotation_threshold = autoproperty(5.0)
     want_multiple_quest_rest = autoproperty(False)
-    multiple_reset_distance_threshold = autoproperty(0.05)
+    multiple_reset_distance_threshold = autoproperty(0.03)
 
     def __init__(
         self,
@@ -51,8 +51,8 @@ class PositionEstimator(Module):
 
         if self.quest_has_reset and self.quest_connected:
             if self.want_multiple_quest_rest and drivetrain_under_speed:
-                dist = math.hypot(math.fabs(self.best_pose.x - self.drivetrain.getPose().x), math.fabs(self.best_pose.y - self.drivetrain.getPose().y))
-                if dist > self.multiple_reset_distance_threshold and dist < self.multiple_reset_distance_threshold * 2:
+                dist = math.hypot(self.best_std[0], self.best_std[1])
+                if dist < self.multiple_reset_distance_threshold:
                     self.quest_nav.resetToPose(self.best_pose)
 
             for (
