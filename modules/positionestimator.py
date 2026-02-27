@@ -51,42 +51,62 @@ class PositionEstimator(Module):
         )
 
         if self.quest_has_reset and self.quest_connected:
-            for quest_data in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
+            for (
+                quest_data
+            ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
                 quest_pose = quest_data[0]
                 quest_time = quest_data[1]
                 quest_std = quest_data[2]
                 if quest_pose is not None:
-                    self.drivetrain.addVisionMeasurement(quest_pose, quest_time, quest_std)
+                    self.drivetrain.addVisionMeasurement(
+                        quest_pose, quest_time, quest_std
+                    )
         else:
             if self.camera_front_connected:
-                for camera_front_data in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
+                for (
+                    camera_front_data
+                ) in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
                     if camera_front_data[0] is not None:
                         camera_front_pose = camera_front_data[0].estimatedPose
                         camera_front_time = camera_front_data[0].timestampSeconds
                         camera_front_std = camera_front_data[1]
 
-                        dist_estimated = math.hypot(camera_front_std[0], camera_front_std[1])
+                        dist_estimated = math.hypot(
+                            camera_front_std[0], camera_front_std[1]
+                        )
                         dist_best = math.hypot(self.best_std[0], self.best_std[1])
                         if dist_estimated < dist_best:
                             self.best_pose = camera_front_pose
                             self.best_std = camera_front_std
 
-                        self.drivetrain.addVisionMeasurement(camera_front_pose.toPose2d(), camera_front_time, camera_front_std)
+                        self.drivetrain.addVisionMeasurement(
+                            camera_front_pose.toPose2d(),
+                            camera_front_time,
+                            camera_front_std,
+                        )
 
             if self.camera_back_connected:
-                for camera_back_data in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
+                for (
+                    camera_back_data
+                ) in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
                     if camera_back_data[0] is not None:
                         camera_back_pose = camera_back_data[0].estimatedPose
                         camera_back_time = camera_back_data[0].timestampSeconds
                         camera_back_std = camera_back_data[1]
 
-                        dist_estimated = math.hypot(camera_back_std[0], camera_back_std[1])
+                        dist_estimated = math.hypot(
+                            camera_back_std[0], camera_back_std[1]
+                        )
                         dist_best = math.hypot(self.best_std[0], self.best_std[1])
                         if dist_estimated < dist_best:
                             self.best_pose = camera_back_pose
                             self.best_std = camera_back_std
 
-                        self.drivetrain.addVisionMeasurement(camera_back_pose.toPose2d(), camera_back_time, camera_back_std)
+                        self.drivetrain.addVisionMeasurement(
+                            camera_back_pose.toPose2d(),
+                            camera_back_time,
+                            camera_back_std,
+                        )
 
             if drivetrain_under_speed:
                 self.quest_nav.resetToPose(self.best_pose)

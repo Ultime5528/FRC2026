@@ -6,6 +6,7 @@ from modules.control import ControlModule
 from modules.dashboard import DashboardModule
 from modules.hardware import HardwareModule
 from modules.logging import LoggingModule
+from modules.positionestimator import PositionEstimator
 from modules.propertysavechecker import PropertySaveCheckerModule
 from modules.questvision import QuestVisionModule
 from modules.sysidmodule import SysIDModule
@@ -34,6 +35,14 @@ class Robot(ModuleRobot):
         )
         self.camera_back = self.addModule(
             TagVisionModule.back(self.hardware.drivetrain)
+        )
+        self.position_estimator = self.addModule(
+            PositionEstimator(
+                self.hardware.drivetrain,
+                self.quest_vision,
+                self.camera_front,
+                self.camera_back,
+            )
         )
 
         self.dashboard = self.addModule(

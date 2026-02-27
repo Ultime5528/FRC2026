@@ -73,7 +73,9 @@ class AbsoluteVision(Vision):
         self.estimated_pose: EstimatedRobotPose = None
         self.std_devs = [4, 4, 8]
 
-    def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose|None:
+    def getEstimatedPose(
+        self, frame: PhotonPipelineResult
+    ) -> EstimatedRobotPose | None:
         self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(
             frame
         )
