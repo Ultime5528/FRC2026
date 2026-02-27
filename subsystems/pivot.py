@@ -16,7 +16,7 @@ import ports
 from ultime.autoproperty import autoproperty
 from ultime.control import pf, clamp
 from ultime.linear.linearsubsystem import LinearSubsystem
-from ultime.modulerobot import is_simulation
+from ultime.modulerobot import is_simulation, is_real
 from ultime.switch import Switch
 
 
@@ -42,7 +42,7 @@ class Pivot(LinearSubsystem):
             should_block_min_switch=False,
             should_block_max_switch=True,
             sim_motor_to_distance_factor=2.0,
-            sim_gravity=0.0,
+            sim_gravity=self.speed_maintain,
         )
         self._motor_current_rpm = self.createProperty(0.0)
         self._switch_min_pressed: bool = False
@@ -127,4 +127,7 @@ class Pivot(LinearSubsystem):
         return self._motor_current_rpm
 
     def getMotorOutput(self) -> float:
-        return self._motor.getBusVoltage() * self._motor.getAppliedOutput()
+        if is_real:
+            return self._motor.getBusVoltage() * self._motor.getAppliedOutput()
+        else:
+            return self._motor_sim.getSetpoint()
