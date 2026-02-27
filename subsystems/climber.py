@@ -1,4 +1,11 @@
-from rev import SparkMax, SparkMaxSim
+from rev import (
+    SparkMax,
+    SparkMaxSim,
+    SparkMaxConfig,
+    SparkBaseConfig,
+    ResetMode,
+    PersistMode,
+)
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
@@ -10,7 +17,7 @@ from ultime.switch import Switch
 
 class Climber(LinearSubsystem):
     position_conversion_factor = autoproperty(1.0)
-    speed_maintain = autoproperty(0.04)
+    speed_maintain = autoproperty(0.0)
     position_min = autoproperty(0.0)
     position_max = autoproperty(190.0)
 
@@ -30,6 +37,13 @@ class Climber(LinearSubsystem):
 
         self._motor = SparkMax(ports.CAN.climber_motor, SparkMax.MotorType.kBrushless)
         self._motor.setInverted(False)
+        self._config = SparkMaxConfig()
+        self._config.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+        self._motor.configure(
+            self._config,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters,
+        )
         self._encoder = self._motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
 

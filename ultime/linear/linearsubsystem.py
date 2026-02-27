@@ -20,7 +20,7 @@ class LinearSubsystem(Subsystem):
     ):
         super().__init__()
         self._offset = self.createProperty(0.0)
-        self._has_reset = self.createProperty(False)
+        self._has_reset = self.createProperty(False, subscribe=True)
         self._prev_is_at_min = self.createProperty(False)
         self._prev_is_at_max = self.createProperty(False)
         self._should_reset_min = should_reset_min
