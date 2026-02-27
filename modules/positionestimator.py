@@ -66,7 +66,7 @@ class PositionEstimator(Module):
                         quest_pose, quest_time, quest_std
                     )
 
-        self.best_pose: Pose2d = Pose3d()
+        self.best_pose = Pose3d()
         self.best_std = [1000, 1000, 1000]
 
         if self.camera_front_connected:
@@ -102,9 +102,7 @@ class PositionEstimator(Module):
                     camera_back_time = camera_back_data[0].timestampSeconds
                     camera_back_std = camera_back_data[1]
 
-                    dist_estimated = math.hypot(
-                        camera_back_std[0], camera_back_std[1]
-                    )
+                    dist_estimated = math.hypot(camera_back_std[0], camera_back_std[1])
                     dist_best = math.hypot(self.best_std[0], self.best_std[1])
                     if dist_estimated < dist_best:
                         self.best_pose = camera_back_pose
