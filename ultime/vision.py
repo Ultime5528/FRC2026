@@ -70,12 +70,10 @@ class AbsoluteVision(Vision):
             april_tag_field_layout,
             camera_offset,
         )
-        self.estimated_pose: EstimatedRobotPose = EstimatedRobotPose(
-            Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()]
-        )
+        self.estimated_pose: EstimatedRobotPose = None
         self.std_devs = [4, 4, 8]
 
-    def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose:
+    def getEstimatedPose(self, frame: PhotonPipelineResult) -> EstimatedRobotPose|None:
         self.estimated_pose = self.camera_pose_estimator.estimateCoprocMultiTagPose(
             frame
         )
@@ -84,12 +82,7 @@ class AbsoluteVision(Vision):
                 self.camera_pose_estimator.estimateLowestAmbiguityPose(frame)
             )
 
-        if self.estimated_pose:
-            return self.estimated_pose
-        else:
-            return EstimatedRobotPose(
-                Pose3d(0, 0, 0, Rotation3d(0, 0, 0)), 0.0, [PhotonTrackedTarget()]
-            )
+        return self.estimated_pose
 
     def getAllUnreadEstimatedPosesWithStdDevs(
         self,

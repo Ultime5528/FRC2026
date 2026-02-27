@@ -1,4 +1,8 @@
-from wpimath.geometry import Pose3d, Rotation3d
+import math
+from typing import List
+
+from wpimath.filter import LinearFilter
+from wpimath.geometry import Pose3d, Rotation3d, Pose2d
 
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule
@@ -29,97 +33,60 @@ class PositionEstimator(Module):
         self.camera_front_connected = self.createProperty(False)
         self.camera_back_connected = self.createProperty(False)
 
+        self.best_pose: Pose3d = Pose3d()
+        self.best_std = [1000, 1000, 1000]
+
     def robotPeriodic(self) -> None:
         self.quest_connected = self.quest_nav.isConnected()
         self.camera_front_connected = self.camera_front.isConnected()
         self.camera_back_connected = self.camera_back.isConnected()
 
-        for quest_data, camera_front_data, camera_back_data in zip(
-            self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs(),
-            self.camera_front.getAllUnreadEstimatedPosesWithStdDevs(),
-            self.camera_back.getAllUnreadEstimatedPosesWithStdDevs(),
-        ):
-            quest_pose = quest_data[0]
-            quest_time = quest_data[1]
-            quest_std = quest_data[2]
+        self.best_pose: Pose2d = Pose3d()
+        self.best_std = [1000, 1000, 1000]
 
-            camera_front_pose = camera_front_data[0].estimatedPose
-            camera_front_time = camera_front_data[0].timestampSeconds
-            camera_front_std = camera_front_data[1]
-            camera_front_number_of_tags_used = len(camera_front_data[0].targetsUsed)
+        drivetrain_under_speed = self.drivetrain.isUnderSpeed(
+            self.drivetrain_speed_threshold,
+            self.drivetrain_speed_threshold,
+            self.drivetrain_speed_rotation_threshold,
+        )
 
-            camera_back_pose = camera_back_data[0].estimatedPose
-            camera_back_time = camera_back_data[0].timestampSeconds
-            camera_back_std = camera_back_data[1]
-            camera_back_number_of_tags_used = len(camera_back_data[0].targetsUsed)
+        if self.quest_has_reset and self.quest_connected:
+            for quest_data in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
+                quest_pose = quest_data[0]
+                quest_time = quest_data[1]
+                quest_std = quest_data[2]
+                if quest_pose is not None:
+                    self.drivetrain.addVisionMeasurement(quest_pose, quest_time, quest_std)
+        else:
+            if self.camera_front_connected:
+                for camera_front_data in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
+                    if camera_front_data[0] is not None:
+                        camera_front_pose = camera_front_data[0].estimatedPose
+                        camera_front_time = camera_front_data[0].timestampSeconds
+                        camera_front_std = camera_front_data[1]
 
-            drivetrain_under_speed = self.drivetrain.isUnderSpeed(
-                self.drivetrain_speed_threshold,
-                self.drivetrain_speed_threshold,
-                self.drivetrain_speed_rotation_threshold,
-            )
+                        dist_estimated = math.hypot(camera_front_std[0], camera_front_std[1])
+                        dist_best = math.hypot(self.best_std[0], self.best_std[1])
+                        if dist_estimated < dist_best:
+                            self.best_pose = camera_front_pose
+                            self.best_std = camera_front_std
 
-            if self.quest_has_reset and self.quest_connected:
-                self.drivetrain.addVisionMeasurement(quest_pose, quest_time, quest_std)
-            else:
-                if (
-                    camera_front_number_of_tags_used > camera_back_number_of_tags_used
-                    and self.camera_front_connected
-                ):
-                    if drivetrain_under_speed:
-                        self.quest_nav.resetToPose(camera_front_pose)
-                    else:
-                        self.drivetrain.addVisionMeasurement(
-                            camera_front_pose.toPose2d(),
-                            camera_front_time,
-                            camera_front_std,
-                        )
-                elif (
-                    camera_back_number_of_tags_used > camera_front_number_of_tags_used
-                    and self.camera_back_connected
-                ):
-                    if drivetrain_under_speed:
-                        self.quest_nav.resetToPose(camera_back_pose)
-                    else:
-                        self.drivetrain.addVisionMeasurement(
-                            camera_back_pose.toPose2d(),
-                            camera_back_time,
-                            camera_back_std,
-                        )
-                else:
-                    if (
-                        drivetrain_under_speed
-                        and self.camera_front_connected
-                        and self.camera_back_connected
-                    ):
-                        x = (camera_front_pose.x + camera_back_pose.x) / 2
-                        y = (camera_front_pose.y + camera_back_pose.y) / 2
-                        z = (camera_front_pose.z + camera_back_pose.z) / 2
-                        rot_x = (
-                            camera_front_pose.rotation().x
-                            + camera_back_pose.rotation().x
-                        ) / 2
-                        rot_y = (
-                            camera_front_pose.rotation().y
-                            + camera_back_pose.rotation().y
-                        ) / 2
-                        rot_z = (
-                            camera_front_pose.rotation().z
-                            + camera_back_pose.rotation().z
-                        ) / 2
-                        pose = Pose3d(x, y, z, Rotation3d(rot_x, rot_y, rot_z))
+                        self.drivetrain.addVisionMeasurement(camera_front_pose.toPose2d(), camera_front_time, camera_front_std)
 
-                        self.quest_nav.resetToPose(pose)
-                    else:
-                        if self.camera_front_connected:
-                            self.drivetrain.addVisionMeasurement(
-                                camera_front_pose.toPose2d(),
-                                camera_front_time,
-                                camera_front_std,
-                            )
-                        if self.camera_back_connected:
-                            self.drivetrain.addVisionMeasurement(
-                                camera_back_pose.toPose2d(),
-                                camera_back_time,
-                                camera_back_std,
-                            )
+            if self.camera_back_connected:
+                for camera_back_data in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
+                    if camera_back_data[0] is not None:
+                        camera_back_pose = camera_back_data[0].estimatedPose
+                        camera_back_time = camera_back_data[0].timestampSeconds
+                        camera_back_std = camera_back_data[1]
+
+                        dist_estimated = math.hypot(camera_back_std[0], camera_back_std[1])
+                        dist_best = math.hypot(self.best_std[0], self.best_std[1])
+                        if dist_estimated < dist_best:
+                            self.best_pose = camera_back_pose
+                            self.best_std = camera_back_std
+
+                        self.drivetrain.addVisionMeasurement(camera_back_pose.toPose2d(), camera_back_time, camera_back_std)
+
+            if drivetrain_under_speed:
+                self.quest_nav.resetToPose(self.best_pose)
