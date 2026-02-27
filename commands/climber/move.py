@@ -79,7 +79,7 @@ class _PropertiesMove:
     speed_min = autoproperty(0.1, subtable=MoveClimber.__name__)
     speed_max = autoproperty(1.0, subtable=MoveClimber.__name__)
     accel = autoproperty(0.5, subtable=MoveClimber.__name__)
-    position_climbed = autoproperty(100.0, subtable=MoveClimber.__name__)
+    position_climbed = autoproperty(75.0, subtable=MoveClimber.__name__)
     position_ready = autoproperty(190.0, subtable=MoveClimber.__name__)
     position_retracted = autoproperty(0.0, subtable=MoveClimber.__name__)
 

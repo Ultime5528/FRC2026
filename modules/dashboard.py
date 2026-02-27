@@ -110,7 +110,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Pivot", MovePivot.toUp(hardware.pivot))
         putCommandOnDashboard("Pivot", MovePivot.toDown(hardware.pivot))
-        putCommandOnDashboard("Pivot", ResetPivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ResetPivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", MaintainPivot(hardware.pivot))
