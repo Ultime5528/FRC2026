@@ -63,7 +63,9 @@ class PositionEstimator(Module):
             self.drivetrain_speed_rotation_threshold,
         )
 
-        is_at_least_one_camera_connnected = self.camera_front_connected or self.camera_back_connected
+        is_at_least_one_camera_connnected = (
+            self.camera_front_connected or self.camera_back_connected
+        )
 
         if self.quest_connected:
 
@@ -103,7 +105,6 @@ class PositionEstimator(Module):
             self.quest_nav.resetToPose(estimated_pose)
             self.quest_has_reset = True
 
-
     def _addQuestMeasurementsOnly(self):
 
         if self.quest_has_reset:
@@ -140,7 +141,9 @@ class PositionEstimator(Module):
         self, tag_vision_module: TagVisionModule
     ):
 
-        for tag_vision_data in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
+        for (
+            tag_vision_data
+        ) in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
             if tag_vision_data[0] is not None:
                 pose = tag_vision_data[0].estimatedPose
                 time = tag_vision_data[0].timestampSeconds
