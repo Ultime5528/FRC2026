@@ -48,7 +48,9 @@ class Robot(ModuleRobot):
             ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
         )
 
-        self.control = self.addModule(ControlModule(self.hardware, self.shooter_calc_module))
+        self.control = self.addModule(
+            ControlModule(self.hardware, self.shooter_calc_module)
+        )
 
         self.dashboard = self.addModule(
             DashboardModule(

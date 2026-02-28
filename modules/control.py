@@ -64,11 +64,10 @@ class ControlModule(Module):
 
         # ResetGyro
 
-        hardware.panel_1.button(2).onTrue(
-            ResetGyro(hardware.drivetrain)
-        )
+        hardware.panel_1.button(2).onTrue(ResetGyro(hardware.drivetrain))
 
         # ResetAll
 
-        hardware.panel_1.button(1).onTrue(ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide))
-
+        hardware.panel_1.button(1).onTrue(
+            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide)
+        )

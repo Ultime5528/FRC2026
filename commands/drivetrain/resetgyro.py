@@ -22,6 +22,5 @@ class ResetGyro(Command):
 
         self.drivetrain.resetToPose(Pose2d(current.translation(), new_rot))
 
-
     def isFinished(self) -> bool:
         return True
