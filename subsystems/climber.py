@@ -56,7 +56,7 @@ class Climber(LinearSubsystem):
             self._sim_encoder = self._sim_motor.getRelativeEncoderSim()
 
     def readInputs(self):
-        self._encoder_position = self._climber_encoder.getPosition()
+        self._encoder_position = self._encoder.getPosition()
         self._switch_pressed = self._switch.isPressed()
 
     def getMinPosition(self) -> float:
