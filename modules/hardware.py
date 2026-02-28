@@ -4,6 +4,7 @@ from wpilib import PowerDistribution
 from commands.climber.maintainclimber import MaintainClimber
 from commands.drivetrain.drive import DriveField
 from commands.pivot.maintainpivot import MaintainPivot
+from modules.questvision import QuestVisionModule
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder
@@ -38,7 +39,7 @@ class HardwareModule(Module):
 
         self.pdp = PowerDistribution()
 
-        self.quest_visio
+        self.quest_vision_module = QuestVisionModule(self.drivetrain)
 
     def teleopInit(self) -> None:
         self.shooter.updatePIDFConfig()

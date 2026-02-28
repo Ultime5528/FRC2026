@@ -8,7 +8,6 @@ from commands.pivot.move import MovePivot
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
 from modules.hardware import HardwareModule
-from robot import Robot
 from ultime.module import Module
 
 
@@ -50,17 +49,22 @@ class ControlModule(Module):
         # Climber
         hardware.panel_2.button(6).onTrue(MoveClimber.toReady(hardware.climber))
 
-        hardware.panel_2.button(4).onTrue(HugAndClimb(hardware.climber, hardware.hugger))
+        hardware.panel_2.button(4).onTrue(
+            HugAndClimb(hardware.climber, hardware.hugger)
+        )
 
-        hardware.panel_2.button(3).onTrue(RetractAndUnhug(hardware.climber,hardware.hugger))
+        hardware.panel_2.button(3).onTrue(
+            RetractAndUnhug(hardware.climber, hardware.hugger)
+        )
 
-        hardware.panel_2.button(5).onTrue(ResetClimber())
+        hardware.panel_2.button(5).onTrue(ResetClimber.down(hardware.climber))
 
         # ResetGyro
 
-        hardware.panel_2.button(2).onTrue(ResetGyro(hardware.drivetrain, hardware.))
+        hardware.panel_2.button(2).onTrue(
+            ResetGyro(hardware.drivetrain, hardware.quest_vision_module)
+        )
 
         # ResetAll
 
-
-
+        hardware.panel_2.button(1)
