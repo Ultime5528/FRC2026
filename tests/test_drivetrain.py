@@ -47,7 +47,7 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
-    drivetrain.resetToPose(Pose2d)
+    drivetrain.resetToPose(Pose2d())
 
     # Move left
     left_cmd = DriveRelative.left(drivetrain)
@@ -75,6 +75,8 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     xbox_remote = wpilib.simulation.XboxControllerSim(0)
 
     robot_controller.startTeleop()
+
+    drivetrain.resetToPose(Pose2d())
 
     # tests the robot moving plus the slow trigger
     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
