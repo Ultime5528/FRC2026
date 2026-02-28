@@ -22,7 +22,7 @@ class ResetGyro(Command):
             new_rot = Rotation2d.fromDegrees(180)
 
         self.drivetrain.resetToPose(Pose2d(current.translation(), new_rot))
-        self.quest.resetToPose(
+        self.quest.reset(
             Pose3d(current.x, current.y, 0, Rotation3d(0, new_rot.degrees(), 0))
         )
 
