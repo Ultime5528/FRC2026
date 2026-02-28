@@ -47,6 +47,8 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
+    drivetrain.resetToPose(Pose2d)
+
     # Move left
     left_cmd = DriveRelative.left(drivetrain)
     left_cmd.schedule()
