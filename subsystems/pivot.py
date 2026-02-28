@@ -27,6 +27,8 @@ class Pivot(LinearSubsystem):
     position_maintain_min = autoproperty(-1.0)
     position_maintain_max = autoproperty(6.5)
 
+    position_conversion_factor = autoproperty(1.0)
+
     kS = autoproperty(0.3)
     kF = autoproperty(0.002)
     kP = autoproperty(0.0001)
@@ -44,6 +46,7 @@ class Pivot(LinearSubsystem):
             sim_motor_to_distance_factor=2.0,
             sim_gravity=self.speed_maintain,
         )
+        self._encoder_position: float = 0.0
         self._motor_current_rpm = self.createProperty(0.0)
         self._switch_min_pressed: bool = False
         self._switch_max_pressed: bool = False
@@ -67,6 +70,11 @@ class Pivot(LinearSubsystem):
         if is_simulation:
             self._motor_sim = SparkMaxSim(self._motor, DCMotor.NEO(1))
             self._encoder_sim = self._motor_sim.getRelativeEncoderSim()
+
+    def readInputs(self):
+        self._encoder_position = self._encoder.getPosition()
+        self._switch_max_pressed = self._switch_max.isPressed()
+        self._switch_min_pressed = self._switch_min.isPressed()
 
     def maintain(self):
         position = self.getPosition()
@@ -103,13 +111,13 @@ class Pivot(LinearSubsystem):
         self._switch_max.setSimValue(pressed)
 
     def getEncoderPosition(self) -> float:
-        return self._encoder.getPosition()
+        return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._encoder_sim.setPosition(position)
 
     def getPositionConversionFactor(self) -> float:
-        return 1.0
+        return self.position_conversion_factor
 
     def _setMotorOutput(self, rpm: float) -> None:
         if abs(rpm) > 1e-6:
