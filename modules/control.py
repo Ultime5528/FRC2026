@@ -37,34 +37,34 @@ class ControlModule(Module):
         """
 
         # Intake
-        hardware.panel_2.povUp().onTrue(MovePivot.toDown(hardware.pivot))
+        hardware.panel_1.povUp().onTrue(MovePivot.toDown(hardware.pivot))
 
-        hardware.panel_2.povDown().onTrue(MovePivot.toUp(hardware.pivot))
+        hardware.panel_1.povDown().onTrue(MovePivot.toUp(hardware.pivot))
 
-        hardware.panel_2.povRight().onTrue(GrabFuel(hardware.feeder))
+        hardware.panel_1.povRight().onTrue(GrabFuel(hardware.feeder))
 
         # Shooter
-        hardware.panel_2.povLeft().onTrue(Shoot(hardware.shooter))
+        hardware.panel_1.povLeft().onTrue(Shoot(hardware.shooter))
 
         # Climber
-        hardware.panel_2.button(6).onTrue(MoveClimber.toReady(hardware.climber))
+        hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
 
-        hardware.panel_2.button(4).onTrue(
+        hardware.panel_1.button(4).onTrue(
             HugAndClimb(hardware.climber, hardware.hugger)
         )
 
-        hardware.panel_2.button(3).onTrue(
+        hardware.panel_1.button(3).onTrue(
             RetractAndUnhug(hardware.climber, hardware.hugger)
         )
 
-        hardware.panel_2.button(5).onTrue(ResetClimber.down(hardware.climber))
+        hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))
 
         # ResetGyro
 
-        hardware.panel_2.button(2).onTrue(
+        hardware.panel_1.button(2).onTrue(
             ResetGyro(hardware.drivetrain)
         )
 
         # ResetAll
 
-        hardware.panel_2.button(1)
+        hardware.panel_1.button(1)
