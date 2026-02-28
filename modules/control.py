@@ -62,7 +62,7 @@ class ControlModule(Module):
         # ResetGyro
 
         hardware.panel_2.button(2).onTrue(
-            ResetGyro(hardware.drivetrain, hardware.quest_vision_module)
+            ResetGyro(hardware.drivetrain)
         )
 
         # ResetAll

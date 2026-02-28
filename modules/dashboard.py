@@ -32,7 +32,6 @@ class DashboardModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
-        quest: QuestVisionModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
@@ -41,7 +40,7 @@ class DashboardModule(Module):
         self._module_list = module_list
         self.setupCopilotCommands(hardware)
         self.setupCommands(hardware)
-        putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
+        putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
 

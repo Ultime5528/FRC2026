@@ -38,11 +38,6 @@ class HardwareModule(Module):
 
         self.pdp = PowerDistribution()
 
-        self.quest_vision_module = QuestVisionModule(self.drivetrain)
-
-    def teleopInit(self) -> None:
-        self.shooter.updatePIDFConfig()
-
     def addSubsystem[T: Subsystem](self, subsystem: T) -> T:
         self.subsystems.append(subsystem)
         return subsystem
