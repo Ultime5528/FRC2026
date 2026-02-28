@@ -19,8 +19,8 @@ class LinearSubsystem(Subsystem):
         sim_gravity: float = 0.0,
     ):
         super().__init__()
-        self._offset = self.createProperty(0.0)
-        self._has_reset = self.createProperty(False)
+        self._offset = self.createProperty(0.0, subscribe=True)
+        self._has_reset = self.createProperty(False, subscribe=True)
         self._prev_is_at_min = self.createProperty(False)
         self._prev_is_at_max = self.createProperty(False)
         self._should_reset_min = should_reset_min
