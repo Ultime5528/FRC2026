@@ -10,8 +10,8 @@ from ultime.questnav import questnav
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_quest_offset = wpimath.geometry.Transform3d(
-    wpimath.geometry.Translation3d(-0.257, -0.245, 0.460),
-    wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, 0.0),
+    wpimath.geometry.Translation3d(-0.216, -0.238, 0.453),
+    wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, 180.0),
 )
 
 
