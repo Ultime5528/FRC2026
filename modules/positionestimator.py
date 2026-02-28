@@ -17,6 +17,10 @@ class PositionEstimator(Module):
     want_multiple_quest_reset = autoproperty(False)
     multiple_reset_distance_threshold = autoproperty(0.03)
 
+    drivetrain_starting_pose_x = autoproperty(1.0)
+    drivetrain_starting_pose_y = autoproperty(1.0)
+    drivetrain_starting_pose_angle = autoproperty(0.0)
+
     def __init__(
         self,
         drivetrain: Drivetrain,
@@ -35,85 +39,120 @@ class PositionEstimator(Module):
         self.camera_front_connected = self.createProperty(False)
         self.camera_back_connected = self.createProperty(False)
 
-        self.best_pose: Pose3d = Pose3d()
-        self.best_std = [1000, 1000, 1000]
+        self.is_drivetrain_under_speed = self.createProperty(True)
+        self.has_sean_at_least_one_tag = self.createProperty(False)
+
+        # Find a good stating point based on alliance
+        self.drivetrain.resetToPose(
+            Pose2d(
+                self.drivetrain_starting_pose_x,
+                self.drivetrain_starting_pose_y,
+                self.drivetrain_starting_pose_angle,
+            )
+        )
 
     def robotPeriodic(self) -> None:
+
         self.quest_connected = self.quest_nav.isConnected()
         self.camera_front_connected = self.camera_front.isConnected()
         self.camera_back_connected = self.camera_back.isConnected()
 
-        drivetrain_under_speed = self.drivetrain.isUnderSpeed(
+        self.is_drivetrain_under_speed = self.drivetrain.isUnderSpeed(
             self.drivetrain_speed_threshold,
             self.drivetrain_speed_threshold,
             self.drivetrain_speed_rotation_threshold,
         )
 
-        if self.quest_has_reset and self.quest_connected:
-            if self.want_multiple_quest_reset and drivetrain_under_speed:
-                dist = math.hypot(self.best_std[0], self.best_std[1])
+        is_at_least_one_camera_connnected = self.camera_front_connected or self.camera_back_connected
+
+        if self.quest_connected:
+
+            if not is_at_least_one_camera_connnected:
+                self.quest_has_reset = True
+                self._addQuestMeasurementsOnly()
+
+            else:
+
+                if self.want_multiple_quest_reset:
+                    self._addQuestMeasurementsWithResetsFromCameras()
+                else:
+                    self._addQuestMeasurementsOnly()
+
+        elif is_at_least_one_camera_connnected:
+            self._addCameraMeasurementsOnly()
+
+    def _addQuestMeasurementsWithResetsFromCameras(self):
+
+        if self.quest_has_reset:
+
+            self._addVisionMeasuremenstFromQuestVisionModule(self.quest_nav)
+
+            if self.is_drivetrain_under_speed:
+                self._addCameraMeasurementsOnly()
+                estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
+
+                dist = math.hypot(self.estimated_pose[0], self.estimated_pose[1])
                 if dist < self.multiple_reset_distance_threshold:
-                    self.quest_nav.resetToPose(self.best_pose)
+                    self.quest_nav.resetToPose(estimated_pose)
 
-            for (
-                quest_data
-            ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
-                quest_pose = quest_data[0]
-                quest_time = quest_data[1]
-                quest_std = quest_data[2]
-                if quest_pose is not None:
-                    self.drivetrain.addVisionMeasurement(
-                        quest_pose, quest_time, quest_std
-                    )
+        else:
+            self._addCameraMeasurementsOnly()
 
-        self.best_pose = Pose3d()
-        self.best_std = [1000, 1000, 1000]
+        if self.has_sean_at_least_one_tag:
+            estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
+            self.quest_nav.resetToPose(estimated_pose)
+            self.quest_has_reset = True
+
+
+    def _addQuestMeasurementsOnly(self):
+
+        if self.quest_has_reset:
+            self._addVisionMeasuremenstFromQuestVisionModule(self.quest_nav)
+        else:
+            self._addCameraMeasurementsOnly()
+
+        if self.has_sean_at_least_one_tag:
+            estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
+            self.quest_nav.resetToPose(estimated_pose)
+            self.quest_has_reset = True
+
+    def _addCameraMeasurementsOnly(self):
 
         if self.camera_front_connected:
-            for (
-                camera_front_data
-            ) in self.camera_front.getAllUnreadEstimatedPosesWithStdDevs():
-                if camera_front_data[0] is not None:
-                    camera_front_pose = camera_front_data[0].estimatedPose
-                    camera_front_time = camera_front_data[0].timestampSeconds
-                    camera_front_std = camera_front_data[1]
-
-                    dist_estimated = math.hypot(
-                        camera_front_std[0], camera_front_std[1]
-                    )
-                    dist_best = math.hypot(self.best_std[0], self.best_std[1])
-                    if dist_estimated < dist_best:
-                        self.best_pose = camera_front_pose
-                        self.best_std = camera_front_std
-
-                    if not self.quest_has_reset:
-                        self.drivetrain.addVisionMeasurement(
-                            camera_front_pose.toPose2d(),
-                            camera_front_time,
-                            camera_front_std,
-                        )
+            self._addVisionMeasuremenstFromTagVisionModule(self.camera_front)
 
         if self.camera_back_connected:
-            for (
-                camera_back_data
-            ) in self.camera_back.getAllUnreadEstimatedPosesWithStdDevs():
-                if camera_back_data[0] is not None:
-                    camera_back_pose = camera_back_data[0].estimatedPose
-                    camera_back_time = camera_back_data[0].timestampSeconds
-                    camera_back_std = camera_back_data[1]
+            self._addVisionMeasuremenstFromTagVisionModule(self.camera_back)
 
-                    dist_estimated = math.hypot(camera_back_std[0], camera_back_std[1])
-                    dist_best = math.hypot(self.best_std[0], self.best_std[1])
-                    if dist_estimated < dist_best:
-                        self.best_pose = camera_back_pose
-                        self.best_std = camera_back_std
+    def _addVisionMeasuremenstFromQuestVisionModule(
+        self, quest_vision_module: QuestVisionModule
+    ):
+        for (
+            quest_data
+        ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
+            pose = quest_data[0]
+            time = quest_data[1]
+            std_devs = quest_data[2]
+            if pose is not None:
+                self.drivetrain.addVisionMeasurement(pose, time, std_devs)
 
-                    if not self.quest_has_reset:
-                        self.drivetrain.addVisionMeasurement(
-                            camera_back_pose.toPose2d(),
-                            camera_back_time,
-                            camera_back_std,
-                        )
+    def _addVisionMeasuremenstFromTagVisionModule(
+        self, tag_vision_module: TagVisionModule
+    ):
+        poses_with_std_devs = tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs()
 
-        if not self.quest_has_reset and drivetrain_under_speed:
-            self.quest_nav.resetToPose(self.best_pose)
+        self.has_sean_at_least_one_tag = (
+            self.has_sean_at_least_one_tag or len(poses_with_std_devs) > 0
+        )
+
+        for tag_vision_data in poses_with_std_devs:
+            if tag_vision_data[0] is not None:
+                pose = tag_vision_data[0].estimatedPose
+                time = tag_vision_data[0].timestampSeconds
+                std_devs = tag_vision_data[1]
+
+                self.drivetrain.addVisionMeasurement(
+                    pose.toPose2d(),
+                    time,
+                    std_devs,
+                )
