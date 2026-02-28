@@ -1,6 +1,6 @@
 import inspect
 import weakref
-from typing import Optional
+from typing import Optional, List
 
 from ntcore import NetworkTableInstance, PubSubOptions
 
@@ -76,6 +76,7 @@ class LogValue[T]:
             float: inst.getFloatTopic,
             str: inst.getStringTopic,
             bool: inst.getBooleanTopic,
+            list: inst.getDoubleArrayTopic,
         }.get(self._type, None)
 
         if not get_topic:

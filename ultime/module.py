@@ -4,18 +4,16 @@ from functools import wraps
 from wpiutil import Sendable
 
 from ultime.alert import AlertCreator
+from ultime.log import Loggable
 
 
-class Module(AlertCreator, Sendable):
+class Module(AlertCreator, Loggable):
     def __init__(self):
         super().__init__()
         self.redefines_init_sendable = False
 
     def getName(self) -> str:
         return self.__class__.__name__
-
-    def initSendable(self, builder):
-        pass
 
     def robotInit(self) -> None:
         pass
