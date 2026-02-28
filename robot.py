@@ -9,6 +9,7 @@ from modules.logging import LoggingModule
 from modules.positionestimator import PositionEstimator
 from modules.propertysavechecker import PropertySaveCheckerModule
 from modules.questvision import QuestVisionModule
+from modules.shootercalcmodule import ShooterCalcModule
 from modules.sysidmodule import SysIDModule
 from modules.tagvision import TagVisionModule
 from ultime.modulerobot import ModuleRobot
@@ -45,9 +46,17 @@ class Robot(ModuleRobot):
             )
         )
 
+        self.shooter_calc_module = self.addModule(
+            ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
+        )
+
         self.dashboard = self.addModule(
             DashboardModule(
-                self.hardware, self.quest_vision, self.autonomous, self.modules
+                self.hardware,
+                self.quest_vision,
+                self.shooter_calc_module,
+                self.autonomous,
+                self.modules,
             )
         )
         self.logging = self.addModule(LoggingModule())
