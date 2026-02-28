@@ -5,6 +5,7 @@ from commands.feeder.grabfuel import GrabFuel
 from commands.feeder.ejectfuel import EjectFuel
 from commands.hugandclimb import HugAndClimb
 from commands.pivot.move import MovePivot
+from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
 from modules.hardware import HardwareModule
@@ -39,14 +40,14 @@ class ControlModule(Module):
         """
 
         # Intake
-        hardware.panel_1.povUp().onTrue(MovePivot.toDown(hardware.pivot))
+        hardware.panel_1.povLeft().onTrue(MovePivot.toDown(hardware.pivot))
 
-        hardware.panel_1.povDown().onTrue(MovePivot.toUp(hardware.pivot))
+        hardware.panel_1.povRight().onTrue(MovePivot.toUp(hardware.pivot))
 
-        hardware.panel_1.povRight().onTrue(GrabFuel(hardware.feeder))
+        hardware.panel_1.povUp().onTrue(GrabFuel(hardware.feeder))
 
         # Shooter
-        hardware.panel_1.povLeft().onTrue(Shoot(hardware.shooter, shooter_calc_module))
+        hardware.panel_1.povDown().onTrue(Shoot(hardware.shooter, shooter_calc_module))
 
         # Climber
         hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
@@ -59,7 +60,7 @@ class ControlModule(Module):
             RetractAndUnhug(hardware.climber, hardware.hugger)
         )
 
-        hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))
+        hardware.panel_2.button(5).onTrue(ResetClimber.down(hardware.climber))
 
         # ResetGyro
 
@@ -69,4 +70,5 @@ class ControlModule(Module):
 
         # ResetAll
 
-        hardware.panel_1.button(1)
+        hardware.panel_1.button(1).onTrue(ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide))
+
