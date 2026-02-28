@@ -37,6 +37,7 @@ class DashboardModule(Module):
         hardware: HardwareModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
+        shooter_calc_module: ShooterCalcModule
     ):
         super().__init__()
         self._hardware = hardware

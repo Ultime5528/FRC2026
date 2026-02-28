@@ -26,8 +26,6 @@ class Robot(ModuleRobot):
 
         self.hardware = self.addModule(HardwareModule())
 
-        self.control = self.addModule(ControlModule(self.hardware))
-
         self.autonomous = self.addModule(AutonomousModule(self.hardware))
 
         self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
@@ -50,9 +48,11 @@ class Robot(ModuleRobot):
             ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
         )
 
+        self.control = self.addModule(ControlModule(self.hardware, self.shooter_calc_module))
+
         self.dashboard = self.addModule(
             DashboardModule(
-                self.hardware, self.autonomous, self.modules
+                self.hardware, self.autonomous, self.modules, self.shooter_calc_module
             )
         )
         self.logging = self.addModule(LoggingModule())

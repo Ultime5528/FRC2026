@@ -8,6 +8,7 @@ from commands.pivot.move import MovePivot
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
 from modules.hardware import HardwareModule
+from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
 
 
@@ -15,6 +16,7 @@ class ControlModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
+        shooter_calc_module: ShooterCalcModule,
     ):
         super().__init__()
 
@@ -44,7 +46,7 @@ class ControlModule(Module):
         hardware.panel_1.povRight().onTrue(GrabFuel(hardware.feeder))
 
         # Shooter
-        hardware.panel_1.povLeft().onTrue(Shoot(hardware.shooter))
+        hardware.panel_1.povLeft().onTrue(Shoot(hardware.shooter, shooter_calc_module))
 
         # Climber
         hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
