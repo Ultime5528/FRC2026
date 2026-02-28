@@ -38,8 +38,8 @@ class CAN(Immutable):
 
 class PWM(Immutable):
     guide_servo = 5
-    climber_servo_left = 9
-    climber_servo_right = 8
+    hugger_servo_left = 9
+    hugger_servo_right = 8
 
 
 class DIO(Immutable):
@@ -47,7 +47,7 @@ class DIO(Immutable):
     guide_encoder_a = 8
     guide_encoder_b = 9
     climber_switch = 6
-    pivot_switch_min = -1
+    pivot_switch_min = 2
     pivot_switch_max = 5
     drivetrain_photocell_left = 4
     drivetrain_photocell_right = 3

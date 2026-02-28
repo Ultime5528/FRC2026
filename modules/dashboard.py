@@ -1,18 +1,23 @@
 import commands2
 import wpilib
 from commands2 import CommandScheduler
+from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
+from wpimath.geometry import Pose2d
 
-from commands.climber.hug import Hug
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
-from commands.climber.unhug import Unhug
 from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
+from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel
 from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.hugger.hug import Hug
+from commands.hugger.unhug import Unhug
 from commands.pivot.maintainpivot import MaintainPivot
 from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
+from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
@@ -54,6 +59,13 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        path = PathPlannerPath.fromPathFile("Test")
+        putCommandOnDashboard(
+            "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
+        )
+        putCommandOnDashboard(
+            "Drivetrain", PathFindPrecise(hardware.drivetrain, Pose2d(8, 4, 0))
+        )
 
         """
         Shooter
@@ -81,8 +93,12 @@ class DashboardModule(Module):
         putCommandOnDashboard("Climber", MoveClimber.toClimbed(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toReady(hardware.climber))
         putCommandOnDashboard("Climber", MoveClimber.toRetracted(hardware.climber))
-        putCommandOnDashboard("Climber", Hug(hardware.climber))
-        putCommandOnDashboard("Climber", Unhug(hardware.climber))
+
+        """
+        Hugger
+        """
+        putCommandOnDashboard("Hugger", Hug(hardware.hugger))
+        putCommandOnDashboard("Hugger", Unhug(hardware.hugger))
 
         """
         Feeder
@@ -95,10 +111,18 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Pivot", MovePivot.toUp(hardware.pivot))
         putCommandOnDashboard("Pivot", MovePivot.toDown(hardware.pivot))
-        putCommandOnDashboard("Pivot", ResetPivot.up(hardware.pivot))
+        putCommandOnDashboard("Pivot", ResetPivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", MaintainPivot(hardware.pivot))
+
+        """
+        Group
+        """
+        putCommandOnDashboard(
+            "Group",
+            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide),
+        )
 
     def robotInit(self) -> None:
         for subsystem in self._hardware.subsystems:

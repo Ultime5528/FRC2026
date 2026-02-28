@@ -11,7 +11,6 @@ from wpimath.geometry import Transform3d
 
 from ultime.alert import AlertType
 from ultime.module import Module
-from ultime.timethis import tt
 
 april_tag_field_layout = AprilTagFieldLayout.loadField(
     AprilTagField.k2025ReefscapeWelded
@@ -151,4 +150,4 @@ class AbsoluteVision(Vision):
         def noop(x):
             pass
 
-        builder.addIntegerArrayProperty("UsedTagIDs", tt(self.getUsedTagIDs), noop)
+        builder.addIntegerArrayProperty("UsedTagIDs", self.getUsedTagIDs, noop)

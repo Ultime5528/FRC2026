@@ -1,8 +1,13 @@
-import wpilib
-from rev import SparkMax, SparkMaxSim
+from rev import (
+    SparkMax,
+    SparkMaxSim,
+    SparkMaxConfig,
+    SparkBaseConfig,
+    ResetMode,
+    PersistMode,
+)
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
-from wpiutil import SendableBuilder
 
 import ports
 from ultime.autoproperty import autoproperty
@@ -11,18 +16,15 @@ from ultime.switch import Switch
 
 
 class Climber(LinearSubsystem):
-    position_hug_left = autoproperty(0.43)
-    position_unhug_left = autoproperty(0.06)
-    position_hug_right = autoproperty(0.05)
-    position_unhug_right = autoproperty(0.47)
-    delay_hug = autoproperty(0.5)
-
     position_conversion_factor = autoproperty(1.0)
-    height_max = autoproperty(190.0)
+    speed_maintain = autoproperty(0.0)
+    position_min = autoproperty(0.0)
+    position_max = autoproperty(190.0)
 
     def __init__(self):
+
         super().__init__(
-            sim_initial_position=self.height_max * 0.5,
+            sim_initial_position=self.position_max * 0.5,
             should_reset_min=True,
             should_reset_max=False,
             should_block_min_position=False,
@@ -35,18 +37,23 @@ class Climber(LinearSubsystem):
         self._encoder_position: float = 0.0
         self._switch_pressed: bool = False
 
-        self._climber_motor = SparkMax(
-            ports.CAN.climber_motor, SparkMax.MotorType.kBrushless
+        self._motor = SparkMax(ports.CAN.climber_motor, SparkMax.MotorType.kBrushless)
+        self._motor.setInverted(False)
+        self._config = SparkMaxConfig()
+        self._config.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+        self._motor.configure(
+            self._config,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters,
         )
-        self._climber_motor.setInverted(False)
-        self._hugger_motor_left = wpilib.Servo(ports.PWM.climber_servo_left)
-        self._hugger_motor_right = wpilib.Servo(ports.PWM.climber_servo_right)
-        self._climber_encoder = self._climber_motor.getEncoder()
+        self._encoder = self._motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
 
+        self.maintain_position_tolerance = self.position_max * 0.01
+
         if RobotBase.isSimulation():
-            self._climber_sim_motor = SparkMaxSim(self._climber_motor, DCMotor.NEO(1))
-            self._climber_sim_encoder = self._climber_sim_motor.getRelativeEncoderSim()
+            self._sim_motor = SparkMaxSim(self._motor, DCMotor.NEO(1))
+            self._sim_encoder = self._sim_motor.getRelativeEncoderSim()
 
     def readInputs(self):
         self._encoder_position = self._climber_encoder.getPosition()
@@ -56,7 +63,7 @@ class Climber(LinearSubsystem):
         return 0.0
 
     def getMaxPosition(self) -> float:
-        return self.height_max
+        return self.position_max
 
     def isSwitchMinPressed(self) -> bool:
         return self._switch_pressed
@@ -68,16 +75,16 @@ class Climber(LinearSubsystem):
         return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
-        self._climber_sim_encoder.setPosition(position)
+        self._sim_encoder.setPosition(position)
 
     def getPositionConversionFactor(self) -> float:
         return self.position_conversion_factor
 
     def _setMotorOutput(self, speed: float) -> None:
-        self._climber_motor.set(speed)
+        self._motor.set(speed)
 
     def getMotorOutput(self) -> float:
-        return self._climber_motor.get()
+        return self._motor.get()
 
     def setSimSwitchMinPressed(self, pressed: bool) -> None:
         self._switch.setSimValue(pressed)
@@ -85,10 +92,11 @@ class Climber(LinearSubsystem):
     def setSimSwitchMaxPressed(self, pressed: bool) -> None:
         pass
 
-    def hug(self):
-        self._hugger_motor_left.set(self.position_hug_left)
-        self._hugger_motor_right.set(self.position_hug_right)
-
-    def unhug(self):
-        self._hugger_motor_left.set(self.position_unhug_left)
-        self._hugger_motor_right.set(self.position_unhug_right)
+    def maintain(self):
+        position = self.getPosition()
+        if (
+            self.hasReset()
+            and position >= (self.position_min - self.maintain_position_tolerance)
+            and position <= (self.position_max + self.maintain_position_tolerance)
+        ):
+            self._motor.set(self.speed_maintain)

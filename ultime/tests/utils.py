@@ -88,11 +88,11 @@ class RobotTestController:
         time = 0.0
         delta = min(delta, timeout)
 
-        while not cond():
+        while not cond() and time < timeout:
             self.wait(delta)
             time += delta
-            assert time < timeout, f"Condition was not reached within {timeout} seconds"
 
+        assert time < timeout, f"Condition was not reached within {timeout} seconds"
         assert cond()
 
 
