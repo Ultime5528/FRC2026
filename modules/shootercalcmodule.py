@@ -74,9 +74,9 @@ def computeShooterSpeedToShoot(
 
     gravity = 9.80665
 
-    distance_shooter_xy = math.hypot(shooter_position.x, shooter_position.y)
-    distance_target_xy = math.hypot(target_position.x, target_position.y)
-    delta_xy = distance_target_xy - distance_shooter_xy
+    delta_x = target_position.x- shooter_position.x
+    delta_y = target_position.y- shooter_position.y
+    delta_xy = math.hypot(delta_x,delta_y)
     delta_z = target_position.z - shooter_position.z
 
     distance_xy_squared = delta_xy**2
