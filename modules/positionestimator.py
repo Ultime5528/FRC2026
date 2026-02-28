@@ -139,17 +139,14 @@ class PositionEstimator(Module):
     def _addVisionMeasuremenstFromTagVisionModule(
         self, tag_vision_module: TagVisionModule
     ):
-        poses_with_std_devs = tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs()
 
-        self.has_sean_at_least_one_tag = (
-            self.has_sean_at_least_one_tag or len(poses_with_std_devs) > 0
-        )
-
-        for tag_vision_data in poses_with_std_devs:
+        for tag_vision_data in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
             if tag_vision_data[0] is not None:
                 pose = tag_vision_data[0].estimatedPose
                 time = tag_vision_data[0].timestampSeconds
                 std_devs = tag_vision_data[1]
+
+                self.has_sean_at_least_one_tag = True
 
                 self.drivetrain.addVisionMeasurement(
                     pose.toPose2d(),
