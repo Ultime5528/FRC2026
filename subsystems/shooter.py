@@ -39,7 +39,6 @@ class Shooter(Subsystem):
 
     def __init__(self):
         super().__init__()
-
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )

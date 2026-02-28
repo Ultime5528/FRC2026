@@ -34,6 +34,8 @@ class Climber(LinearSubsystem):
             sim_motor_to_distance_factor=80.0,
             sim_gravity=0.0,
         )
+        self._encoder_position: float = 0.0
+        self._switch_pressed: bool = False
 
         self._motor = SparkMax(ports.CAN.climber_motor, SparkMax.MotorType.kBrushless)
         self._motor.setInverted(False)
@@ -53,6 +55,10 @@ class Climber(LinearSubsystem):
             self._sim_motor = SparkMaxSim(self._motor, DCMotor.NEO(1))
             self._sim_encoder = self._sim_motor.getRelativeEncoderSim()
 
+    def readInputs(self):
+        self._encoder_position = self._encoder.getPosition()
+        self._switch_pressed = self._switch.isPressed()
+
     def getMinPosition(self) -> float:
         return 0.0
 
@@ -60,13 +66,13 @@ class Climber(LinearSubsystem):
         return self.position_max
 
     def isSwitchMinPressed(self) -> bool:
-        return self._switch.isPressed()
+        return self._switch_pressed
 
     def isSwitchMaxPressed(self) -> bool:
         return False
 
     def getEncoderPosition(self) -> float:
-        return self._encoder.getPosition()
+        return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._sim_encoder.setPosition(position)
