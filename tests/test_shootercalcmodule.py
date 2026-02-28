@@ -5,7 +5,6 @@ from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
 from commands.drivetrain.resetpose import ResetPose
 from modules.shootercalcmodule import (
-    ShooterCalcModule,
     computeRobotRotationToAlign,
     computeRobotRotationToAlignSimple,
 )
@@ -14,9 +13,7 @@ from ultime.tests import RobotTestController
 
 
 def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
-    shooter_calc_module = ShooterCalcModule(
-        robot.hardware.drivetrain, robot.hardware.guide
-    )
+    shooter_calc_module = robot.shooter_calc_module
     robot_controller.startTeleop()
     robot_controller.run_command(
         ResetPose(robot.hardware.drivetrain, Pose2d(2, 3, 0)), timeout=3.0

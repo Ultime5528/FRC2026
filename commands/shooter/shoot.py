@@ -1,6 +1,6 @@
+from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.shooter import Shooter
 from ultime.command import Command
-from modules.shootercalcmodule import ShooterCalcModule
 
 
 class Shoot(Command):

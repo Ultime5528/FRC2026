@@ -53,13 +53,9 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
 def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
-    shooter_calc_module = ShooterCalcModule(
-        robot.hardware.drivetrain, robot.hardware.guide
-    )
+    shooter_calc_module = robot.shooter_calc_module
 
-    rpm_flywheel = (
-        shooter_calc_module.getRPM()
-    )  # TODO mettre la valeur du calcul d'hayder
+    rpm_flywheel = shooter_calc_module.getRPM()
     rpm_flywheel_tolerance = rpm_flywheel * 0.01
 
     robot_controller.startTeleop()
@@ -90,9 +86,7 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
 def test_shoot(robot_controller: RobotTestController, robot: Robot):
 
     shooter = robot.hardware.shooter
-    shooter_calc_module = ShooterCalcModule(
-        robot.hardware.drivetrain, robot.hardware.guide
-    )
+    shooter_calc_module = robot.shooter_calc_module
 
     rpm_indexer_tolerance = shooter.indexer_rpm * 0.01
 

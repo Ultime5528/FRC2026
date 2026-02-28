@@ -1,3 +1,5 @@
+import modulefinder
+
 import commands2
 import wpilib
 from commands2 import CommandScheduler
@@ -34,12 +36,14 @@ class DashboardModule(Module):
         self,
         hardware: HardwareModule,
         quest: QuestVisionModule,
+        shooter_calc_module: ShooterCalcModule,
         autonomous: AutonomousModule,
         module_list: ModuleList,
     ):
         super().__init__()
         self._hardware = hardware
         self._module_list = module_list
+        self.shooter_calc_module = shooter_calc_module
         self.setupCopilotCommands(hardware)
         self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, quest))
@@ -72,16 +76,11 @@ class DashboardModule(Module):
         Shooter
         """
         putCommandOnDashboard(
-            "Shooter",
-            PrepareShoot(
-                hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)
-            ),
+            "Shooter", PrepareShoot(hardware.shooter, self.shooter_calc_module)
         )
         putCommandOnDashboard(
             "Shooter",
-            Shoot(
-                hardware.shooter, ShooterCalcModule(hardware.drivetrain, hardware.guide)
-            ),
+            Shoot(hardware.shooter, self.shooter_calc_module),
         )
         putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))
