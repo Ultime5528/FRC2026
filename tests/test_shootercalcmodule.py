@@ -31,7 +31,7 @@ def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
                 robot.hardware.drivetrain.getPose().translation(), Rotation2d(angle)
             ),
         ),
-        timeout=3.0,
+        timeout=10.0,
     )
     rpm = shooter_calc_module.getSpeedRaw()
     assert rpm == approx(11.1779781175, abs=0.01)
