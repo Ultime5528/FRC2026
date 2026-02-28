@@ -52,11 +52,7 @@ class Robot(ModuleRobot):
 
         self.dashboard = self.addModule(
             DashboardModule(
-                self.hardware,
-                self.quest_vision,
-                self.shooter_calc_module,
-                self.autonomous,
-                self.modules,
+                self.hardware, self.autonomous, self.modules
             )
         )
         self.logging = self.addModule(LoggingModule())

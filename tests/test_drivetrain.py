@@ -20,13 +20,13 @@ def test_ResetGyro(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.startTeleop()
 
-    reset_cmd = ResetGyro(drivetrain, robot.quest_vision)
+    reset_cmd = ResetGyro(drivetrain)
     robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
     init_pose = drivetrain.getPose()
     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
     xbox_remote.setRightX(-1)
     robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
-    reset_cmd = ResetGyro(drivetrain, robot.quest_vision)
+    reset_cmd = ResetGyro(drivetrain)
     robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
     assert drivetrain.getPose().rotation() == init_pose.rotation()
 
@@ -96,7 +96,7 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 5), abs=3.0)
 
     robot_controller.run_command(
-        ResetGyro(drivetrain, robot.quest_vision).withTimeout(0.1), 0.3
+        ResetGyro(drivetrain).withTimeout(0.1), 0.3
     )
     xbox_remote.setRightBumperButton(False)
     xbox_remote.setLeftX(0)
