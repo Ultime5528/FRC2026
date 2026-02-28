@@ -20,11 +20,27 @@ def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
     )
     robot_controller.wait(0.2)
     angle = shooter_calc_module.getAngleToAlignWithTarget()
-    angle_simple = shooter_calc_module.getAngleToAlignWithTargetSimple()
-    rpm = shooter_calc_module.getSpeedRaw()
-    assert rpm == approx(11.1779781175, abs=0.01)
+    speed = shooter_calc_module.getSpeedRaw()
+    assert speed == approx(11.6004159251, abs=0.01)
     assert angle == approx(0.13114722400913124732706041777946, abs=0.005)
-    assert angle_simple == approx(0.13114722400913124732706041777946, abs=0.005)
+
+    robot_controller.run_command(
+        ResetPose(robot.hardware.drivetrain, Pose2d(-4, 5, 0)), timeout=3.0
+    )
+    robot_controller.wait(0.2)
+    angle = shooter_calc_module.getAngleToAlignWithTarget()
+    speed = shooter_calc_module.getSpeedRaw()
+    assert speed == approx(14.1631522268, abs=0.01)
+    assert angle == approx(-0.04359091359774116837002917726338, abs=0.005)
+
+    robot_controller.run_command(
+        ResetPose(robot.hardware.drivetrain, Pose2d(10, -3, 0)), timeout=3.0
+    )
+    robot_controller.wait(0.2)
+    angle = shooter_calc_module.getAngleToAlignWithTarget()
+    speed = shooter_calc_module.getSpeedRaw()
+    assert speed == approx(10.3327747906, abs=0.01)
+    assert angle == approx(1.3421361043188485606163187171984, abs=0.005)
 
 
 def test_zero_angles():
