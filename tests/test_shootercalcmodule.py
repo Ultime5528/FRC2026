@@ -24,15 +24,6 @@ def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
     robot_controller.wait(0.2)
     angle = shooter_calc_module.getAngleToAlignWithTarget()
     angle_simple = shooter_calc_module.getAngleToAlignWithTargetSimple()
-    robot_controller.run_command(
-        ResetPose(
-            robot.hardware.drivetrain,
-            Pose2d(
-                robot.hardware.drivetrain.getPose().translation(), Rotation2d(angle)
-            ),
-        ),
-        timeout=10.0,
-    )
     rpm = shooter_calc_module.getSpeedRaw()
     assert rpm == approx(11.1779781175, abs=0.01)
     assert angle == approx(0.13114722400913124732706041777946, abs=0.005)
