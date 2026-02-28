@@ -6,9 +6,11 @@ from modules.control import ControlModule
 from modules.dashboard import DashboardModule
 from modules.hardware import HardwareModule
 from modules.logging import LoggingModule
+from modules.positionestimator import PositionEstimator
 from modules.propertysavechecker import PropertySaveCheckerModule
 from modules.questvision import QuestVisionModule
 from modules.sysidmodule import SysIDModule
+from modules.tagvision import TagVisionModule
 from ultime.modulerobot import ModuleRobot
 
 
@@ -28,6 +30,20 @@ class Robot(ModuleRobot):
         self.autonomous = self.addModule(AutonomousModule(self.hardware))
 
         self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+        self.camera_front = self.addModule(
+            TagVisionModule.front(self.hardware.drivetrain)
+        )
+        self.camera_back = self.addModule(
+            TagVisionModule.back(self.hardware.drivetrain)
+        )
+        self.position_estimator = self.addModule(
+            PositionEstimator(
+                self.hardware.drivetrain,
+                self.quest_vision,
+                self.camera_front,
+                self.camera_back,
+            )
+        )
 
         self.dashboard = self.addModule(
             DashboardModule(
