@@ -17,9 +17,9 @@ class PositionEstimator(Module):
     want_multiple_quest_reset = autoproperty(False)
     multiple_reset_distance_threshold = autoproperty(0.03)
 
-    drivetrain_starting_pose_x = autoproperty(1.0)
-    drivetrain_starting_pose_y = autoproperty(1.0)
-    drivetrain_starting_pose_angle = autoproperty(0.0)
+    drivetrain_starting_pose_x = autoproperty(3.945)
+    drivetrain_starting_pose_y = autoproperty(3.87)
+    drivetrain_starting_pose_angle = autoproperty(math.pi)
 
     def __init__(
         self,
