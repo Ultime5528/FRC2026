@@ -82,16 +82,14 @@ def computeShooterSpeedToShoot(
 
     gravity = 9.80665
 
-    distance_shooter_xy = math.hypot(shooter_position.x, shooter_position.y)
-    distance_target_xy = math.hypot(target_position.x, target_position.y)
-    delta_xy = distance_target_xy - distance_shooter_xy
-    delta_z = target_position.z - shooter_position.z
+    shooter_to_target = target_position - shooter_position
+    distance_xy = math.hypot(shooter_to_target.x, shooter_to_target.y)
 
-    distance_xy_squared = delta_xy**2
+    distance_xy_squared = distance_xy**2
 
     numerator = gravity * distance_xy_squared
     denominator = (2 * ((math.cos(shooter_angle)) ** 2)) * (
-        delta_xy * (math.tan(shooter_angle)) - delta_z
+        distance_xy * (math.tan(shooter_angle)) - shooter_to_target.z
     )
 
     if abs(denominator) < 1.0e-6:
@@ -124,9 +122,7 @@ class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
-    shooter_offset = Transform3d(
-        -0.1525, -0.271, 0.5, Rotation3d(Translation3d(0, 0, 1), 0)
-    )
+    shooter_offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d())
     shooter_extremity = Translation3d(0.1525, -0.271, 0.5)
     speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
     rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
@@ -197,9 +193,9 @@ class ShooterCalcModule(Module):
 
     def _isInOurZone(self) -> bool:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            return self._drivetrain.getPose().x > 14.228191
+            return self._drivetrain.getPose().x > 11.915394
         else:
-            return self._drivetrain.getPose().x < 2.312797
+            return self._drivetrain.getPose().x < 4.625594
 
     def getAngleToAlignWithTarget(self) -> float:
         return computeRobotRotationToAlign(

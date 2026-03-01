@@ -8,6 +8,7 @@ from commands.pivot.move import MovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
+from commands.shootwithalign import ShootWithAlign
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
@@ -48,7 +49,7 @@ class ControlModule(Module):
 
         # Shooter
         hardware.panel_1.povDown().whileTrue(
-            Shoot(hardware.shooter, shooter_calc_module)
+            ShootWithAlign(hardware, shooter_calc_module)
         )
 
         # Climber
