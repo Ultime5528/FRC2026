@@ -23,6 +23,7 @@ from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
+from commands.shootwithalign import ShootWithAlign
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.questvision import QuestVisionModule
@@ -80,6 +81,10 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Shooter",
             Shoot(hardware.shooter, self.shooter_calc_module),
+        )
+        putCommandOnDashboard(
+            "Shooter",
+            ShootWithAlign(hardware, self.shooter_calc_module),
         )
         putCommandOnDashboard("Shooter", ManualShoot(hardware.shooter))
         putCommandOnDashboard("Shooter", ManualPrepareShoot(hardware.shooter))
