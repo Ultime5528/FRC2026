@@ -121,7 +121,6 @@ class ShooterCalcModule(Module):
         super().__init__()
         self._drivetrain = drivetrain
         self.guide = guide
-        self.guide_usage = None
         self._interpolator_for_open_guide = LinearInterpolator(
             self.speed_guide_open, self.rpm_guide_open
         )
@@ -129,125 +128,160 @@ class ShooterCalcModule(Module):
             self.speed_guide_closed, self.rpm_guide_closed
         )
 
-        self.last_robot_pose = Pose2d()
-        self.last_shooter_pose = Pose3d()
-        self.last_angle_computed = self.createProperty(0.0)
-        self.last_angle_simple_computed = self.createProperty(0.0)
-        self.last_should_use_guide_computed = self.createProperty(False)
-        self.last_rpm_computed = self.createProperty(0.0)
-        self.last_speed_computed = self.createProperty(0.0)
+        self._shooter_rpm = 0.0
+        self._robot_rotation_angle = 0.0
+        self._robot_rotation_angle_simple = 0.0
+
+        self._is_on_red_team = DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        if self._is_on_red_team:
+            self.team_hub_position = self.red_hub
+        else:
+            self.team_hub_position = self.blue_hub
+
+        self._robot_pose = Pose2d()
+        self._shooter_pose = Pose3d()
+        self._target_position = Translation3d()
+        self._is_in_our_zone = False
+        self._should_use_guide = False
+        self._shooter_exit_angle = 0.0
+        self._projectile_speed = 0.0
+        self._robot_rotation_angle = 0.0
+        self._robot_rotation_angle_simple = 0.0
+
+    def getAngleToAlignWithTarget(self) -> float:
+        return self._robot_rotation_angle
+
+    def getRPM(self) -> float:
+        return self._shooter_rpm
 
     def robotPeriodic(self) -> None:
-        current_usage = self.shouldUseGuide()
 
-        if self.guide_usage is not None:
-            if current_usage != self.guide_usage:
-                if current_usage:
-                    MoveGuide.toUsed(self.guide).schedule()
-                else:
-                    MoveGuide.toUnused(self.guide).schedule()
+        self._computeRobotPoseAndShooterPose()
+        self._computeIsInOurZone()
+        self._computeTargetPosition()
 
-        self.guide_usage = current_usage
+        previous_should_use_guide = self._should_use_guide
+        self._computeShouldUseGuide()
 
-    def _getShooterPose(self) -> Pose3d:
-        self.last_robot_pose = self._drivetrain.getPose()
-        self.last_shooter_pose = computeShooterPose(
-            Pose3d(self.last_robot_pose), self.shooter_offset
+        if self._should_use_guide != previous_should_use_guide:
+            if self._should_use_guide:
+                MoveGuide.toUsed(self.guide).schedule()
+            else:
+                MoveGuide.toUnused(self.guide).schedule()
+
+        self._computeShooterExitAngle()
+        self._computeProjectileSpeed()
+        self._computeShooterRPM()
+        self._computeAngleToAlignWithTarget()
+
+    def _computeRobotPoseAndShooterPose(self) -> None:
+        self._robot_pose = self._drivetrain.getPose()
+        self._shooter_pose = computeShooterPose(
+            Pose3d(self._robot_pose), self.shooter_offset
         )
 
-        # logging Pose2d and Pose3d not supprted. Add support?
-        #self.log("last_robot_pose", self.last_robot_pose)
-        #self.log("last_shooter_pose", self.last_shooter_pose)
-
-        return self.last_shooter_pose
-
-    def _getTargetPosition(self) -> Translation3d:
-        if self._isInOurZone():
-            self.last_target_computed = self._getHubPosition()
+    def _computeIsInOurZone(self) -> None:
+        if self._is_on_red_team:
+            self._is_in_our_zone = self._drivetrain.getPose().x > 11.915394
         else:
-            self.last_target_computed = self._getZonePosition()
+            self._is_in_our_zone = self._drivetrain.getPose().x < 4.625594
 
-        return self.last_target_computed
-
-    def _getHubPosition(self) -> Translation3d:
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            return self.red_hub
+    def _computeTargetPosition(self) -> None:
+        if self._is_in_our_zone:
+            self._target_position = self.team_hub_position
         else:
-            return self.blue_hub
+            self._target_position = self._getZonePosition()
 
     def _getZonePosition(self) -> Translation3d:
 
-        if self._drivetrain.getPose().y < 4.034663:
+        if self._robot_pose.y < 4.034663:
             y = 2.0173315
         else:
             y = 6.0519945
 
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+        if self._is_on_red_team:
             x = 14.228191
         else:
             x = 2.312797
 
         return Translation3d(x, y, 0.0)
 
-    def _isInOurZone(self) -> bool:
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-            self.last_is_in_our_zone_computed = self._drivetrain.getPose().x > 11.915394
-        else:
-            self.last_is_in_our_zone_computed = self._drivetrain.getPose().x < 4.625594
+    def _computeShouldUseGuide(self) -> None:
+        shooter_postion_xy = self._shooter_pose.translation().toTranslation2d()
+        target_positon_xy = self._target_position.toTranslation2d()
 
-        return self.last_is_in_our_zone_computed
-
-    def getAngleToAlignWithTarget(self) -> float:
-        self.last_angle_computed = computeRobotRotationToAlign(
-            Pose3d(self._drivetrain.getPose()),
-            self.shooter_offset.translation(),
-            self.shooter_extremity,
-            self._getTargetPosition(),
-        )
-        return self.last_angle_computed
-
-    def getAngleToAlignWithTargetSimple(self) -> float:
-        self.last_angle_simple_computed = computeRobotRotationToAlignSimple(
-            self._getShooterPose(),
-            self._getTargetPosition(),
-        )
-
-        return self.last_angle_simple_computed
-
-    def shouldUseGuide(self) -> bool:
-        shooter_postion_xy = self._getShooterPose().translation().toTranslation2d()
-        target_positon_xy = self._getTargetPosition().toTranslation2d()
-
-        self.last_should_use_guide_computed = (
+        self._should_use_guide = (
             shooter_postion_xy.distance(shooter_postion_xy)
             >= self.long_distance_treshold
         )
 
-        return self.last_should_use_guide_computed
-
-    def getRPM(self) -> float:
-        if self.shouldUseGuide():
-            self.last_rpm_computed = self._interpolator_for_closed_guide.interpolate(
-                self.getSpeedRaw()
-            )
+    def _computeShooterExitAngle(self) -> None:
+        if self._should_use_guide:
+            self._shooter_exit_angle = math.radians(60.0)
         else:
-            self.last_rpm_computed = self._interpolator_for_open_guide.interpolate(
-                self.getSpeedRaw()
-            )
+            self._shooter_exit_angle = math.radians(70.0)
 
-        return self.last_rpm_computed
+    def _computeProjectileSpeed(self) -> None:
 
-    def getSpeedRaw(self) -> float:
+        gravity = 9.80665
 
-        shooter_angle = math.radians(70.0)
+        shooter_to_target = self._target_positionn - self._shooter_pose.translation()
+        distance_xy = math.hypot(shooter_to_target.x, shooter_to_target.y)
 
-        if self.shouldUseGuide():
-            shooter_angle = math.radians(60.0)
+        distance_xy_squared = distance_xy ** 2
 
-        self.last_speed_computed = computeShooterSpeedToShoot(
-            self._getShooterPose().translation(),
-            self._getTargetPosition(),
-            shooter_angle,
+        numerator = gravity * distance_xy_squared
+        denominator = (2 * ((math.cos(self._shooter_exit_angle)) ** 2)) * (
+                distance_xy * (math.tan(self._shooter_exit_angle)) - shooter_to_target.z
         )
 
-        return self.last_speed_computed
+        if abs(denominator) < 1.0e-6:
+            self._projectile_speed = 0.0
+            return
+
+        speed_squared = numerator / denominator
+
+        if speed_squared < 0.0:
+            self._projectile_speed =  0.0
+            return
+
+        self._projectile_speed = math.sqrt(speed_squared)
+
+    def _computeShooterRPM(self) -> None:
+        if self._should_use_guide:
+            self._shooter_rpm = self._interpolator_for_closed_guide.interpolate(
+                self._projectile_speed
+            )
+        else:
+            self._shooter_rpm = self._interpolator_for_open_guide.interpolate(
+                self._projectile_speed
+            )
+
+    def _computeAngleToAlignWithTarget(self) -> None:
+        self._robot_rotation_angle = computeRobotRotationToAlign(
+            Pose3d(self._robot_pose),
+            self.shooter_offset.translation(),
+            self.shooter_extremity,
+            self._target_position
+        )
+
+    def _computeAngleToAlignWithTargetSimple(self) -> None:
+        self._robot_rotation_angle_simple = computeRobotRotationToAlignSimple(
+            self._shooter_pose),
+            self._target_position,
+        )
+
+
+    def logValues(self):
+        self.log("x", self.estimated_pose.x)
+        # logging Pose2d and Pose3d not supprted. Add support?
+
+        self.log("robot_pose", self._robot_pose )
+        self.log("shooter_pose", self._shooter_pose)
+        self.log("target_position", self._target_position)
+        self.log("is_in_our_zone",self._is_in_our_zone)
+        self.log("should_use_guide", self._should_use_guide)
+        self.log("shooter_exit_angle". self._shooter_exit_angle )
+        self.log("projectile_speed", self._projectile_speed)
+        self.log("_robot_rotation_angle", self._robot_rotation_angle)
+        self.log("_robot_rotation_angle_simple", self._robot_rotation_angle_simple)
