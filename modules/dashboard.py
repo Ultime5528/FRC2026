@@ -6,6 +6,7 @@ from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d
 
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
@@ -59,6 +60,7 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        putCommandOnDashboard("Drivetrain", AlignToTower(hardware.drivetrain))
         path = PathPlannerPath.fromPathFile("Test")
         putCommandOnDashboard(
             "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
