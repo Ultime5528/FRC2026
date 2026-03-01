@@ -26,27 +26,33 @@ def computeAngleDifferenceRadians(angle1: float, angle2: float) -> float:
 
 def computeRobotRotationToAlignSimple(
     shooter_pose3d: Pose3d,
-    hub_position: Translation3d,
+    target: Translation3d,
 ) -> float:
-    shooter_to_hub = (hub_position - shooter_pose3d.translation()).toTranslation2d()
-    shooter_to_hub_angle = shooter_to_hub.angle().radians()
+    shooter_to_target = (target - shooter_pose3d.translation()).toTranslation2d()
+    shooter_to_target_angle = shooter_to_target.angle().radians()
     shooter_angle = shooter_pose3d.rotation().angle
-    return computeAngleDifferenceRadians(shooter_to_hub_angle, shooter_angle)
+    return computeAngleDifferenceRadians(shooter_to_target_angle, shooter_angle)
 
 
 def computeRobotRotationToAlign(
     robot_pose3d: Pose3d,
     shooter_offset_origin: Translation3d,
     shooter_extremity_origin: Translation3d,
-    hub_pose: Translation3d,
+    target: Translation3d,
 ) -> float:
 
-    delta_hub_and_bot = hub_pose - robot_pose3d.translation()
-    hub_at_origin = delta_hub_and_bot.rotateBy(-robot_pose3d.rotation())
+    robot_to_target = target - robot_pose3d.translation()
+    target_at_origin = robot_to_target.rotateBy(-robot_pose3d.rotation())
     shooter_direction = shooter_extremity_origin - shooter_offset_origin
 
-    A = -(shooter_direction.x * hub_at_origin.y - shooter_direction.y * hub_at_origin.x)
-    B = -(shooter_direction.x * hub_at_origin.x + shooter_direction.y * hub_at_origin.y)
+    A = -(
+        shooter_direction.x * target_at_origin.y
+        - shooter_direction.y * target_at_origin.x
+    )
+    B = -(
+        shooter_direction.x * target_at_origin.x
+        + shooter_direction.y * target_at_origin.y
+    )
     C = (
         shooter_offset_origin.x * shooter_extremity_origin.y
         - shooter_offset_origin.y * shooter_extremity_origin.x
@@ -55,7 +61,9 @@ def computeRobotRotationToAlign(
     denominator = math.sqrt((A**2) + (B**2))
 
     # to avoid domain errors
-    if abs(C / denominator) > 1 or denominator == 0:
+    if abs(denominator) < 1.0e-6:
+        return 0.0
+    elif abs(C / denominator) > 1.0:
         return 0.0
     else:
         return normalizeAngleRadians(-(math.atan2(B, A) + math.acos(C / denominator)))
@@ -86,22 +94,24 @@ def computeShooterSpeedToShoot(
         delta_xy * (math.tan(shooter_angle)) - delta_z
     )
 
-    if denominator == 0.0:
-        return -1.0
-    else:
-        return math.sqrt(numerator / denominator)
+    if abs(denominator) < 1.0e-6:
+        return 0.0
+
+    speed_squared = numerator / denominator
+
+    if speed_squared < 0.0:
+        return 0.0
+
+    return math.sqrt(speed_squared)
 
 
 def shouldUseGuide(
-    robot_pose: Translation3d, target_pose: Translation3d, long_shoot_zone: float
+    shooter_postiion: Translation3d, target: Translation3d, long_shoot_zone: float
 ) -> bool:
-    if (
-        target_pose.toTranslation2d().distance(robot_pose.toTranslation2d())
+    return (
+        target.toTranslation2d().distance(shooter_postiion.toTranslation2d())
         >= long_shoot_zone
-    ):
-        return True
-    else:
-        return False
+    )
 
 
 def computeShooterPosition(
@@ -112,8 +122,8 @@ def computeShooterPosition(
 
 class ShooterCalcModule(Module):
     long_zone = autoproperty(6.0)
-    red_hub = Translation3d(4.625594, 4.034536, 3.057144)
-    blue_hub = Translation3d(11.915394, 4.034536, 3.057144)
+    red_hub = Translation3d(11.915394, 4.034536, 1.510284)
+    blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
     shooter_offset = Transform3d(
         -0.1525, -0.271, 0.5, Rotation3d(Translation3d(0, 0, 1), 0)
     )
@@ -159,40 +169,66 @@ class ShooterCalcModule(Module):
         )
         return shooter_pose
 
+    def _getTargetPosition(self) -> Translation3d:
+        if self._isInOurZone():
+            return self._getHubPosition()
+        else:
+            return self._getZonePosition()
+
     def _getHubPosition(self) -> Translation3d:
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
             return self.red_hub
         else:
             return self.blue_hub
 
+    def _getZonePosition(self) -> Translation3d:
+
+        if self._drivetrain.getPose().y < 4.034663:
+            y = 2.0173315
+        else:
+            y = 6.0519945
+
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            x = 14.228191
+        else:
+            x = 2.312797
+
+        return Translation3d(x, y, 0.0)
+
+    def _isInOurZone(self) -> bool:
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            return self._drivetrain.getPose().x > 14.228191
+        else:
+            return self._drivetrain.getPose().x < 2.312797
+
     def getAngleToAlignWithTarget(self) -> float:
         return computeRobotRotationToAlign(
             Pose3d(self._drivetrain.getPose()),
             self.shooter_offset.translation(),
             self.shooter_extremity,
-            self._getHubPosition(),
+            self._getTargetPosition(),
         )
 
     def getAngleToAlignWithTargetSimple(self) -> float:
         return computeRobotRotationToAlignSimple(
             Pose3d(self._getShooterPose(), self.shooter_offset.rotation()),
-            self._getHubPosition(),
+            self._getTargetPosition(),
         )
 
     def shouldUseGuide(self) -> bool:
         return shouldUseGuide(
             self._getShooterPose(),
-            self._getHubPosition(),
+            self._getTargetPosition(),
             self.long_zone,
         )
 
     def getRPM(self) -> float:
         if self.shouldUseGuide():
-            return self._interpolator_for_open_guide.interpolate(self.getSpeedRaw())
-        else:
             return self._interpolator_for_closed_guide.interpolate(self.getSpeedRaw())
+        else:
+            return self._interpolator_for_open_guide.interpolate(self.getSpeedRaw())
 
     def getSpeedRaw(self) -> float:
         return computeShooterSpeedToShoot(
-            self._getShooterPose(), self._getHubPosition(), self.long_zone
+            self._getShooterPose(), self._getTargetPosition(), self.long_zone
         )

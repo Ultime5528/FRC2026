@@ -1,8 +1,6 @@
 import math
-from typing import List
 
-from wpimath.filter import LinearFilter
-from wpimath.geometry import Pose3d, Rotation3d, Pose2d
+from wpimath.geometry import Pose2d
 
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule

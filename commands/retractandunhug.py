@@ -16,6 +16,6 @@ class RetractAndUnhug(SequentialCommandGroup):
         hugger: Hugger,
     ):
         super().__init__(
-            Unhug(hugger),
             MoveClimber.toRetracted(climber),
+            Unhug(hugger),
         )

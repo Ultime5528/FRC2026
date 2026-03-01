@@ -44,10 +44,12 @@ class ControlModule(Module):
 
         hardware.panel_1.povRight().onTrue(MovePivot.toUp(hardware.pivot))
 
-        hardware.panel_1.povUp().onTrue(GrabFuel(hardware.feeder))
+        hardware.panel_1.povUp().whileTrue(GrabFuel(hardware.feeder))
 
         # Shooter
-        hardware.panel_1.povDown().onTrue(Shoot(hardware.shooter, shooter_calc_module))
+        hardware.panel_1.povDown().whileTrue(
+            Shoot(hardware.shooter, shooter_calc_module)
+        )
 
         # Climber
         hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
@@ -60,7 +62,7 @@ class ControlModule(Module):
             RetractAndUnhug(hardware.climber, hardware.hugger)
         )
 
-        hardware.panel_2.button(5).onTrue(ResetClimber.down(hardware.climber))
+        hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))
 
         # ResetGyro
 
