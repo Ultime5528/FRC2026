@@ -88,7 +88,7 @@ class AbsoluteVision(Vision):
 
     def getAllUnreadEstimatedPosesWithStdDevs(
         self,
-    ) -> Generator[tuple[EstimatedRobotPose, List[float]]]:
+    ) -> Generator[tuple[EstimatedRobotPose, tuple[float, float, float]]]:
         for frame in self._cam.getAllUnreadResults():
             estimated_pose = self.getEstimatedPose(frame)
             std_devs = self.getEstimationStdDevs(
@@ -98,7 +98,7 @@ class AbsoluteVision(Vision):
 
     def getEstimationStdDevs(
         self, estimated_pose: EstimatedRobotPose, targets: List[PhotonTrackedTarget]
-    ) -> list[float]:
+    ) -> tuple[float, float, float]:
         if estimated_pose is None:
             self.std_devs = [4.0, 4.0, 8.0]
         else:

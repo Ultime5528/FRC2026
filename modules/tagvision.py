@@ -11,8 +11,8 @@ robot_to_camera_front_offset = wpimath.geometry.Transform3d(
     wpimath.geometry.Rotation3d.fromDegrees(0.0, 18.5, 0.0),
 )
 robot_to_camera_back_offset = wpimath.geometry.Transform3d(
-    wpimath.geometry.Translation3d(-0.310, -0.352, 0.427),
-    wpimath.geometry.Rotation3d.fromDegrees(0.0, 17.5, 135.0),
+    wpimath.geometry.Translation3d(-0.340, -0.35, 0.45),
+    wpimath.geometry.Rotation3d.fromDegrees(0.0, -17.5, -135.0),
 )
 
 camera_front_name = "FrontCamera"

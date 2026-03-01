@@ -12,6 +12,9 @@ class Module(AlertCreator, Loggable):
         super().__init__()
         self.redefines_init_sendable = False
 
+    def getSubtable(self) -> str:
+        return super().getSubtable() + self.getName() + "/"
+
     def getName(self) -> str:
         return self.__class__.__name__
 

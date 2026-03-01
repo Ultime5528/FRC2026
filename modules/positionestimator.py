@@ -10,15 +10,6 @@ from ultime.module import Module
 
 
 class PositionEstimator(Module):
-    drivetrain_speed_threshold = autoproperty(0.2)
-    drivetrain_speed_rotation_threshold = autoproperty(5.0)
-    want_multiple_quest_reset = autoproperty(False)
-    multiple_reset_distance_threshold = autoproperty(0.03)
-
-    drivetrain_starting_pose_x = autoproperty(3.945)
-    drivetrain_starting_pose_y = autoproperty(3.87)
-    drivetrain_starting_pose_angle = autoproperty(math.pi)
-
     def __init__(
         self,
         drivetrain: Drivetrain,
@@ -37,94 +28,32 @@ class PositionEstimator(Module):
         self.camera_front_connected = self.createProperty(False)
         self.camera_back_connected = self.createProperty(False)
 
-        self.is_drivetrain_under_speed = self.createProperty(True)
-        self.has_sean_at_least_one_tag = self.createProperty(False)
-
-        # Find a good stating point based on alliance
-        self.drivetrain.resetToPose(
-            Pose2d(
-                self.drivetrain_starting_pose_x,
-                self.drivetrain_starting_pose_y,
-                self.drivetrain_starting_pose_angle,
-            )
-        )
+        self.tag_seen = self.createProperty(False)
+        self.tag_seen_in_frame = self.createProperty(False)
 
     def robotPeriodic(self) -> None:
+        self.tag_seen_in_frame = False
 
         self.quest_connected = self.quest_nav.isConnected()
         self.camera_front_connected = self.camera_front.isConnected()
         self.camera_back_connected = self.camera_back.isConnected()
 
-        self.is_drivetrain_under_speed = self.drivetrain.isUnderSpeed(
-            self.drivetrain_speed_threshold,
-            self.drivetrain_speed_threshold,
-            self.drivetrain_speed_rotation_threshold,
-        )
-
-        is_at_least_one_camera_connnected = (
-            self.camera_front_connected or self.camera_back_connected
-        )
-
-        if self.quest_connected:
-
-            if not is_at_least_one_camera_connnected:
-                self.quest_has_reset = True
-                self._addQuestMeasurementsOnly()
-
-            else:
-
-                if self.want_multiple_quest_reset:
-                    self._addQuestMeasurementsWithResetsFromCameras()
-                else:
-                    self._addQuestMeasurementsOnly()
-
-        elif is_at_least_one_camera_connnected:
-            self._addCameraMeasurementsOnly()
-
-    def _addQuestMeasurementsWithResetsFromCameras(self):
-
-        if self.quest_has_reset:
-
-            self._addVisionMeasuremenstFromQuestVisionModule(self.quest_nav)
-
-            if self.is_drivetrain_under_speed:
-                self._addCameraMeasurementsOnly()
-                estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
-
-                dist = math.hypot(self.estimated_pose[0], self.estimated_pose[1])
-                if dist < self.multiple_reset_distance_threshold:
-                    self.quest_nav.resetToPose(estimated_pose)
-
-        else:
-            self._addCameraMeasurementsOnly()
-
-        if self.has_sean_at_least_one_tag:
-            estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
-            self.quest_nav.resetToPose(estimated_pose)
-            self.quest_has_reset = True
-
-    def _addQuestMeasurementsOnly(self):
-
-        if self.quest_has_reset:
-            self._addVisionMeasuremenstFromQuestVisionModule(self.quest_nav)
-        else:
-            self._addCameraMeasurementsOnly()
-
-        if self.has_sean_at_least_one_tag:
-            estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
-            self.quest_nav.resetToPose(estimated_pose)
-            self.quest_has_reset = True
-
-    def _addCameraMeasurementsOnly(self):
+        if self.quest_connected and self.tag_seen:
+            self._addQuestMeasurements()
 
         if self.camera_front_connected:
-            self._addVisionMeasuremenstFromTagVisionModule(self.camera_front)
+            self._addCameraMeasurements(self.camera_front)
 
         if self.camera_back_connected:
-            self._addVisionMeasuremenstFromTagVisionModule(self.camera_back)
+            self._addCameraMeasurements(self.camera_back)
 
-    def _addVisionMeasuremenstFromQuestVisionModule(
-        self, quest_vision_module: QuestVisionModule
+        self.tag_seen = self.tag_seen or self.tag_seen_in_frame
+
+        estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
+        self.quest_nav.resetToPose(estimated_pose)
+
+    def _addQuestMeasurements(
+        self
     ):
         for (
             quest_data
@@ -135,19 +64,18 @@ class PositionEstimator(Module):
             if pose is not None:
                 self.drivetrain.addVisionMeasurement(pose, time, std_devs)
 
-    def _addVisionMeasuremenstFromTagVisionModule(
+    def _addCameraMeasurements(
         self, tag_vision_module: TagVisionModule
     ):
-
         for (
-            tag_vision_data
+            estimation, std_devs
         ) in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
-            if tag_vision_data[0] is not None:
-                pose = tag_vision_data[0].estimatedPose
-                time = tag_vision_data[0].timestampSeconds
-                std_devs = tag_vision_data[1]
 
-                self.has_sean_at_least_one_tag = True
+            if estimation and len(estimation.targetsUsed) >= 2:
+                pose = estimation.estimatedPose
+                time = estimation.timestampSeconds
+
+                self.tag_seen_in_frame = True
 
                 self.drivetrain.addVisionMeasurement(
                     pose.toPose2d(),

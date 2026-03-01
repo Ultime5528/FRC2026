@@ -278,9 +278,11 @@ class ShooterCalcModule(Module):
 
     def logValues(self):
         # logging Pose2d and Pose3d not supprted. Add support?
-        # self.log("robot_pose", self._robot_pose)
-        # self.log("shooter_pose", self._shooter_pose)
-        # self.log("target_position", self._target_position)
+        robot_position = self._robot_pose.translation()
+        self.log("robot_position_x", robot_position.x)
+        self.log("robot_position_y", robot_position.y)
+        self.log("target_position_x", self._target_position.x)
+        self.log("target_position_y", self._target_position.y)
         self.log("is_in_our_zone", self._is_in_our_zone)
         self.log("should_use_guide", self._should_use_guide)
         self.log("shooter_exit_angle", self._projectile_angle)
