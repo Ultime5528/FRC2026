@@ -167,15 +167,6 @@ class Shooter(Subsystem):
         self._indexer_sim.setVelocity(
             target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
         )
-        if self._is_at_velocity and self.indexer_state == IndexerState.On:
-            self._updateIndexerSimVelocity(self.indexer_rpm)
-        elif self.indexer_state == IndexerState.Stuck:
-            self._updateIndexerSimVelocity(self.indexer_rpm_unstuck)
-
-    def _updateIndexerSimVelocity(self, target_rpm: float) -> None:
-        self._indexer_sim.setVelocity(
-            target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
-        )
 
     def stop(self):
         self._flywheel.stopMotor()
