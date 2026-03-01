@@ -27,7 +27,7 @@ def _test_ShooterCalcModule_common(
         ResetPose(robot.hardware.drivetrain, robot_pose), timeout=3.0
     )
 
-    angle = shooter_calc_module.getAngleToAlignWithTarget()
+    angle = shooter_calc_module.getRotationToAlignWithTarget()
 
     transform = Transform2d(0.0, 0.0, angle)
 

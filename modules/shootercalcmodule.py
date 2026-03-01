@@ -1,7 +1,7 @@
 import math
 
 from wpilib import DriverStation
-from wpimath.geometry import Translation3d, Pose3d, Rotation3d, Transform3d, Pose2d
+from wpimath.geometry import Translation3d, Pose3d, Rotation3d, Transform3d, Pose2d, Rotation2d
 
 from commands.guide import MoveGuide
 from subsystems.drivetrain import Drivetrain
@@ -25,11 +25,12 @@ def computeAngleDifferenceRadians(angle1: float, angle2: float) -> float:
 def computeRobotRotationToAlignSimple(
     shooter_pose3d: Pose3d,
     target: Translation3d,
-) -> float:
+) -> Rotation2d:
     shooter_to_target = (target - shooter_pose3d.translation()).toTranslation2d()
     shooter_to_target_angle = shooter_to_target.angle().radians()
     shooter_angle = shooter_pose3d.rotation().angle
-    return computeAngleDifferenceRadians(shooter_to_target_angle, shooter_angle)
+    angle_rad = computeAngleDifferenceRadians(shooter_to_target_angle, shooter_angle)
+    return Rotation2d(angle_rad)
 
 
 def computeRobotRotationToAlign(
@@ -37,7 +38,7 @@ def computeRobotRotationToAlign(
     shooter_offset_origin: Translation3d,
     shooter_extremity_origin: Translation3d,
     target: Translation3d,
-) -> float:
+) -> Rotation2d:
 
     robot_to_target = target - robot_pose3d.translation()
     target_at_origin = robot_to_target.rotateBy(-robot_pose3d.rotation())
@@ -58,13 +59,13 @@ def computeRobotRotationToAlign(
 
     denominator = math.sqrt((A**2) + (B**2))
 
+    angle_rad = 0.0
+
     # to avoid domain errors
-    if abs(denominator) < 1.0e-6:
-        return 0.0
-    elif abs(C / denominator) > 1.0:
-        return 0.0
-    else:
-        return normalizeAngleRadians(-(math.atan2(B, A) + math.acos(C / denominator)))
+    if abs(denominator) >= 1.0e-6 and abs(C / denominator) <= 1.0:
+        angle_rad = normalizeAngleRadians(-(math.atan2(B, A) + math.acos(C / denominator)))
+
+    return Rotation2d(angle_rad)
 
 
 def computeShooterSpeedToShoot(
@@ -129,8 +130,8 @@ class ShooterCalcModule(Module):
         )
 
         self._shooter_rpm = 0.0
-        self._robot_rotation_angle = 0.0
-        self._robot_rotation_angle_simple = 0.0
+        self._robot_rotation_angle = Rotation2d()
+        self._robot_rotation_angle_simple = Rotation2d()
 
         self._is_on_red_team = (
             DriverStation.getAlliance() == DriverStation.Alliance.kRed
@@ -147,10 +148,8 @@ class ShooterCalcModule(Module):
         self._should_use_guide = False
         self._projectile_angle = 0.0
         self._projectile_speed = 0.0
-        self._robot_rotation_angle = 0.0
-        self._robot_rotation_angle_simple = 0.0
 
-    def getAngleToAlignWithTarget(self) -> float:
+    def getRotationToAlignWithTarget(self) -> Rotation2d:
         return self._robot_rotation_angle
 
     def getRPM(self) -> float:
@@ -160,7 +159,6 @@ class ShooterCalcModule(Module):
         return self._projectile_speed
 
     def robotPeriodic(self) -> None:
-
         self._computeRobotPoseAndShooterPose()
         self._computeIsInOurZone()
         self._computeTargetPosition()
@@ -287,5 +285,5 @@ class ShooterCalcModule(Module):
         self.log("should_use_guide", self._should_use_guide)
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
-        self.log("_robot_rotation_angle", self._robot_rotation_angle)
-        self.log("_robot_rotation_angle_simple", self._robot_rotation_angle_simple)
+        self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
+        self.log("_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees())

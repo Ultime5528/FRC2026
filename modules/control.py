@@ -49,7 +49,7 @@ class ControlModule(Module):
 
         # Shooter
         hardware.panel_1.povDown().whileTrue(
-            ShootWithAlign(hardware, shooter_calc_module)
+            ShootWithAlign(hardware.drivetrain, hardware.shooter, hardware.controller, shooter_calc_module)
         )
 
         # Climber

@@ -1,6 +1,6 @@
 import math
 
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Pose3d
 
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule
@@ -49,8 +49,9 @@ class PositionEstimator(Module):
 
         self.tag_seen = self.tag_seen or self.tag_seen_in_frame
 
-        estimated_pose = self.drivetrain.swerve_estimator.getEstimatedPosition()
-        self.quest_nav.resetToPose(estimated_pose)
+        if self.tag_seen_in_frame:
+            estimated_pose = self.drivetrain.getPose()
+            self.quest_nav.resetToPose(Pose3d(estimated_pose))
 
     def _addQuestMeasurements(
         self
