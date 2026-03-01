@@ -35,7 +35,7 @@ def _test_ShooterCalcModule_common(
         ResetPose(robot.hardware.drivetrain, robot_pose + transform), timeout=3.0
     )
 
-    speed = shooter_calc_module.getSpeedRaw()
+    speed = shooter_calc_module.getProjectileSpeed()
 
     assert speed == approx(speed_solution, abs=0.01)
     assert angle == approx(angle_solution, abs=0.005)

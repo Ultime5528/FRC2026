@@ -132,7 +132,9 @@ class ShooterCalcModule(Module):
         self._robot_rotation_angle = 0.0
         self._robot_rotation_angle_simple = 0.0
 
-        self._is_on_red_team = DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        self._is_on_red_team = (
+            DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        )
         if self._is_on_red_team:
             self.team_hub_position = self.red_hub
         else:
@@ -143,7 +145,7 @@ class ShooterCalcModule(Module):
         self._target_position = Translation3d()
         self._is_in_our_zone = False
         self._should_use_guide = False
-        self._shooter_exit_angle = 0.0
+        self._projectile_angle = 0.0
         self._projectile_speed = 0.0
         self._robot_rotation_angle = 0.0
         self._robot_rotation_angle_simple = 0.0
@@ -154,6 +156,9 @@ class ShooterCalcModule(Module):
     def getRPM(self) -> float:
         return self._shooter_rpm
 
+    def getProjectileSpeed(self) -> float:
+        return self._projectile_speed
+
     def robotPeriodic(self) -> None:
 
         self._computeRobotPoseAndShooterPose()
@@ -163,6 +168,7 @@ class ShooterCalcModule(Module):
         previous_should_use_guide = self._should_use_guide
         self._computeShouldUseGuide()
 
+        # Uninitialized case
         if self._should_use_guide != previous_should_use_guide:
             if self._should_use_guide:
                 MoveGuide.toUsed(self.guide).schedule()
@@ -211,28 +217,28 @@ class ShooterCalcModule(Module):
         target_positon_xy = self._target_position.toTranslation2d()
 
         self._should_use_guide = (
-            shooter_postion_xy.distance(shooter_postion_xy)
+            target_positon_xy.distance(shooter_postion_xy)
             >= self.long_distance_treshold
         )
 
     def _computeShooterExitAngle(self) -> None:
         if self._should_use_guide:
-            self._shooter_exit_angle = math.radians(60.0)
+            self._projectile_angle = math.radians(60.0)
         else:
-            self._shooter_exit_angle = math.radians(70.0)
+            self._projectile_angle = math.radians(70.0)
 
     def _computeProjectileSpeed(self) -> None:
 
         gravity = 9.80665
 
-        shooter_to_target = self._target_positionn - self._shooter_pose.translation()
+        shooter_to_target = self._target_position - self._shooter_pose.translation()
         distance_xy = math.hypot(shooter_to_target.x, shooter_to_target.y)
 
-        distance_xy_squared = distance_xy ** 2
+        distance_xy_squared = distance_xy**2
 
         numerator = gravity * distance_xy_squared
-        denominator = (2 * ((math.cos(self._shooter_exit_angle)) ** 2)) * (
-                distance_xy * (math.tan(self._shooter_exit_angle)) - shooter_to_target.z
+        denominator = (2 * ((math.cos(self._projectile_angle)) ** 2)) * (
+                distance_xy * (math.tan(self._projectile_angle)) - shooter_to_target.z
         )
 
         if abs(denominator) < 1.0e-6:
@@ -242,7 +248,7 @@ class ShooterCalcModule(Module):
         speed_squared = numerator / denominator
 
         if speed_squared < 0.0:
-            self._projectile_speed =  0.0
+            self._projectile_speed = 0.0
             return
 
         self._projectile_speed = math.sqrt(speed_squared)
@@ -262,26 +268,22 @@ class ShooterCalcModule(Module):
             Pose3d(self._robot_pose),
             self.shooter_offset.translation(),
             self.shooter_extremity,
-            self._target_position
+            self._target_position,
         )
 
     def _computeAngleToAlignWithTargetSimple(self) -> None:
         self._robot_rotation_angle_simple = computeRobotRotationToAlignSimple(
-            self._shooter_pose),
-            self._target_position,
+            self._shooter_pose, self._target_position
         )
 
-
     def logValues(self):
-        self.log("x", self.estimated_pose.x)
         # logging Pose2d and Pose3d not supprted. Add support?
-
-        self.log("robot_pose", self._robot_pose )
-        self.log("shooter_pose", self._shooter_pose)
-        self.log("target_position", self._target_position)
-        self.log("is_in_our_zone",self._is_in_our_zone)
+        # self.log("robot_pose", self._robot_pose)
+        # self.log("shooter_pose", self._shooter_pose)
+        # self.log("target_position", self._target_position)
+        self.log("is_in_our_zone", self._is_in_our_zone)
         self.log("should_use_guide", self._should_use_guide)
-        self.log("shooter_exit_angle". self._shooter_exit_angle )
+        self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
         self.log("_robot_rotation_angle", self._robot_rotation_angle)
         self.log("_robot_rotation_angle_simple", self._robot_rotation_angle_simple)
