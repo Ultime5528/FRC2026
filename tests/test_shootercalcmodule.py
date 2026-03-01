@@ -1,6 +1,8 @@
+import math
+
 import numpy
 from _pytest.python_api import approx
-from wpimath.geometry import Pose2d, Rotation2d
+from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Transform2d
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
 from commands.drivetrain.resetpose import ResetPose
@@ -12,19 +14,70 @@ from robot import Robot
 from ultime.tests import RobotTestController
 
 
-def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
+def _test_ShooterCalcModule_common(
+    robot_controller: RobotTestController,
+    robot: Robot,
+    robot_pose: Pose2d,
+    speed_solution: float,
+    angle_solution: float,
+):
     shooter_calc_module = robot.shooter_calc_module
     robot_controller.startTeleop()
     robot_controller.run_command(
-        ResetPose(robot.hardware.drivetrain, Pose2d(2, 3, 0)), timeout=3.0
+        ResetPose(robot.hardware.drivetrain, robot_pose), timeout=3.0
     )
-    robot_controller.wait(0.2)
+
     angle = shooter_calc_module.getAngleToAlignWithTarget()
-    angle_simple = shooter_calc_module.getAngleToAlignWithTargetSimple()
-    rpm = shooter_calc_module.getSpeedRaw()
-    assert rpm == approx(11.1779781175, abs=0.01)
-    assert angle == approx(0.13114722400913124732706041777946, abs=0.005)
-    assert angle_simple == approx(0.13114722400913124732706041777946, abs=0.005)
+
+    transform = Transform2d(0.0, 0.0, angle)
+
+    robot_controller.run_command(
+        ResetPose(robot.hardware.drivetrain, robot_pose + transform), timeout=3.0
+    )
+
+    speed = shooter_calc_module.getSpeedRaw()
+
+    assert speed == approx(speed_solution, abs=0.01)
+    assert angle == approx(angle_solution, abs=0.005)
+
+
+def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
+
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(2, 3, 0), 7.18366932701, 0.471517850869
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(2, 5, 0), 7.15792018564, -0.255341218445
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(1, 2, 0), 8.47220924023, 0.57660113341
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(3, 4, 0), 5.82183695912, 0.188694113917
+    )
+
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(5, 1, 0), 6.58517154536, 2.87413979556
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(6, 2, 0), 7.46975446748, -3.07273010236
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(8, 3, 0), 9.3604457092, -2.92352375287
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(5, 5, 0), 6.59960579301, 2.86249712744
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller, robot, Pose2d(6, 6, math.pi), 7.47008754727, 0.0594560464062
+    )
+    _test_ShooterCalcModule_common(
+        robot_controller,
+        robot,
+        Pose2d(6, 7, 0.5 * math.pi),
+        7.5913053378,
+        1.89369523653,
+    )
 
 
 def test_zero_angles():
