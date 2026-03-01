@@ -43,7 +43,7 @@ class Pivot(LinearSubsystem):
             should_block_max_position=False,
             should_block_min_switch=False,
             should_block_max_switch=True,
-            sim_motor_to_distance_factor=2.0,
+            sim_motor_to_distance_factor=80.0,
             sim_gravity=self.speed_maintain,
         )
         self._encoder_position: float = 0.0

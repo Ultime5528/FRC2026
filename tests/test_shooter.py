@@ -4,6 +4,7 @@ from pytest import approx
 from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
+from modules.shootercalcmodule import ShooterCalcModule
 from robot import Robot
 from subsystems.shooter import IndexerState
 from ultime.tests import RobotTestController
@@ -52,8 +53,9 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
 def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
+    shooter_calc_module = robot.shooter_calc_module
 
-    rpm_flywheel = 666.6  # TODO mettre la valeur du calcul d'hayder
+    rpm_flywheel = shooter_calc_module.getRPM()
     rpm_flywheel_tolerance = rpm_flywheel * 0.01
 
     robot_controller.startTeleop()
@@ -62,7 +64,7 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter._indexer.get() == 0.0
     assert shooter._feeder.get() == 0.0
 
-    cmd = PrepareShoot(shooter)
+    cmd = PrepareShoot(shooter, shooter_calc_module)
     cmd.schedule()
     robot_controller.wait_one_frame()
 
@@ -84,6 +86,7 @@ def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
 def test_shoot(robot_controller: RobotTestController, robot: Robot):
 
     shooter = robot.hardware.shooter
+    shooter_calc_module = robot.shooter_calc_module
 
     rpm_indexer_tolerance = shooter.indexer_rpm * 0.01
 
@@ -93,7 +96,7 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter._indexer.get() == 0.0
     assert shooter._feeder.get() == 0.0
 
-    cmd = Shoot(shooter)
+    cmd = Shoot(shooter, shooter_calc_module)
     cmd.schedule()
     robot_controller.wait_one_frame()
 

@@ -430,6 +430,10 @@ class Drivetrain(Subsystem):
         """
         return self._chassis_speed
 
+    def isUnderSpeed(self, vx, vy, vrot):
+        speed = self.getRobotRelativeChassisSpeeds()
+        return speed.vx < vx and speed.vy < vy and speed.omega < vrot
+
     def resetToPose(self, pose: Pose2d):
         self.swerve_estimator.resetPosition(
             self._gyro_rotation2d,

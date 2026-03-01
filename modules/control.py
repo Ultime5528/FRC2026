@@ -1,5 +1,16 @@
+from commands.climber.move import MoveClimber, ManualMoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.resetgyro import ResetGyro
+from commands.feeder.grabfuel import GrabFuel
+from commands.feeder.ejectfuel import EjectFuel
+from commands.hugandclimb import HugAndClimb
+from commands.pivot.move import MovePivot
+from commands.resetall import ResetAll
+from commands.retractandunhug import RetractAndUnhug
+from commands.shooter.shoot import Shoot
+from commands.shootwithalign import ShootWithAlign
 from modules.hardware import HardwareModule
+from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
 
 
@@ -7,6 +18,7 @@ class ControlModule(Module):
     def __init__(
         self,
         hardware: HardwareModule,
+        shooter_calc_module: ShooterCalcModule,
     ):
         super().__init__()
 
@@ -27,3 +39,38 @@ class ControlModule(Module):
         """
         Copilot's panel
         """
+
+        # Intake
+        hardware.panel_1.povLeft().onTrue(MovePivot.toDown(hardware.pivot))
+
+        hardware.panel_1.povRight().onTrue(MovePivot.toUp(hardware.pivot))
+
+        hardware.panel_1.povUp().whileTrue(GrabFuel(hardware.feeder))
+
+        # Shooter
+        hardware.panel_1.povDown().whileTrue(
+            ShootWithAlign(hardware, shooter_calc_module)
+        )
+
+        # Climber
+        hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
+
+        hardware.panel_1.button(4).onTrue(
+            HugAndClimb(hardware.climber, hardware.hugger)
+        )
+
+        hardware.panel_1.button(3).onTrue(
+            RetractAndUnhug(hardware.climber, hardware.hugger)
+        )
+
+        hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))
+
+        # ResetGyro
+
+        hardware.panel_1.button(2).onTrue(ResetGyro(hardware.drivetrain))
+
+        # ResetAll
+
+        hardware.panel_1.button(1).onTrue(
+            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide)
+        )
