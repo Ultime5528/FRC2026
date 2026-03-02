@@ -53,9 +53,7 @@ class PositionEstimator(Module):
             estimated_pose = self.drivetrain.getPose()
             self.quest_nav.resetToPose(Pose3d(estimated_pose))
 
-    def _addQuestMeasurements(
-        self
-    ):
+    def _addQuestMeasurements(self):
         for (
             quest_data
         ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
@@ -65,11 +63,10 @@ class PositionEstimator(Module):
             if pose is not None:
                 self.drivetrain.addVisionMeasurement(pose, time, std_devs)
 
-    def _addCameraMeasurements(
-        self, tag_vision_module: TagVisionModule
-    ):
+    def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
         for (
-            estimation, std_devs
+            estimation,
+            std_devs,
         ) in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
 
             if estimation and len(estimation.targetsUsed) >= 2:

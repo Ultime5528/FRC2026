@@ -34,7 +34,7 @@ class DriveAlign(Command):
     def __init__(
         self,
         drivetrain: Drivetrain,
-        shooter_calc_module : ShooterCalcModule,
+        shooter_calc_module: ShooterCalcModule,
         xbox_remote: commands2.button.CommandXboxController,
     ):
         super().__init__()
@@ -54,10 +54,7 @@ class DriveAlign(Command):
 
         rot = self.shooter_calc_module.getRotationToAlignWithTarget()
 
-        rot_speed = (
-            rot.degrees()
-            * self.rotate_speed
-        )
+        rot_speed = rot.degrees() * self.rotate_speed
 
         if is_red:
             x_speed *= -1
