@@ -111,16 +111,16 @@ def computeShooterPose(robot_pose: Pose3d, shooter_offset: Transform3d) -> Pose3
 
 
 class ShooterCalcModule(Module):
-    long_distance_treshold = autoproperty(6.0)
+    long_distance_treshold = autoproperty(3.0)
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
-    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d())
+    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, -5.1))
     shooter_extremity = Translation3d(0.0, 0.245, 0.5)
-    speed_guide_open = autoproperty([5.9, 6.5, 7.67])
-    rpm_guide_open = autoproperty([2500.0, 3000.0, 4300.0])
-    speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
+    speed_guide_open = autoproperty([5.5, 6.3, 7.3])
+    rpm_guide_open = autoproperty([2800.0, 3600.0, 5500.0])
+    speed_guide_closed = autoproperty([3.0, 9.0])
     rpm_guide_closed = autoproperty(
-        [501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34]
+        [2500.0, 5500.0]
     )
 
     def __init__(

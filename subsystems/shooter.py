@@ -35,7 +35,7 @@ class Shooter(Subsystem):
     indexer_kF = autoproperty(0.002)
     indexer_kP = autoproperty(0.001)
 
-    feeder_speed = autoproperty(0.5)
+    feeder_speed = autoproperty(0.685)
 
     def __init__(self):
         super().__init__()
@@ -173,6 +173,7 @@ class Shooter(Subsystem):
         self._feeder.stopMotor()
         self._indexer.stopMotor()
         self._is_at_velocity = False
+        self._velocity_filter.reset()
         self.indexer_state = IndexerState.Off
 
         if is_simulation:
