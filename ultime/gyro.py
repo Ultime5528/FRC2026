@@ -9,7 +9,6 @@ from wpiutil import Sendable, SendableBuilder
 
 from ultime.autoproperty import autoproperty, defaultSetter
 from ultime.modulerobot import is_real
-from ultime.timethis import tt
 
 
 class AbstractSendableMetaclass(type(ABC), type(Sendable)):
@@ -144,17 +143,17 @@ class ADIS16470(Gyro):
 
         builder.addFloatProperty(
             "raw_yaw",
-            tt(lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kYaw)),
+            lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kYaw),
             noop,
         )
         builder.addFloatProperty(
             "raw_pitch",
-            tt(lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kPitch)),
+            lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kPitch),
             noop,
         )
         builder.addFloatProperty(
             "raw_roll",
-            tt(lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kRoll)),
+            lambda: self.gyro.getAngle(wpilib.ADIS16470_IMU.IMUAxis.kRoll),
             noop,
         )
 

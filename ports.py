@@ -47,7 +47,7 @@ class DIO(Immutable):
     guide_encoder_a = 8
     guide_encoder_b = 9
     climber_switch = 6
-    pivot_switch_min = -1
+    pivot_switch_min = 2
     pivot_switch_max = 5
     drivetrain_photocell_left = 4
     drivetrain_photocell_right = 3

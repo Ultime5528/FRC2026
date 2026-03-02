@@ -4,6 +4,7 @@ import commands2.button
 from wpilib import DriverStation
 from wpimath.geometry import Rotation2d
 
+from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
 from ultime.command import Command
@@ -24,25 +25,23 @@ def apply_linear_deadzone(_input, deadzone):
         return _input
 
 
-class DriveField(Command):
+class DriveAlign(Command):
     rotation_deadzone = autoproperty(0.3)
     rotate_speed = autoproperty(0.00375)
     slow_speed_multiplier = autoproperty(0.33)
+    moving_deadzone = autoproperty(0.1)
 
     def __init__(
         self,
         drivetrain: Drivetrain,
+        shooter_calc_module : ShooterCalcModule,
         xbox_remote: commands2.button.CommandXboxController,
     ):
         super().__init__()
-        self.rot: float = 0.0
-        self.actual_rot: float = 0.0
         self.addRequirements(drivetrain)
         self.xbox_remote = xbox_remote
         self.drivetrain = drivetrain
-
-    def initialize(self):
-        self.rot = self.drivetrain.getPose().rotation()
+        self.shooter_calc_module = shooter_calc_module
 
     def execute(self):
         is_red = DriverStation.getAlliance() == DriverStation.Alliance.kRed
@@ -50,29 +49,14 @@ class DriveField(Command):
         x_speed, y_speed, _ = apply_center_distance_deadzone(
             self.xbox_remote.getLeftY() * -1,
             self.xbox_remote.getLeftX() * -1,
-            properties.moving_deadzone,
+            self.moving_deadzone,
         )
 
-        rot_x, rot_y, rot_hyp = apply_center_distance_deadzone(
-            self.xbox_remote.getRightX(),
-            -1 * self.xbox_remote.getRightY(),
-            self.rotation_deadzone,
-        )
-
-        if not (rot_x == 0 and rot_y == 0):
-            self.rot = Rotation2d(math.atan2(rot_x, rot_y) * -1)
-            if is_red:
-                self.rot = Rotation2d.fromDegrees(180 + self.rot.degrees())
-
-        if self.xbox_remote.leftBumper():
-            self.actual_rot = self.rot + Rotation2d.fromDegrees(180.0)
-        else:
-            self.actual_rot = self.rot
+        rot = self.shooter_calc_module.getRotationToAlignWithTarget()
 
         rot_speed = (
-            (self.actual_rot - self.drivetrain.getPose().rotation()).degrees()
+            rot.degrees()
             * self.rotate_speed
-            * rot_hyp
         )
 
         if is_red:
@@ -82,16 +66,8 @@ class DriveField(Command):
         if self.xbox_remote.rightBumper():
             x_speed *= self.slow_speed_multiplier
             y_speed *= self.slow_speed_multiplier
-            rot_speed *= self.slow_speed_multiplier
 
         self.drivetrain.driveFromStickInputs(x_speed, y_speed, rot_speed, True)
 
     def end(self, interrupted: bool) -> None:
         self.drivetrain.stop()
-
-
-class _Properties:
-    moving_deadzone = autoproperty(0.1, subtable=DriveField.__name__)
-
-
-properties = _Properties()

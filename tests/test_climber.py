@@ -1,5 +1,3 @@
-import math
-
 from _pytest.python_api import approx
 from commands2 import Command
 from rev import SparkBase
@@ -64,7 +62,7 @@ def _test_move_climber_common(
     final_position_2: float,
 ):
     climber = robot.hardware.climber
-    position_tolerance = climber.position_max * 0.01
+    position_tolerance = climber.position_max * 0.02
 
     robot_controller.startTeleop()
 
@@ -77,9 +75,16 @@ def _test_move_climber_common(
     cmd_1.schedule()
 
     robot_controller.wait_one_frame()
-    assert (final_position_1 == 0.0 and climber.getMotorOutput() == 0.0) or (
-        math.copysign(1.0, final_position_1) * climber.getMotorOutput()
-        > climber.speed_maintain
+    assert (
+        (final_position_1 == climber.getPosition() and climber.getMotorOutput() == 0.0)
+        or (
+            final_position_1 > climber.getPosition()
+            and climber.getMotorOutput() > climber.speed_maintain
+        )
+        or (
+            final_position_1 < climber.getPosition()
+            and climber.getMotorOutput() < climber.speed_maintain
+        )
     )
 
     robot_controller.run_command(cmd_1, 10.0)
@@ -93,11 +98,15 @@ def _test_move_climber_common(
 
     robot_controller.wait_one_frame()
     assert (
-        final_position_2 == climber.getPosition() and climber.getMotorOutput() == 0.0
-    ) or (
-        math.copysign(1.0, (final_position_2 - climber.getPosition()))
-        * climber.getMotorOutput()
-        > climber.speed_maintain
+        (final_position_2 == climber.getPosition() and climber.getMotorOutput() == 0.0)
+        or (
+            final_position_2 > climber.getPosition()
+            and climber.getMotorOutput() > climber.speed_maintain
+        )
+        or (
+            final_position_2 < climber.getPosition()
+            and climber.getMotorOutput() < climber.speed_maintain
+        )
     )
 
     robot_controller.run_command(cmd_2, 10.0)

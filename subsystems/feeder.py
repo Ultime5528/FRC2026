@@ -1,4 +1,5 @@
 import rev
+from rev import SparkMaxConfig, SparkBaseConfig, ResetMode, PersistMode
 
 import ports
 from ultime.autoproperty import autoproperty
@@ -13,6 +14,13 @@ class Feeder(Subsystem):
         super().__init__()
         self._motor = rev.SparkMax(
             ports.CAN.feeder_motor, rev.SparkMax.MotorType.kBrushless
+        )
+        self._config = SparkMaxConfig()
+        self._config.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+        self._motor.configure(
+            self._config,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters,
         )
 
     def grab(self):

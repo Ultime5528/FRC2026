@@ -5,8 +5,6 @@ from weakref import WeakSet
 from wpilib import SmartDashboard, RobotController
 from wpiutil import Sendable, SendableBuilder
 
-from ultime.timethis import tt
-
 
 class AlertType(Enum):
     Error = auto()
@@ -45,13 +43,13 @@ class AlertGroup(Sendable):
 
         builder.setSmartDashboardType("Alerts")
         builder.addStringArrayProperty(
-            "errors", tt(lambda: self.getStrings(AlertType.Error)), noop
+            "errors", lambda: self.getStrings(AlertType.Error), noop
         )
         builder.addStringArrayProperty(
-            "warnings", tt(lambda: self.getStrings(AlertType.Warning)), noop
+            "warnings", lambda: self.getStrings(AlertType.Warning), noop
         )
         builder.addStringArrayProperty(
-            "infos", tt(lambda: self.getStrings(AlertType.Info)), noop
+            "infos", lambda: self.getStrings(AlertType.Info), noop
         )
 
 

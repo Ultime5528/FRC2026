@@ -1,4 +1,11 @@
-from rev import SparkMax, SparkMaxSim
+from rev import (
+    SparkMax,
+    SparkMaxSim,
+    SparkMaxConfig,
+    SparkBaseConfig,
+    ResetMode,
+    PersistMode,
+)
 from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
@@ -10,7 +17,7 @@ from ultime.switch import Switch
 
 class Climber(LinearSubsystem):
     position_conversion_factor = autoproperty(1.0)
-    speed_maintain = autoproperty(0.04)
+    speed_maintain = autoproperty(0.0)
     position_min = autoproperty(0.0)
     position_max = autoproperty(190.0)
 
@@ -27,9 +34,18 @@ class Climber(LinearSubsystem):
             sim_motor_to_distance_factor=80.0,
             sim_gravity=0.0,
         )
+        self._encoder_position: float = 0.0
+        self._switch_pressed: bool = False
 
         self._motor = SparkMax(ports.CAN.climber_motor, SparkMax.MotorType.kBrushless)
         self._motor.setInverted(False)
+        self._config = SparkMaxConfig()
+        self._config.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+        self._motor.configure(
+            self._config,
+            ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters,
+        )
         self._encoder = self._motor.getEncoder()
         self._switch = Switch(Switch.Type.NormallyClosed, ports.DIO.climber_switch)
 
@@ -39,6 +55,10 @@ class Climber(LinearSubsystem):
             self._sim_motor = SparkMaxSim(self._motor, DCMotor.NEO(1))
             self._sim_encoder = self._sim_motor.getRelativeEncoderSim()
 
+    def readInputs(self):
+        self._encoder_position = self._encoder.getPosition()
+        self._switch_pressed = self._switch.isPressed()
+
     def getMinPosition(self) -> float:
         return 0.0
 
@@ -46,13 +66,13 @@ class Climber(LinearSubsystem):
         return self.position_max
 
     def isSwitchMinPressed(self) -> bool:
-        return self._switch.isPressed()
+        return self._switch_pressed
 
     def isSwitchMaxPressed(self) -> bool:
         return False
 
     def getEncoderPosition(self) -> float:
-        return self._encoder.getPosition()
+        return self._encoder_position
 
     def setSimulationEncoderPosition(self, position: float) -> None:
         self._sim_encoder.setPosition(position)
