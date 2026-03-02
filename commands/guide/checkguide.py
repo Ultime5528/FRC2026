@@ -5,8 +5,8 @@ from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.guide import Guide
 
 
-class UseOrUnuseGuide(Command):
-    def __init__(self, guide: Guide, shooter_calc_module : ShooterCalcModule):
+class CheckGuide(Command):
+    def __init__(self, guide: Guide, shooter_calc_module: ShooterCalcModule):
         super().__init__()
         self.guide = guide
         self.shooter_calc_module = shooter_calc_module

@@ -152,6 +152,7 @@ class ShooterCalcModule(Module):
         self._should_use_guide = False
         self._projectile_angle = 0.0
         self._projectile_speed = 0.0
+        self.distance_xy = 0.0
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
         return self._robot_rotation_angle_simple
@@ -167,7 +168,7 @@ class ShooterCalcModule(Module):
 
     def robotPeriodic(self) -> None:
         self._is_on_red_team = (
-                DriverStation.getAlliance() == DriverStation.Alliance.kRed
+            DriverStation.getAlliance() == DriverStation.Alliance.kRed
         )
         if self._is_on_red_team:
             self.team_hub_position = self.red_hub
@@ -238,13 +239,13 @@ class ShooterCalcModule(Module):
         gravity = 9.80665
 
         shooter_to_target = self._target_position - self._shooter_pose.translation()
-        distance_xy = math.hypot(shooter_to_target.x, shooter_to_target.y)
+        self.distance_xy = math.hypot(shooter_to_target.x, shooter_to_target.y)
 
-        distance_xy_squared = distance_xy**2
+        distance_xy_squared = self.distance_xy**2
 
         numerator = gravity * distance_xy_squared
         denominator = (2 * ((math.cos(self._projectile_angle)) ** 2)) * (
-            distance_xy * (math.tan(self._projectile_angle)) - shooter_to_target.z
+            self.distance_xy * (math.tan(self._projectile_angle)) - shooter_to_target.z
         )
 
         if abs(denominator) < 1.0e-6:
@@ -289,7 +290,6 @@ class ShooterCalcModule(Module):
     def logValues(self):
         # logging Pose2d and Pose3d not supprted. Add support?
         robot_position = self._robot_pose.translation()
-        distance = self._shooter_pose.translation().distance(self._target_position)
         self.log("robot_position_x", robot_position.x)
         self.log("robot_position_y", robot_position.y)
         self.log("target_position_x", self._target_position.x)
@@ -302,4 +302,4 @@ class ShooterCalcModule(Module):
         self.log(
             "_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees()
         )
-        self.log("target_distance", distance)
+        self.log("target_distance_xy", self.distance_xy)

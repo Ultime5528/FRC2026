@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import wpilib
 
-from commands.guide.useorunuseguide import UseOrUnuseGuide
+from commands.guide.checkguide import CheckGuide
 from modules.autonomous import AutonomousModule
 from modules.control import ControlModule
 from modules.dashboard import DashboardModule
@@ -48,6 +48,9 @@ class Robot(ModuleRobot):
         self.shooter_calc_module = self.addModule(
             ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
         )
+        self.hardware.guide.setDefaultCommand(
+            CheckGuide(self.hardware.guide, self.shooter_calc_module)
+        )
 
         self.control = self.addModule(
             ControlModule(self.hardware, self.shooter_calc_module)
@@ -62,6 +65,3 @@ class Robot(ModuleRobot):
         self.property_save_checker = self.addModule(PropertySaveCheckerModule())
 
         self.sys_id = self.addModule(SysIDModule(self.hardware.drivetrain))
-
-        self.hardware.guide.setDefaultCommand(UseOrUnuseGuide(self.hardware.guide, self.shooter_calc_module))
-
