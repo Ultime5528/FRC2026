@@ -85,8 +85,8 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Shooter",
             ShootWithAlign(
-                hardware.drivetrain,
                 hardware.shooter,
+                hardware.drivetrain,
                 hardware.controller,
                 self.shooter_calc_module,
             ),
