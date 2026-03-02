@@ -162,6 +162,9 @@ class ShooterCalcModule(Module):
     def getProjectileSpeed(self) -> float:
         return self._projectile_speed
 
+    def shouldUseGuide(self) -> bool:
+        return self._should_use_guide
+
     def robotPeriodic(self) -> None:
         self._is_on_red_team = (
                 DriverStation.getAlliance() == DriverStation.Alliance.kRed
@@ -175,15 +178,9 @@ class ShooterCalcModule(Module):
         self._computeIsInOurZone()
         self._computeTargetPosition()
 
-        previous_should_use_guide = self._should_use_guide
         self._computeShouldUseGuide()
 
         # TODO Uninitialized case
-        if self._should_use_guide != previous_should_use_guide:
-            if self._should_use_guide:
-                MoveGuide.toUsed(self.guide).schedule()
-            else:
-                MoveGuide.toUnused(self.guide).schedule()
 
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
@@ -292,6 +289,7 @@ class ShooterCalcModule(Module):
     def logValues(self):
         # logging Pose2d and Pose3d not supprted. Add support?
         robot_position = self._robot_pose.translation()
+        distance = self._shooter_pose.translation().distance(self._target_position)
         self.log("robot_position_x", robot_position.x)
         self.log("robot_position_y", robot_position.y)
         self.log("target_position_x", self._target_position.x)
@@ -304,3 +302,4 @@ class ShooterCalcModule(Module):
         self.log(
             "_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees()
         )
+        self.log("target_distance", distance)
