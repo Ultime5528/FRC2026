@@ -1,3 +1,4 @@
+import commands2
 from commands2 import SequentialCommandGroup, Command
 from commands2.cmd import deadline, sequence, race
 from wpimath.geometry import Pose2d, Rotation2d, Transform2d
@@ -14,7 +15,7 @@ from subsystems.shooter import Shooter
 
 class ShootWithAlign(SequentialCommandGroup):
     def __init__(
-        self, shooter : Shooter, drivetrain : Drivetrain, xbox_remote, shooter_calc_module: ShooterCalcModule
+        self, shooter : Shooter, drivetrain : Drivetrain, xbox_remote: commands2.button.CommandXboxController, shooter_calc_module: ShooterCalcModule
     ):
         super().__init__()
         self.addCommands(

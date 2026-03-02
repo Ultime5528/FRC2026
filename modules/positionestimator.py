@@ -31,6 +31,8 @@ class PositionEstimator(Module):
         self.tag_seen = self.createProperty(False)
         self.tag_seen_in_frame = self.createProperty(False)
 
+        self.rejection_treashold_z = self.createProperty(-0.1)
+
     def robotPeriodic(self) -> None:
         self.tag_seen_in_frame = False
 
@@ -76,10 +78,12 @@ class PositionEstimator(Module):
                 pose = estimation.estimatedPose
                 time = estimation.timestampSeconds
 
-                self.tag_seen_in_frame = True
+                if pose.translation().z > self.rejection_treashold_z:
 
-                self.drivetrain.addVisionMeasurement(
-                    pose.toPose2d(),
-                    time,
-                    std_devs,
-                )
+                    self.tag_seen_in_frame = True
+
+                    self.drivetrain.addVisionMeasurement(
+                        pose.toPose2d(),
+                        time,
+                        std_devs,
+                    )

@@ -31,17 +31,17 @@ from ultime.switch import Switch
 
 
 class Drivetrain(Subsystem):
-    width = 0.597
-    length = 0.673
+    width = 0.676
+    length = 0.550
     p_gain_translation = 5.0
     p_gain_rotation = 5.0
     max_angular_speed = autoproperty(25.0)
     max_speed = autoproperty(5.0)
 
-    angular_offset_fl = autoproperty(-1.57)
+    angular_offset_fl = autoproperty(math.pi * -0.5)
     angular_offset_fr = autoproperty(0.0)
-    angular_offset_bl = autoproperty(3.14)
-    angular_offset_br = autoproperty(1.57)
+    angular_offset_bl = autoproperty(math.pi)
+    angular_offset_br = autoproperty(math.pi * 0.5)
 
     period_seconds = 0.02
 
@@ -141,6 +141,8 @@ class Drivetrain(Subsystem):
             maxAngularAccelerationRpsSq=3.1415,
         )
 
+        self._estimated_pose: Pose2d = Pose2d()
+        self._estimated_angle: Rotation2d = Rotation2d()
         self._chassis_speed: ChassisSpeeds = ChassisSpeeds()
 
         # Gyro
@@ -289,10 +291,13 @@ class Drivetrain(Subsystem):
         """
         return self._gyro_angles_radians
 
+    def getEstimatedAngle(self):
+        return self._estimated_angle
+
     def resetGyro(self):
         self._gyro.reset()
 
-    def getPose(self) -> Pose2d:
+    def getPose(self):
         return self.swerve_estimator.getEstimatedPosition()
 
     def setForwardFormation(self):
@@ -369,6 +374,8 @@ class Drivetrain(Subsystem):
         self.swerve_module_bl.readInputs()
         self.swerve_module_br.readInputs()
 
+        self._estimated_pose = self.swerve_estimator.getEstimatedPosition()
+        self._estimated_angle = self._estimated_pose.rotation()
         self._chassis_speed = self.swerve_drive_kinematics.toChassisSpeeds(
             (
                 self.swerve_module_fl.getState(),
@@ -380,6 +387,8 @@ class Drivetrain(Subsystem):
 
         self._gyro_angles_radians = self._gyro.getAngle()
         self._gyro_rotation2d = self._gyro.getRotation2d()
+
+        pass
 
     def periodic(self):
         swerve_positions = (
@@ -416,6 +425,7 @@ class Drivetrain(Subsystem):
         chassis_rotation_speed = self._chassis_speed.omega
         self.sim_yaw += chassis_rotation_speed * self.period_seconds
         self._gyro.setSimAngle(math.degrees(self.sim_yaw))
+        pass
 
     def getRobotRelativeChassisSpeeds(self):
         """
@@ -447,6 +457,11 @@ class Drivetrain(Subsystem):
     ):
         self.swerve_estimator.addVisionMeasurement(pose, timestamp, std_devs)
         self.vision_pose.setPose(pose)
+        self._estimated_pose = self.swerve_estimator.getEstimatedPosition()
+        self._estimated_angle = self._estimated_pose.rotation()
+
+    def getCurrentDrawAmps(self):
+        return 0.0
 
     def shouldFlipPath(self):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
