@@ -54,22 +54,22 @@ class MovePivot(MoveLinear):
 
 class _PropertiesManual:
     speed_up = autoproperty(600.0, subtable=ManualMovePivot.__name__)
-    speed_down = autoproperty(-200.0, subtable=ManualMovePivot.__name__)
+    speed_down = autoproperty(-600.0, subtable=ManualMovePivot.__name__)
 
 
 manual_move_properties = _PropertiesManual()
 
 
 class _PropertiesReset:
-    speed_up = autoproperty(500.0, subtable=ResetPivot.__name__)
-    speed_down = autoproperty(-200.0, subtable=ResetPivot.__name__)
+    speed_up = autoproperty(600.0, subtable=ResetPivot.__name__)
+    speed_down = autoproperty(-600.0, subtable=ResetPivot.__name__)
 
 
 reset_properties = _PropertiesReset()
 
 
 class _PropertiesMove:
-    speed_min = autoproperty(175.0, subtable=MovePivot.__name__)
+    speed_min = autoproperty(600.0, subtable=MovePivot.__name__)
     speed_max = autoproperty(1250.0, subtable=MovePivot.__name__)
     accel = autoproperty(250.0, subtable=MovePivot.__name__)
 

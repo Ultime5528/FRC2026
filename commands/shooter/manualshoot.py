@@ -23,9 +23,6 @@ class ManualShoot(ManualPrepareShoot):
     def __init__(self, shooter: Shooter):
         super().__init__(shooter)
 
-    def initialize(self):
-        self.shooter.reset()
-
     def execute(self):
         super().execute()
         if self.shooter.isAtVelocity():
