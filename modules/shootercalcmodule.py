@@ -1,7 +1,14 @@
 import math
 
 from wpilib import DriverStation
-from wpimath.geometry import Translation3d, Pose3d, Rotation3d, Transform3d, Pose2d, Rotation2d
+from wpimath.geometry import (
+    Translation3d,
+    Pose3d,
+    Rotation3d,
+    Transform3d,
+    Pose2d,
+    Rotation2d,
+)
 
 from commands.guide import MoveGuide
 from subsystems.drivetrain import Drivetrain
@@ -63,7 +70,9 @@ def computeRobotRotationToAlign(
 
     # to avoid domain errors
     if abs(denominator) >= 1.0e-6 and abs(C / denominator) <= 1.0:
-        angle_rad = normalizeAngleRadians(-(math.atan2(B, A) + math.acos(C / denominator)))
+        angle_rad = normalizeAngleRadians(
+            -(math.atan2(B, A) + math.acos(C / denominator))
+        )
 
     return Rotation2d(angle_rad)
 
@@ -236,7 +245,7 @@ class ShooterCalcModule(Module):
 
         numerator = gravity * distance_xy_squared
         denominator = (2 * ((math.cos(self._projectile_angle)) ** 2)) * (
-                distance_xy * (math.tan(self._projectile_angle)) - shooter_to_target.z
+            distance_xy * (math.tan(self._projectile_angle)) - shooter_to_target.z
         )
 
         if abs(denominator) < 1.0e-6:
@@ -286,4 +295,6 @@ class ShooterCalcModule(Module):
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
         self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
-        self.log("_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees())
+        self.log(
+            "_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees()
+        )

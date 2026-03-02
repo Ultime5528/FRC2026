@@ -210,7 +210,7 @@ class SwerveModule:
         normalized_pos = ((current_turn_pos + math.pi) % (2 * math.pi)) - math.pi
         self.sim_encoder_turn.setPosition(normalized_pos)
         self.sim_encoder_turn.setVelocity(self.sim_turning_motor.getVelocity())
-        pass
+
 
 class SwerveDriveElasticSendable(Sendable):
     def __init__(

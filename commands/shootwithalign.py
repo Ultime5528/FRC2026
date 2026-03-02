@@ -15,7 +15,11 @@ from subsystems.shooter import Shooter
 
 class ShootWithAlign(SequentialCommandGroup):
     def __init__(
-        self, shooter : Shooter, drivetrain : Drivetrain, xbox_remote: commands2.button.CommandXboxController, shooter_calc_module: ShooterCalcModule
+        self,
+        shooter: Shooter,
+        drivetrain: Drivetrain,
+        xbox_remote: commands2.button.CommandXboxController,
+        shooter_calc_module: ShooterCalcModule,
     ):
         super().__init__()
         self.addCommands(
