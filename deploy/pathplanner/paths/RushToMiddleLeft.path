@@ -52,12 +52,12 @@
         "y": 4.8695659722222215
       },
       "prevControl": {
-        "x": 7.615746527777777,
-        "y": 5.452187499999998
+        "x": 7.624654879606099,
+        "y": 5.451878546943719
       },
       "nextControl": {
-        "x": 7.57779208567327,
-        "y": 4.047873142133175
+        "x": 7.589424575536083,
+        "y": 4.619789751581809
       },
       "isLocked": false,
       "linkedName": null
@@ -104,7 +104,7 @@
         "y": 7.387265214783628
       },
       "nextControl": {
-        "x": 1.8611631944444447,
+        "x": 1.8611631944444451,
         "y": 7.415746527777778
       },
       "isLocked": false,
@@ -112,12 +112,12 @@
     },
     {
       "anchor": {
-        "x": 2.0816145833333333,
-        "y": 5.153003472222221
+        "x": 2.4549596774193554,
+        "y": 5.315040322580646
       },
       "prevControl": {
-        "x": 1.6722048611111107,
-        "y": 5.672638888888888
+        "x": 2.045549955197133,
+        "y": 5.834675739247313
       },
       "nextControl": null,
       "isLocked": false,
@@ -152,7 +152,26 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "DropIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Pickup",
+      "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "RetractIntake",
+      "waypointRelativePos": 3.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 3.0,
@@ -163,7 +182,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -35.90972307917766
+    "rotation": -40.53105774544856
   },
   "reversed": false,
   "folder": "Auto",

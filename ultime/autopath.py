@@ -1,16 +1,17 @@
 from pathplannerlib.path import (
     PathPlannerPath,
     PathConstraints,
-    PathPlannerTrajectory,
     IdealStartingState,
     GoalEndState,
 )
+from pathplannerlib.util import FlippingUtil
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.units import degreesToRadians
 
 """
 Tower constants
 """
+FlippingUtil.symmetryType = FlippingUtil.symmetryType.kRotational
 _constraints_for_tower = PathConstraints(
     maxVelocityMps=1.0,
     maxAccelerationMpsSq=1.0,
