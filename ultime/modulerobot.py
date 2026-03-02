@@ -126,6 +126,7 @@ class ModuleRobot(wpilib.RobotBase):
         if self._watchdog.isExpired():
             wpilib.reportError(f"Loop time of {self.period}s overrun")
             self._watchdog.printEpochs()
+            CommandScheduler.getInstance()._watchdog.printEpochs()
 
     def startCompetition(self):
         self.robotInit()

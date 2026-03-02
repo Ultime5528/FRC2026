@@ -38,10 +38,10 @@ class Drivetrain(Subsystem):
     max_angular_speed = autoproperty(25.0)
     max_speed = autoproperty(5.0)
 
-    angular_offset_fl = autoproperty(math.pi * -0.5)
+    angular_offset_fl = autoproperty(-1.5707963267948966)
     angular_offset_fr = autoproperty(0.0)
-    angular_offset_bl = autoproperty(math.pi)
-    angular_offset_br = autoproperty(math.pi * 0.5)
+    angular_offset_bl = autoproperty(3.141592653589793)
+    angular_offset_br = autoproperty(1.5707963267948966)
 
     period_seconds = 0.02
 

@@ -27,7 +27,7 @@ def apply_linear_deadzone(_input, deadzone):
 
 class DriveAlign(Command):
     rotation_deadzone = autoproperty(0.3)
-    rotate_speed = autoproperty(0.00375)
+    rotate_speed = autoproperty(0.003)
     slow_speed_multiplier = autoproperty(0.33)
     moving_deadzone = autoproperty(0.1)
 

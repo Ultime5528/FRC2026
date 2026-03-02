@@ -35,7 +35,7 @@ def computeRobotRotationToAlignSimple(
 ) -> Rotation2d:
     shooter_to_target = (target - shooter_pose3d.translation()).toTranslation2d()
     shooter_to_target_angle = shooter_to_target.angle().radians()
-    shooter_angle = shooter_pose3d.rotation().angle
+    shooter_angle = shooter_pose3d.rotation().z
     angle_rad = computeAngleDifferenceRadians(shooter_to_target_angle, shooter_angle)
     return Rotation2d(angle_rad)
 
@@ -114,10 +114,10 @@ class ShooterCalcModule(Module):
     long_distance_treshold = autoproperty(6.0)
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
-    shooter_offset = Transform3d(-0.1525, -0.271, 0.5, Rotation3d())
-    shooter_extremity = Translation3d(0.1525, -0.271, 0.5)
-    speed_guide_open = autoproperty([4.0, 6.0, 7.0, 9.5, 11.0, 14.0])
-    rpm_guide_open = autoproperty([501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34])
+    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d())
+    shooter_extremity = Translation3d(0.0, 0.245, 0.5)
+    speed_guide_open = autoproperty([5.9, 6.5, 7.67])
+    rpm_guide_open = autoproperty([2500.0, 3000.0, 4300.0])
     speed_guide_closed = autoproperty([3.5, 5.0, 5.5, 7.0, 9.0, 11.5])
     rpm_guide_closed = autoproperty(
         [501.24, 751.86, 877.17, 1190.445, 1378.41, 1754.34]
@@ -142,13 +142,8 @@ class ShooterCalcModule(Module):
         self._robot_rotation_angle = Rotation2d()
         self._robot_rotation_angle_simple = Rotation2d()
 
-        self._is_on_red_team = (
-            DriverStation.getAlliance() == DriverStation.Alliance.kRed
-        )
-        if self._is_on_red_team:
-            self.team_hub_position = self.red_hub
-        else:
-            self.team_hub_position = self.blue_hub
+        self._is_on_red_team = False
+        self.team_hub_position = self.red_hub
 
         self._robot_pose = Pose2d()
         self._shooter_pose = Pose3d()
@@ -159,7 +154,7 @@ class ShooterCalcModule(Module):
         self._projectile_speed = 0.0
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
-        return self._robot_rotation_angle
+        return self._robot_rotation_angle_simple
 
     def getRPM(self) -> float:
         return self._shooter_rpm
@@ -168,6 +163,14 @@ class ShooterCalcModule(Module):
         return self._projectile_speed
 
     def robotPeriodic(self) -> None:
+        self._is_on_red_team = (
+                DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        )
+        if self._is_on_red_team:
+            self.team_hub_position = self.red_hub
+        else:
+            self.team_hub_position = self.blue_hub
+
         self._computeRobotPoseAndShooterPose()
         self._computeIsInOurZone()
         self._computeTargetPosition()
@@ -175,7 +178,7 @@ class ShooterCalcModule(Module):
         previous_should_use_guide = self._should_use_guide
         self._computeShouldUseGuide()
 
-        # Uninitialized case
+        # TODO Uninitialized case
         if self._should_use_guide != previous_should_use_guide:
             if self._should_use_guide:
                 MoveGuide.toUsed(self.guide).schedule()
@@ -185,7 +188,8 @@ class ShooterCalcModule(Module):
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
         self._computeShooterRPM()
-        self._computeAngleToAlignWithTarget()
+        # self._computeAngleToAlignWithTarget()
+        self._computeAngleToAlignWithTargetSimple()
 
     def _computeRobotPoseAndShooterPose(self) -> None:
         self._robot_pose = self._drivetrain.getPose()
@@ -206,7 +210,6 @@ class ShooterCalcModule(Module):
             self._target_position = self._getZonePosition()
 
     def _getZonePosition(self) -> Translation3d:
-
         if self._robot_pose.y < 4.034663:
             y = 2.0173315
         else:
@@ -235,7 +238,6 @@ class ShooterCalcModule(Module):
             self._projectile_angle = math.radians(70.0)
 
     def _computeProjectileSpeed(self) -> None:
-
         gravity = 9.80665
 
         shooter_to_target = self._target_position - self._shooter_pose.translation()
@@ -262,10 +264,14 @@ class ShooterCalcModule(Module):
 
     def _computeShooterRPM(self) -> None:
         if self._should_use_guide:
+            self._interpolator_for_closed_guide.setPointsX(self.speed_guide_closed)
+            self._interpolator_for_closed_guide.setPointsY(self.rpm_guide_closed)
             self._shooter_rpm = self._interpolator_for_closed_guide.interpolate(
                 self._projectile_speed
             )
         else:
+            self._interpolator_for_open_guide.setPointsX(self.speed_guide_open)
+            self._interpolator_for_open_guide.setPointsY(self.rpm_guide_open)
             self._shooter_rpm = self._interpolator_for_open_guide.interpolate(
                 self._projectile_speed
             )
