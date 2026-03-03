@@ -14,7 +14,7 @@ from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel
-from commands.guide import ManualMoveGuide, ResetGuide, MoveGuide
+from commands.guide.move import ManualMoveGuide, ResetGuide, MoveGuide
 from commands.hugger.hug import Hug
 from commands.hugger.unhug import Unhug
 from commands.pivot.maintainpivot import MaintainPivot

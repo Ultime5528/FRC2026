@@ -35,7 +35,7 @@ class Shooter(Subsystem):
     indexer_kF = autoproperty(0.002)
     indexer_kP = autoproperty(0.001)
 
-    feeder_speed = autoproperty(0.685)
+    feeder_speed = autoproperty(0.5)
 
     def __init__(self):
         super().__init__()
