@@ -10,7 +10,6 @@ from wpimath.geometry import (
     Rotation2d,
 )
 
-from commands.guide import MoveGuide
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
 from ultime.autoproperty import autoproperty
