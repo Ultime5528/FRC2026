@@ -1,6 +1,6 @@
 from commands2 import Command
 
-from commands.guide.guide import MoveGuide, ResetGuide
+from commands.guide.move import MoveGuide, ResetGuide
 from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.guide import Guide
 
