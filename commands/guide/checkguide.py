@@ -11,16 +11,22 @@ class CheckGuide(Command):
         self.guide = guide
         self.shooter_calc_module = shooter_calc_module
         self.addRequirements(guide)
-        self.is_reset_done = False
+
+        self.command = None
 
     def execute(self):
-        if not self.guide.hasReset():
-            ResetGuide.down(self.guide)
-        else:
-            self.is_reset_done = True
 
-        if self.is_reset_done:
-            if self.shooter_calc_module.shouldUseGuide():
-                MoveGuide.toUsed(self.guide).schedule()
+        if self.command is None:
+
+            if not self.guide.hasReset():
+                self.command = ResetGuide.down(self.guide)
+            elif self.shooter_calc_module.shouldUseGuide():
+                self.command = MoveGuide.toUsed(self.guide)
             else:
-                MoveGuide.toUnused(self.guide).schedule()
+                self.command = MoveGuide.toUnused(self.guide)
+
+            self.command.schedule()
+
+        elif not self.command.isScheduled():
+            self.command = None
+
