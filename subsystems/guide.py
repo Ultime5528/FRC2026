@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 import wpilib
 from wpilib import RobotBase
 from wpilib.simulation import EncoderSim
@@ -9,6 +11,12 @@ from ultime.switch import Switch
 
 
 class Guide(LinearSubsystem):
+    class State(Enum):
+        Unknown = auto()
+        Reset = auto()
+        Used = auto()
+        Unused = auto()
+
     position_min = autoproperty(0.0)
     position_max = autoproperty(1.0)
 
@@ -38,6 +46,8 @@ class Guide(LinearSubsystem):
 
         if RobotBase.isSimulation():
             self._sim_encoder = EncoderSim(self._encoder)
+
+        self.state = self.State.Unknown
 
     def readInputs(self):
         self._encoder_position = self._encoder.get()
@@ -75,3 +85,6 @@ class Guide(LinearSubsystem):
 
     def getMotorOutput(self) -> float:
         return self._motor.get()
+
+    def logValues(self):
+        self.log("State", str(self.state))
