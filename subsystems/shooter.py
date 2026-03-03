@@ -24,7 +24,7 @@ class Shooter(Subsystem):
     flywheel_kF = autoproperty(0.00217039)
     flywheel_kP = autoproperty(0.0)
     flywheel_kS = autoproperty(0.119613)
-    shooter_tolerance = autoproperty(100.0)
+    shooter_tolerance = autoproperty(30.0)
 
     indexer_rpm = autoproperty(1400.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
@@ -101,12 +101,18 @@ class Shooter(Subsystem):
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
 
+        # 1/3 valeur approx, de la vitesse pour ne pas que le ballon reste jammé
+        if average >= 0.33 * rpm:
+            self._feeder.setVoltage(
+                feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
+            )
+        else:
+            self._feeder.setVoltage(0.0)
+
         if is_simulation:
             self._flywheel_last_rpm_sim = rpm
 
-    def sendFuel(self):
-        self._feeder.set(self.feeder_speed)
-
+    def sendFuel(self, flywheel_rpm):
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
             self._timer.restart()
@@ -130,7 +136,6 @@ class Shooter(Subsystem):
 
     def stopFuel(self):
         self._indexer.set(0.0)
-        self._feeder.set(0.0)
         self.indexer_state = IndexerState.Off
 
     def _setIndexerRPM(self, target_rpm: float) -> None:

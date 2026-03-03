@@ -15,7 +15,7 @@ class Shoot(Command):
         self.shooter.shoot(speed_rpm)
 
         if self.shooter.isAtVelocity():
-            self.shooter.sendFuel()
+            self.shooter.sendFuel(speed_rpm)
         else:
             self.shooter.stopFuel()
 

@@ -73,7 +73,7 @@ class _PropertiesMove:
     speed_max = autoproperty(0.2, subtable=MoveGuide.__name__)
     accel = autoproperty(5.0, subtable=MoveGuide.__name__)
 
-    position_unused = autoproperty(-5.0, subtable=MoveGuide.__name__)
+    position_unused = autoproperty(-8.0, subtable=MoveGuide.__name__)
     position_used = autoproperty(3.0, subtable=MoveGuide.__name__)
 
 

@@ -9,7 +9,7 @@ from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.path import PathPlannerPath, PathConstraints
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase, DriverStation
+from wpilib import RobotBase, DriverStation, SmartDashboard
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
 from wpimath.kinematics import (
@@ -23,7 +23,7 @@ from wpimath.kinematics import (
 import ports
 from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
-from ultime.gyro import ADIS16470
+from ultime.gyro import ADIS16470, NavX
 from ultime.modulerobot import is_simulation
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
@@ -150,6 +150,8 @@ class Drivetrain(Subsystem):
         Possibilités : NavX, ADIS16448, ADIS16470, ADXRS, Empty
         """
         self._gyro = ADIS16470()
+        self._navx = NavX()
+        SmartDashboard.putData("NavX", self._navx)
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
         self._gyro_angles_radians = self.createProperty(0.0)

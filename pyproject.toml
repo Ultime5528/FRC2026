@@ -13,6 +13,7 @@ components = [
 requires = [
      "robotpy-commands-v2==2026.2.1.1",
      "robotpy-rev==2026.0.3.1",
+     "robotpy-navx==2026.0.1.1",
      "numpy",
      "robotpy-pathplannerlib==2026.1.2",
      "photonlibpy==2026.2.2",
