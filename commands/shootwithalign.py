@@ -1,31 +1,43 @@
 import commands2
-from commands2 import SequentialCommandGroup, Command
-from commands2.cmd import deadline, sequence, race
-from wpimath.geometry import Pose2d, Rotation2d, Transform2d
+from commands2 import SequentialCommandGroup
+from commands2.cmd import  sequence, race, parallel, repeatingSequence
 
 from commands.drivetrain.drivealign import DriveAlign
-from commands.drivetrain.drivetoposes import DriveToPoses
-from commands.shooter.prepareshoot import PrepareShoot
+from commands.pivot.move import MovePivot
 from commands.shooter.shoot import Shoot
-from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.drivetrain import Drivetrain
+from subsystems.pivot import Pivot
 from subsystems.shooter import Shooter
+from ultime.autoproperty import autoproperty
+from ultime.command import WaitCommand
 
 
 class ShootWithAlign(SequentialCommandGroup):
-    def __init__(
-        self,
-        shooter: Shooter,
-        drivetrain: Drivetrain,
-        xbox_remote: commands2.button.CommandXboxController,
-        shooter_calc_module: ShooterCalcModule,
+    wait_delay = autoproperty(3.0)
+
+    def init(
+            self,
+            shooter: Shooter,
+            drivetrain: Drivetrain,
+            pivot: Pivot,
+            xbox_remote: commands2.button.CommandXboxController,
+            shooter_calc_module: ShooterCalcModule,
     ):
-        super().__init__()
+        super().init()
         self.addCommands(
-            race(
-                Shoot(shooter, shooter_calc_module),
-                DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
-                # TODO condition d'arrêt
-            ),
+            parallel(
+                race(
+                    Shoot(shooter, shooter_calc_module),
+                    DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
+                    # TODO condition d'arrêt
+                ),
+                sequence(
+                    WaitCommand(self.wait_delay),
+                    repeatingSequence(
+                        MovePivot.toUp(pivot),
+                        MovePivot.toDown(pivot),
+                    ),
+                ),
+            )
         )
