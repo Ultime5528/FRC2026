@@ -26,7 +26,7 @@ class ShootWithAlign(SequentialCommandGroup):
     ):
         super().init()
         self.addCommands(
-            parallel(
+            race(
                 race(
                     Shoot(shooter, shooter_calc_module),
                     DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
