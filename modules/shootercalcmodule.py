@@ -28,7 +28,7 @@ def computeAngleDifferenceRadians(angle1: float, angle2: float) -> float:
     return normalizeAngleRadians(angle1 - angle2)
 
 
-def computeRobotRotationToAlignSimple(
+def computeRobotRotationToAlign(
     shooter_pose3d: Pose3d,
     target: Translation3d,
 ) -> Rotation2d:
@@ -39,7 +39,7 @@ def computeRobotRotationToAlignSimple(
     return Rotation2d(angle_rad)
 
 
-def computeRobotRotationToAlign(
+def computeRobotRotationToAlignExact(
     robot_pose3d: Pose3d,
     shooter_offset_origin: Translation3d,
     shooter_extremity_origin: Translation3d,
@@ -114,13 +114,10 @@ class ShooterCalcModule(Module):
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
     shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, -5.1))
-    shooter_extremity = Translation3d(0.0, 0.245, 0.5)
     speed_guide_open = autoproperty([5.5, 6.3, 7.3])
     rpm_guide_open = autoproperty([2800.0, 3600.0, 5500.0])
     speed_guide_closed = autoproperty([3.0, 9.0])
-    rpm_guide_closed = autoproperty(
-        [2500.0, 5500.0]
-    )
+    rpm_guide_closed = autoproperty([2500.0, 5500.0])
 
     def __init__(
         self,
@@ -139,7 +136,6 @@ class ShooterCalcModule(Module):
 
         self._shooter_rpm = 0.0
         self._robot_rotation_angle = Rotation2d()
-        self._robot_rotation_angle_simple = Rotation2d()
 
         self._is_on_red_team = False
         self.team_hub_position = self.red_hub
@@ -154,7 +150,21 @@ class ShooterCalcModule(Module):
         self.distance_xy = 0.0
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
-        return self._robot_rotation_angle_simple
+        return self._robot_rotation_angle
+
+    def computeRotationToAlignWithTargetExact(self) -> Rotation2d:
+
+        shooter_extremity = (
+            Translation3d(0.5, 0.0, 0.0).rotateBy(self.shooter_offset.rotation())
+            + self.shooter_offset.translation()
+        )
+
+        return computeRobotRotationToAlignExact(
+            Pose3d(self._robot_pose),
+            self.shooter_offset.translation(),
+            shooter_extremity,
+            self._target_position,
+        )
 
     def getRPM(self) -> float:
         return self._shooter_rpm
@@ -185,8 +195,7 @@ class ShooterCalcModule(Module):
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
         self._computeShooterRPM()
-        # self._computeAngleToAlignWithTarget()
-        self._computeAngleToAlignWithTargetSimple()
+        self._computeAngleToAlignWithTarget()
 
     def _computeRobotPoseAndShooterPose(self) -> None:
         self._robot_pose = self._drivetrain.getPose()
@@ -275,14 +284,6 @@ class ShooterCalcModule(Module):
 
     def _computeAngleToAlignWithTarget(self) -> None:
         self._robot_rotation_angle = computeRobotRotationToAlign(
-            Pose3d(self._robot_pose),
-            self.shooter_offset.translation(),
-            self.shooter_extremity,
-            self._target_position,
-        )
-
-    def _computeAngleToAlignWithTargetSimple(self) -> None:
-        self._robot_rotation_angle_simple = computeRobotRotationToAlignSimple(
             self._shooter_pose, self._target_position
         )
 
@@ -298,7 +299,4 @@ class ShooterCalcModule(Module):
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
         self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
-        self.log(
-            "_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees()
-        )
         self.log("target_distance_xy", self.distance_xy)

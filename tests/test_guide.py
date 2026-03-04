@@ -1,6 +1,7 @@
 from _pytest.python_api import approx
+from commands2 import CommandScheduler
 
-from commands.guide import ResetGuide, MoveGuide, _move_properties
+from commands.guide.move import ResetGuide, MoveGuide, _move_properties
 from robot import Robot
 from ultime.switch import Switch
 from ultime.tests import RobotTestController
@@ -52,8 +53,13 @@ def _common_test_moveGuide_from_switch_down(
 ):
     guide = robot.hardware.guide
 
+    robot.hardware.guide.removeDefaultCommand()
+
     robot_controller.startTeleop()
 
+    # The default command for the guide is always repositioning the
+    # guide based on the distance to the target. In order to do basic
+    # tests on the Subsystem, we remove the default command
     robot_controller.run_command(ResetGuide.down(guide), 10.0)
 
     robot_controller.run_command(MoveGuideCommand_1(guide), 10.0)

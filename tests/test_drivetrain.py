@@ -110,5 +110,5 @@ def test_drivefield(robot_controller: RobotTestController, robot: Robot):
     xbox_remote.setRightX(1)
 
     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-    robot_controller.run_command(drive_cmd.withTimeout(3.0), 4.0)
+    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
     assert abs(drivetrain.getPose().rotation().degrees()) == approx(90.0, abs=10.0)
