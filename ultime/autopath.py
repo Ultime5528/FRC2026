@@ -19,12 +19,16 @@ _constraints_for_tower = PathConstraints(
     maxAngularAccelerationRpsSq=degreesToRadians(10.0),
 )
 
-_tower_position_left = 4.675
-_tower_position_right = 2.825
+_tower_position_left = 4.613
+_tower_position_right = 2.877
 
 _tower_distance_from_for_first_pose = 0.30
 _tower_initial_velocity = 0.0
 
+
+"""
+Tower States
+"""
 _tower_ideal_starting_state_left = IdealStartingState(
     velocity=_tower_initial_velocity, rotation=Rotation2d.fromDegrees(90.0)
 )

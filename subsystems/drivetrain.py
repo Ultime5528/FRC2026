@@ -31,8 +31,8 @@ from ultime.switch import Switch
 
 
 class Drivetrain(Subsystem):
-    width = 0.597
-    length = 0.673
+    width = 0.676
+    length = 0.550
     p_gain_translation = 5.0
     p_gain_rotation = 5.0
     max_angular_speed = autoproperty(25.0)
