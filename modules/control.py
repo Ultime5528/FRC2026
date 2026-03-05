@@ -41,9 +41,9 @@ class ControlModule(Module):
         """
 
         # Intake
-        hardware.panel_1.povLeft().onTrue(MovePivot.toDown(hardware.pivot))
+        hardware.panel_1.povLeft().onTrue(MovePivot.toUp(hardware.pivot))
 
-        hardware.panel_1.povRight().onTrue(MovePivot.toUp(hardware.pivot))
+        hardware.panel_1.povRight().onTrue(MovePivot.toDown(hardware.pivot))
 
         hardware.panel_1.povUp().whileTrue(GrabFuel(hardware.feeder))
 
