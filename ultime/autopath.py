@@ -13,14 +13,14 @@ Tower constants
 """
 FlippingUtil.symmetryType = FlippingUtil.symmetryType.kRotational
 _constraints_for_tower = PathConstraints(
-    maxVelocityMps=1.0,
-    maxAccelerationMpsSq=1.0,
+    maxVelocityMps=0.3,
+    maxAccelerationMpsSq=0.3,
     maxAngularVelocityRps=degreesToRadians(10.0),
     maxAngularAccelerationRpsSq=degreesToRadians(10.0),
 )
 
 _tower_position_left = 4.613
-_tower_position_right = 2.877
+_tower_position_right = 2.987
 
 _tower_distance_from_for_first_pose = 0.30
 _tower_initial_velocity = 0.0
@@ -48,22 +48,22 @@ Tower Waypoints
 _to_tower_ready_left_waypoints = PathPlannerPath.waypointsFromPoses(
     [
         Pose2d(
-            1.070,
+            1.040,
             (_tower_position_left + _tower_distance_from_for_first_pose),
             Rotation2d.fromDegrees(-90.0),
         ),
-        Pose2d(1.070, _tower_position_left, Rotation2d.fromDegrees(-90.0)),
+        Pose2d(1.040, _tower_position_left, Rotation2d.fromDegrees(-90.0)),
     ]
 )
 
 _to_tower_ready_right_waypoints = PathPlannerPath.waypointsFromPoses(
     [
         Pose2d(
-            1.070,
+            1.040,
             (_tower_position_right - _tower_distance_from_for_first_pose),
             Rotation2d.fromDegrees(90.0),
         ),
-        Pose2d(1.070, _tower_position_right, Rotation2d.fromDegrees(90.0)),
+        Pose2d(1.040, _tower_position_right, Rotation2d.fromDegrees(90.0)),
     ]
 )
 

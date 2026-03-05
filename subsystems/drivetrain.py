@@ -135,8 +135,8 @@ class Drivetrain(Subsystem):
         Config used only when path finding to a pose
         """
         self.pathfinding_constraints = PathConstraints(
-            maxVelocityMps=3.0,
-            maxAccelerationMpsSq=1.0,
+            maxVelocityMps=0.5,
+            maxAccelerationMpsSq=0.5,
             maxAngularVelocityRps=3.1415,
             maxAngularAccelerationRpsSq=3.1415,
         )
