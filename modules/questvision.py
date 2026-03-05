@@ -25,11 +25,10 @@ class QuestVisionModule(Module):
         self.quest_nav = questnav.QuestNav()
         self.estimated_pose = Pose3d()
 
-    def getAllUnreadPosesTimestampsStdDevs(
+    def getAllUnreadEstimatedPosesWithTimeStampAndStdDevs(
         self,
     ) -> Generator[tuple[Pose2d, float, Tuple[float, float, float]]]:
         for poseFrame in self.quest_nav.getAllUnreadPoseFrames():
-            # if poseFrame.
             self.estimated_pose = poseFrame.quest_pose_3d
             self.estimated_pose = self.estimated_pose.transformBy(
                 robot_to_quest_offset.inverse()
@@ -50,7 +49,7 @@ class QuestVisionModule(Module):
         self.quest_nav.setPose(pose.transformBy(robot_to_quest_offset))
 
     def isConnected(self) -> bool:
-        return self.quest_nav.isConnected() and self.quest_nav.isTracking()
+        return self.quest_nav.isConnected()
 
     def logValues(self):
         self.log("x", self.estimated_pose.x)

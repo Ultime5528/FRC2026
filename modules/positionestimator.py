@@ -36,10 +36,11 @@ class PositionEstimator(Module):
     def robotPeriodic(self) -> None:
         self.tag_seen_in_frame = False
 
+        self.quest_connected = self.quest_nav.isConnected()
         self.camera_front_connected = self.camera_front.isConnected()
         self.camera_back_connected = self.camera_back.isConnected()
 
-        if self.tag_seen:
+        if self.quest_connected and self.tag_seen:
             self._addQuestMeasurements()
 
         if self.camera_front_connected:
@@ -54,14 +55,15 @@ class PositionEstimator(Module):
             estimated_pose = self.drivetrain.getPose()
             self.quest_nav.resetToPose(Pose3d(estimated_pose))
 
-        self.quest_connected = self.quest_nav.isConnected()
-
     def _addQuestMeasurements(self):
         for (
-            pose, timestamp, std_devs
-        ) in self.quest_nav.getAllUnreadPosesTimestampsStdDevs():
+            quest_data
+        ) in self.quest_nav.getAllUnreadEstimatedPosesWithTimeStampAndStdDevs():
+            pose = quest_data[0]
+            time = quest_data[1]
+            std_devs = quest_data[2]
             if pose is not None:
-                self.drivetrain.addVisionMeasurement(pose, timestamp, std_devs)
+                self.drivetrain.addVisionMeasurement(pose, time, std_devs)
 
     def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
         for (
