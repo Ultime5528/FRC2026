@@ -56,7 +56,7 @@ class MoveGuide(MoveLinear):
         self.new_state = new_state
 
     def end(self, interrupted: bool):
-        super().end()
+        super().end(interrupted)
         if not interrupted:
             self.guide.state = self.new_state
         else:
