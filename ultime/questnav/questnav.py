@@ -41,6 +41,7 @@ class PoseFrame:
     data_timestamp: float
     app_timestamp: float
     frame_count: int
+    is_tracking: bool
 
 
 class QuestNav:
