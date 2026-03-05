@@ -87,6 +87,8 @@ class DashboardModule(Module):
             ShootWithAlign(
                 hardware.shooter,
                 hardware.drivetrain,
+                hardware.pivot,
+                hardware.feeder,
                 hardware.controller,
                 self.shooter_calc_module,
             ),
@@ -140,7 +142,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard(
             "Group",
-            ResetAll(hardware.climber, hardware.hugger, hardware.pivot),
+            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide),
         )
 
     def robotInit(self) -> None:

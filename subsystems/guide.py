@@ -13,7 +13,6 @@ from ultime.switch import Switch
 class Guide(LinearSubsystem):
     class State(Enum):
         Unknown = auto()
-        Reset = auto()
         Used = auto()
         Unused = auto()
 

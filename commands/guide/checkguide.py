@@ -13,23 +13,15 @@ class CheckGuide(Command):
         self.addRequirements(guide)
 
     def execute(self):
-        if self.guide.state != self.guide.State.Reset and not self.guide.hasReset():
-            self.guide.state = self.guide.State.Reset
-            self.command = ResetGuide.down(self.guide)
-            self.command.schedule()
-
+        if not self.guide.hasReset():
+            ResetGuide.down(self.guide).schedule()
         elif (
             self.guide.state != self.guide.State.Used
             and self.shooter_calc_module.shouldUseGuide()
         ):
-            self.guide.state = self.guide.State.Used
-            self.command = MoveGuide.toUsed(self.guide)
-            self.command.schedule()
-
+            MoveGuide.toUsed(self.guide).schedule()
         elif (
             self.guide.state != self.guide.State.Unused
             and not self.shooter_calc_module.shouldUseGuide()
         ):
-            self.guide.state = self.guide.State.Unused
-            self.command = MoveGuide.toUnused(self.guide)
-            self.command.schedule()
+            MoveGuide.toUnused(self.guide).schedule()

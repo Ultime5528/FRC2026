@@ -52,6 +52,8 @@ class ControlModule(Module):
             ShootWithAlign(
                 hardware.shooter,
                 hardware.drivetrain,
+                hardware.pivot,
+                hardware.feeder,
                 hardware.controller,
                 shooter_calc_module,
             )

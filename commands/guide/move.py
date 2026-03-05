@@ -29,6 +29,7 @@ class MoveGuide(MoveLinear):
         cmd = cls(
             guide,
             lambda: _move_properties.position_used,
+            Guide.State.Used
         )
         cmd.setName(cls.__name__ + ".toUsed")
         return cmd
@@ -38,11 +39,12 @@ class MoveGuide(MoveLinear):
         cmd = cls(
             guide,
             lambda: _move_properties.position_unused,
+            Guide.State.Unused
         )
         cmd.setName(cls.__name__ + ".toUnused")
         return cmd
 
-    def __init__(self, guide: Guide, end_position: FloatProperty):
+    def __init__(self, guide: Guide, end_position: FloatProperty, new_state: Guide.State):
         super().__init__(
             guide,
             end_position,
@@ -50,6 +52,15 @@ class MoveGuide(MoveLinear):
             lambda: _move_properties.speed_max,
             lambda: _move_properties.accel,
         )
+        self.guide = guide
+        self.new_state = new_state
+
+    def end(self, interrupted: bool):
+        super().end()
+        if not interrupted:
+            self.guide.state = self.new_state
+        else:
+            self.guide.state = Guide.State.Unknown
 
 
 class _PropertiesManual:
