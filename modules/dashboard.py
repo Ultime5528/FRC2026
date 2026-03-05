@@ -7,6 +7,8 @@ from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d
 
+from commands.autonomous.tower_climb_left import TowerClimbLeft
+from commands.autonomous.tower_climb_right import TowerClimbRight
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
@@ -55,6 +57,11 @@ class DashboardModule(Module):
 
     def setupCommands(self, hardware):
         """
+        Autonomous
+        """
+        putCommandOnDashboard("Autonomous", TowerClimbLeft(hardware))
+        putCommandOnDashboard("Autonomous", TowerClimbRight(hardware))
+        """
         Drivetrain
         """
         # putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain, ))
@@ -63,13 +70,6 @@ class DashboardModule(Module):
         putCommandOnDashboard("Drivetrain", DriveRelative.forwards(hardware.drivetrain))
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
-        )
-        path = PathPlannerPath.fromPathFile("Test")
-        putCommandOnDashboard(
-            "Drivetrain", FollowPathPrecise(hardware.drivetrain, path)
-        )
-        putCommandOnDashboard(
-            "Drivetrain", PathFindPrecise(hardware.drivetrain, Pose2d(8, 4, 0))
         )
 
         """

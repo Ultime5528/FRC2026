@@ -301,4 +301,7 @@ class ShooterCalcModule(Module):
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
         self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
+        self.log(
+            "_robot_rotation_angle_simple", self._robot_rotation_angle_simple.degrees()
+        )
         self.log("target_distance_xy", self.distance_xy)
