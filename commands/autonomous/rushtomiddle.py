@@ -57,22 +57,24 @@ class RushToMiddle(SequentialCommandGroup):
         self.climb_command = climb_command
 
         self.addCommands(
-            deadline(
-                FollowPathPrecise(self.drivetrain, self.path),
-                ManualMovePivot.down(self.pivot),
-                ResetAll(self.climber, self.hugger, self.guide),
-                sequence(
-                    GrabFuel(self.feeder).withTimeout(4.0),
-                    PrepareShoot(self.shooter, self.shooter_module),
+            sequence(
+                deadline(
+                    FollowPathPrecise(self.drivetrain, self.path),
+                    ManualMovePivot.down(self.pivot),
+                    ResetAll(self.climber, self.hugger, self.guide),
+                    sequence(
+                        GrabFuel(self.feeder).withTimeout(4.0),
+                        PrepareShoot(self.shooter, self.shooter_module),
+                    ),
                 ),
-            ),
-            ShootWithAlign(
-                self.shooter,
-                self.drivetrain,
-                self.pivot,
-                self.feeder,
-                self.controller,
-                self.shooter_module,
-            ).withTimeout(10.0),
+                ShootWithAlign(
+                    self.shooter,
+                    self.drivetrain,
+                    self.pivot,
+                    self.feeder,
+                    self.controller,
+                    self.shooter_module,
+                ),
+            ).withTimeout(13.0),
             self.climb_command,
         )
