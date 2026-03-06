@@ -7,6 +7,7 @@ from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d
 
+from commands.autonomous.newrushtomiddle import NewRushToMiddle
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
@@ -64,6 +65,15 @@ class DashboardModule(Module):
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
         putCommandOnDashboard(
             "Autonomous", RushToMiddle.right(hardware, self.shooter_calc_module)
+        )
+        putCommandOnDashboard(
+            "Autonomous", RushToMiddle.left(hardware, self.shooter_calc_module)
+        )
+        putCommandOnDashboard(
+            "Autonomous", NewRushToMiddle.right(hardware, self.shooter_calc_module)
+        )
+        putCommandOnDashboard(
+            "Autonomous", NewRushToMiddle.left(hardware, self.shooter_calc_module)
         )
         putCommandOnDashboard(
             "Autonomous", ShootAndClimb.right(hardware, self.shooter_calc_module)

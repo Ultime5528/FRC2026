@@ -1,5 +1,5 @@
 from commands2 import SequentialCommandGroup
-from commands2.cmd import sequence, deadline
+from commands2.cmd import deadline, sequence
 from pathplannerlib.path import PathPlannerPath
 
 from commands.autonomous.towerclimb import TowerClimb
@@ -13,27 +13,27 @@ from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 
 
-class RushToMiddle(SequentialCommandGroup):
+class NewRushToMiddle(SequentialCommandGroup):
     @classmethod
     def right(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
         cmd = cls(
-            PathPlannerPath.fromPathFile("RushToMiddleRight"),
+            PathPlannerPath.fromPathFile("NewRushToMiddleRight"),
             TowerClimb.right(hardware),
             hardware,
             shooter_module,
         )
-        cmd.setName(RushToMiddle.__name__ + ".right")
+        cmd.setName(NewRushToMiddle.__name__ + ".right")
         return cmd
 
     @classmethod
     def left(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
         cmd = cls(
-            PathPlannerPath.fromPathFile("RushToMiddleRight").mirrorPath(),
+            PathPlannerPath.fromPathFile("NewRushToMiddleRight").mirrorPath(),
             TowerClimb.left(hardware),
             hardware,
             shooter_module,
         )
-        cmd.setName(RushToMiddle.__name__ + ".left")
+        cmd.setName(NewRushToMiddle.__name__ + ".left")
         return cmd
 
     def __init__(
@@ -57,22 +57,28 @@ class RushToMiddle(SequentialCommandGroup):
         self.climb_command = climb_command
 
         self.addCommands(
-            deadline(
-                FollowPathPrecise(self.drivetrain, self.path),
-                ManualMovePivot.down(self.pivot),
-                ResetAll(self.climber, self.hugger, self.guide),
-                sequence(
-                    GrabFuel(self.feeder).withTimeout(4.0),
-                    PrepareShoot(self.shooter, self.shooter_module),
+            sequence(
+                deadline(
+                    FollowPathPrecise(self.drivetrain, self.path),
+                    ManualMovePivot.down(self.pivot),
+                    ResetAll(
+                        self.climber,
+                        self.hugger,
+                        self.guide,
+                    ),
+                    sequence(
+                        GrabFuel(self.feeder).withTimeout(4.0),
+                        PrepareShoot(self.shooter, self.shooter_module),
+                    ),
                 ),
-            ),
-            ShootWithAlign(
-                self.shooter,
-                self.drivetrain,
-                self.pivot,
-                self.feeder,
-                self.controller,
-                self.shooter_module,
-            ).withTimeout(10.0),
+                ShootWithAlign(
+                    self.shooter,
+                    self.drivetrain,
+                    self.pivot,
+                    self.feeder,
+                    self.controller,
+                    self.shooter_module,
+                ),
+            ).withTimeout(13.0),
             self.climb_command,
         )
