@@ -1,5 +1,5 @@
 from commands2 import SequentialCommandGroup
-from commands2.cmd import parallel, sequence
+from commands2.cmd import parallel, sequence, deadline
 from pathplannerlib.events import EventTrigger
 from pathplannerlib.path import PathPlannerPath
 
@@ -8,6 +8,7 @@ from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.move import ResetPivot, ManualMovePivot
 from commands.resetall import ResetAll
+from commands.shooter.prepareshoot import PrepareShoot
 from commands.shootwithalign import ShootWithAlign
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
@@ -37,15 +38,21 @@ class RushToMiddle(SequentialCommandGroup):
         self.path = path
 
         self.addCommands(
-            parallel(
+            deadline(
                 FollowPathPrecise(self.drivetrain, self.path),
                     ManualMovePivot.down(self.pivot),
-                GrabFuel(self.feeder).withTimeout(6.0),
                 ResetAll(
                     self.climber,
                     self.hugger,
                     self.guide
                 ),
+                sequence(
+                    GrabFuel(self.feeder).withTimeout(4.0),
+                    PrepareShoot(
+                        self.shooter,
+                        self.shooter_module
+                    )
+                )
             ),
             ShootWithAlign(
                 self.shooter,

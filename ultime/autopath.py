@@ -24,7 +24,7 @@ _tower_position_right = 2.987
 _tower_y = 1.041
 
 _tower_distance_from_for_first_pose = 0.30
-_tower_initial_velocity = 0.0
+_tower_initial_velocity = 1.0
 
 
 """
