@@ -29,21 +29,22 @@ class QuestVisionModule(Module):
         self,
     ) -> Generator[tuple[Pose2d, float, Tuple[float, float, float]]]:
         for poseFrame in self.quest_nav.getAllUnreadPoseFrames():
-            self.estimated_pose = poseFrame.quest_pose_3d
-            self.estimated_pose = self.estimated_pose.transformBy(
-                robot_to_quest_offset.inverse()
-            )
-            self.estimated_pose = self.estimated_pose.toPose2d()
-            time_stamp = poseFrame.data_timestamp
-            yield (
-                self.estimated_pose,
-                time_stamp,
-                (
-                    self.std_translation,
-                    self.std_translation,
-                    self.std_rotation,
-                ),
-            )
+            if poseFrame.is_tracking:
+                self.estimated_pose = poseFrame.quest_pose_3d
+                self.estimated_pose = self.estimated_pose.transformBy(
+                    robot_to_quest_offset.inverse()
+                )
+                self.estimated_pose = self.estimated_pose.toPose2d()
+                time_stamp = poseFrame.data_timestamp
+                yield (
+                    self.estimated_pose,
+                    time_stamp,
+                    (
+                        self.std_translation,
+                        self.std_translation,
+                        self.std_rotation,
+                    ),
+                )
 
     def resetToPose(self, pose: Pose3d):
         self.quest_nav.setPose(pose.transformBy(robot_to_quest_offset))
@@ -58,3 +59,5 @@ class QuestVisionModule(Module):
         self.log("roll", self.estimated_pose.rotation().x)
         self.log("pitch", self.estimated_pose.rotation().y)
         self.log("yaw", self.estimated_pose.rotation().z)
+        self.log("isTracking", self.quest_nav.isTracking())
+        self.log("battery", self.quest_nav.getBatteryPercent())
