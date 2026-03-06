@@ -56,3 +56,6 @@ class AlignPreciseAfterPath(Command):
             .degrees()
             < self.rotation_threshold
         )
+
+    def end(self, interrupted: bool):
+        self.drivetrain.stop()

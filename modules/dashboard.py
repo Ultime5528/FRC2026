@@ -7,6 +7,7 @@ from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d
 
+from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.tower_climb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.drivetrain.driverelative import DriveRelative
@@ -19,7 +20,7 @@ from commands.guide.move import ManualMoveGuide, ResetGuide, MoveGuide
 from commands.hugger.hug import Hug
 from commands.hugger.unhug import Unhug
 from commands.pivot.maintainpivot import MaintainPivot
-from commands.pivot.move import MovePivot, ResetPivot, ManualMovePivot
+from commands.pivot.move import ResetPivot, ManualMovePivot
 from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
@@ -60,6 +61,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Autonomous", TowerClimb.left(hardware))
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
+        putCommandOnDashboard("Autonomous", RushToMiddle.right(hardware, self.shooter_calc_module))
         """
         Drivetrain
         """
@@ -129,8 +131,6 @@ class DashboardModule(Module):
         """
         Pivot
         """
-        putCommandOnDashboard("Pivot", MovePivot.toUp(hardware.pivot))
-        putCommandOnDashboard("Pivot", MovePivot.toDown(hardware.pivot))
         putCommandOnDashboard("Pivot", ResetPivot.down(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.up(hardware.pivot))
         putCommandOnDashboard("Pivot", ManualMovePivot.down(hardware.pivot))
@@ -141,7 +141,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard(
             "Group",
-            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide),
+            ResetAll(hardware.climber, hardware.hugger, hardware.guide),
         )
 
     def robotInit(self) -> None:

@@ -4,7 +4,7 @@ from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.grabfuel import GrabFuel
 from commands.feeder.ejectfuel import EjectFuel
 from commands.hugandclimb import HugAndClimb
-from commands.pivot.move import MovePivot
+from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
@@ -41,9 +41,9 @@ class ControlModule(Module):
         """
 
         # Intake
-        hardware.panel_1.povLeft().onTrue(MovePivot.toDown(hardware.pivot))
+        hardware.panel_1.povRight().whileTrue(ManualMovePivot.down(hardware.pivot))
 
-        hardware.panel_1.povRight().onTrue(MovePivot.toUp(hardware.pivot))
+        hardware.panel_1.povLeft().whileTrue(ManualMovePivot.up(hardware.pivot))
 
         hardware.panel_1.povUp().whileTrue(GrabFuel(hardware.feeder))
 
@@ -79,5 +79,5 @@ class ControlModule(Module):
         # ResetAll
 
         hardware.panel_1.button(1).onTrue(
-            ResetAll(hardware.climber, hardware.hugger, hardware.pivot, hardware.guide)
+            ResetAll(hardware.climber, hardware.hugger, hardware.guide)
         )

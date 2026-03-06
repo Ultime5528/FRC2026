@@ -10,7 +10,11 @@ _ManualMovePivot = manualmovelinear.createManualMoveClass(
 
 
 class ManualMovePivot(_ManualMovePivot):
-    pass
+    def isFinished(self) -> bool:
+        if self.speed() < 0.0:
+            return self.subsystem.isSwitchMinPressed()
+        else:
+            return self.subsystem.isSwitchMaxPressed()
 
 
 _ResetPivot = resetlinear.createResetLinearClass(
@@ -23,38 +27,38 @@ class ResetPivot(_ResetPivot):
     pass
 
 
-class MovePivot(MoveLinear):
-    @classmethod
-    def toUp(cls, pivot: Pivot):
-        cmd = cls(
-            pivot,
-            lambda: move_properties.position_up,
-        )
-        cmd.setName(cls.__name__ + ".toUp")
-        return cmd
-
-    @classmethod
-    def toDown(cls, pivot: Pivot):
-        cmd = cls(
-            pivot,
-            lambda: move_properties.position_down,
-        )
-        cmd.setName(cls.__name__ + ".toDown")
-        return cmd
-
-    def __init__(self, pivot: Pivot, end_position: FloatProperty):
-        super().__init__(
-            pivot,
-            end_position,
-            lambda: move_properties.speed_min,
-            lambda: move_properties.speed_max,
-            lambda: move_properties.accel,
-        )
+# class MovePivot(MoveLinear):
+#     @classmethod
+#     def toUp(cls, pivot: Pivot):
+#         cmd = cls(
+#             pivot,
+#             lambda: move_properties.position_up,
+#         )
+#         cmd.setName(cls.__name__ + ".toUp")
+#         return cmd
+#
+#     @classmethod
+#     def toDown(cls, pivot: Pivot):
+#         cmd = cls(
+#             pivot,
+#             lambda: move_properties.position_down,
+#         )
+#         cmd.setName(cls.__name__ + ".toDown")
+#         return cmd
+#
+#     def __init__(self, pivot: Pivot, end_position: FloatProperty):
+#         super().__init__(
+#             pivot,
+#             end_position,
+#             lambda: move_properties.speed_min,
+#             lambda: move_properties.speed_max,
+#             lambda: move_properties.accel,
+#         )
 
 
 class _PropertiesManual:
-    speed_up = autoproperty(600.0, subtable=ManualMovePivot.__name__)
-    speed_down = autoproperty(-600.0, subtable=ManualMovePivot.__name__)
+    speed_up = autoproperty(1000.0, subtable=ManualMovePivot.__name__)
+    speed_down = autoproperty(-1000.0, subtable=ManualMovePivot.__name__)
 
 
 manual_move_properties = _PropertiesManual()
@@ -68,13 +72,13 @@ class _PropertiesReset:
 reset_properties = _PropertiesReset()
 
 
-class _PropertiesMove:
-    speed_min = autoproperty(600.0, subtable=MovePivot.__name__)
-    speed_max = autoproperty(1250.0, subtable=MovePivot.__name__)
-    accel = autoproperty(250.0, subtable=MovePivot.__name__)
-
-    position_up = autoproperty(4.6, subtable=MovePivot.__name__)
-    position_down = autoproperty(-2.6, subtable=MovePivot.__name__)
-
-
-move_properties = _PropertiesMove()
+# class _PropertiesMove:
+#     speed_min = autoproperty(600.0, subtable=MovePivot.__name__)
+#     speed_max = autoproperty(1250.0, subtable=MovePivot.__name__)
+#     accel = autoproperty(250.0, subtable=MovePivot.__name__)
+#
+#     position_up = autoproperty(4.6, subtable=MovePivot.__name__)
+#     position_down = autoproperty(-2.6, subtable=MovePivot.__name__)
+#
+#
+# move_properties = _PropertiesMove()

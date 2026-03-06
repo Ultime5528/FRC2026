@@ -4,7 +4,7 @@ from commands2.cmd import repeatingSequence, sequence, parallel
 
 from commands.drivetrain.drivealign import DriveAlign
 from commands.feeder.grabfuel import GrabFuel
-from commands.pivot.move import MovePivot
+from commands.pivot.move import ManualMovePivot
 from commands.shooter.shoot import Shoot
 from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.drivetrain import Drivetrain
@@ -36,7 +36,7 @@ class ShootWithAlign(ParallelCommandGroup):
                 WaitCommand(self.wait_delay),
                 parallel(
                     GrabFuel(feeder),
-                    MovePivot.toUp(pivot)
+                    ManualMovePivot.up(pivot)
                 )
             )
             # sequence(

@@ -11,10 +11,9 @@ from subsystems.pivot import Pivot
 
 
 class ResetAll(ParallelCommandGroup):
-    def __init__(self, climber: Climber, hugger: Hugger, pivot: Pivot, guide: Guide):
+    def __init__(self, climber: Climber, hugger: Hugger, guide: Guide):
         super().__init__(
             ResetClimber.down(climber),
             Unhug(hugger),
-            ResetPivot.down(pivot),
             ResetGuide.down(guide),
         )
