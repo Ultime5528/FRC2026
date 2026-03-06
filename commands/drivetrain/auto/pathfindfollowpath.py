@@ -14,5 +14,5 @@ class PathFindFollowPath(SequentialCommandGroup):
 
         self.addCommands(
             self.drivetrain.getPathFindingFollowPathCommand(self.path),
-            AlignPreciseAfterPath(self.drivetrain, self.path),
+            #AlignPreciseAfterPath(self.drivetrain, self.path),
         )

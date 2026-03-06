@@ -13,8 +13,8 @@ Tower constants
 """
 FlippingUtil.symmetryType = FlippingUtil.symmetryType.kRotational
 _constraints_for_tower = PathConstraints(
-    maxVelocityMps=0.3,
-    maxAccelerationMpsSq=0.3,
+    maxVelocityMps=0.6,
+    maxAccelerationMpsSq=0.6,
     maxAngularVelocityRps=degreesToRadians(10.0),
     maxAngularAccelerationRpsSq=degreesToRadians(10.0),
 )
@@ -23,8 +23,8 @@ _tower_position_left = 4.613
 _tower_position_right = 2.987
 _tower_y = 1.041
 
-_tower_distance_from_for_first_pose = 0.30
-_tower_initial_velocity = 1.0
+_tower_distance_from_for_first_pose = 0.45
+_tower_initial_velocity = 2.0
 
 
 """

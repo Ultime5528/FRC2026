@@ -23,18 +23,18 @@ class QuestVisionModule(Module):
         super().__init__()
         self.drivetrain = drivetrain
         self.quest_nav = questnav.QuestNav()
-        self.estimated_pose = Pose3d()
+        self.estimated_pose = Pose2d()
 
-    def getAllUnreadEstimatedPosesWithTimeStampAndStdDevs(
+    def getAllUnreadPosesTimestampsStdDevs(
         self,
     ) -> Generator[tuple[Pose2d, float, Tuple[float, float, float]]]:
         for poseFrame in self.quest_nav.getAllUnreadPoseFrames():
             if poseFrame.is_tracking:
-                self.estimated_pose = poseFrame.quest_pose_3d
-                self.estimated_pose = self.estimated_pose.transformBy(
+                pose = poseFrame.quest_pose_3d
+                pose = pose.transformBy(
                     robot_to_quest_offset.inverse()
                 )
-                self.estimated_pose = self.estimated_pose.toPose2d()
+                self.estimated_pose = pose.toPose2d()
                 time_stamp = poseFrame.data_timestamp
                 yield (
                     self.estimated_pose,
@@ -50,14 +50,14 @@ class QuestVisionModule(Module):
         self.quest_nav.setPose(pose.transformBy(robot_to_quest_offset))
 
     def isConnected(self) -> bool:
-        return self.quest_nav.isConnected()
+        return self.quest_nav.isConnected() and self.quest_nav.isTracking()
 
     def logValues(self):
         self.log("x", self.estimated_pose.x)
         self.log("y", self.estimated_pose.y)
-        self.log("z", self.estimated_pose.z)
-        self.log("roll", self.estimated_pose.rotation().x)
-        self.log("pitch", self.estimated_pose.rotation().y)
-        self.log("yaw", self.estimated_pose.rotation().z)
+        #self.log("z", self.estimated_pose.z)
+        #self.log("roll", self.estimated_pose.rotation().x)
+        #self.log("pitch", self.estimated_pose.rotation().y)
+        self.log("yaw", self.estimated_pose.rotation().degrees())
         self.log("isTracking", self.quest_nav.isTracking())
         self.log("battery", self.quest_nav.getBatteryPercent())
