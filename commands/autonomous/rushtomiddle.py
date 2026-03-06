@@ -3,7 +3,7 @@ from commands2.cmd import parallel, sequence, deadline
 from pathplannerlib.events import EventTrigger
 from pathplannerlib.path import PathPlannerPath
 
-from commands.autonomous.tower_climb import TowerClimb
+from commands.autonomous.towerclimb import TowerClimb
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.move import ResetPivot, ManualMovePivot
@@ -20,19 +20,18 @@ class RushToMiddle(SequentialCommandGroup):
     @classmethod
     def right(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
         cmd = cls(
-            hardware, PathPlannerPath.fromPathFile("RushToMiddleRight"), shooter_module
+            PathPlannerPath.fromPathFile("RushToMiddleRight"), hardware, shooter_module
         )
         cmd.setName(RushToMiddle.__name__ + ".right")
         return cmd
 
     def __init__(
         self,
-        hardware: HardwareModule,
         path: PathPlannerPath,
+        hardware: HardwareModule,
         shooter_module: ShooterCalcModule,
     ):
         super().__init__()
-        self.hardware = hardware
         self.drivetrain = hardware.drivetrain
         self.climber = hardware.climber
         self.hugger = hardware.hugger
