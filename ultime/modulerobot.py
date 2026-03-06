@@ -5,7 +5,7 @@ import hal
 import wpilib
 from commands2 import CommandScheduler
 from robotpy_ext.misc import NotifierDelay
-from wpilib import Watchdog, SmartDashboard
+from wpilib import Watchdog, SmartDashboard, RobotController
 
 from ultime.log import Logger
 from ultime.module import ModuleList, Module
@@ -31,6 +31,7 @@ class ModuleRobot(wpilib.RobotBase):
         self._last_mode = ModuleRobot.Mode.kNone
         self._watchdog = Watchdog(self.period, lambda: None)
         self.running = True
+        self._timer = wpilib.Timer()
 
     def _loopFunc(self):
         wpilib.DriverStation.refreshData()
@@ -149,6 +150,7 @@ class ModuleRobot(wpilib.RobotBase):
         return module
 
     def robotInit(self):
+        RobotController.setBrownoutVoltage(6.0)
         self.modules.robotInit()
 
         if is_simulation:
@@ -158,6 +160,11 @@ class ModuleRobot(wpilib.RobotBase):
         pass
 
     def robotPeriodic(self):
+        if self._timer.hasElapsed(20.0):
+            wpilib.setCurrentThreadPriority(True, 10)
+            self._timer.stop()
+            self._timer.reset()
+
         self.modules.robotPeriodic()
 
         if is_simulation:
