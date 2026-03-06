@@ -40,9 +40,11 @@ class TowerClimb(SequentialCommandGroup):
                 PathFindFollowPath(self.drivetrain, self.path),
                 MoveClimber.toReady(self.climber),
             ),
-            DriveRelative(self.drivetrain, lambda: Translation2d(-self.speed, 0.0)).withTimeout(self.forward_timeout),
+            DriveRelative(
+                self.drivetrain, lambda: Translation2d(-self.speed, 0.0)
+            ).withTimeout(self.forward_timeout),
             deadline(
                 HugAndClimb(self.climber, self.hugger),
-                DriveRelative(self.drivetrain, lambda: Translation2d(-self.speed, 0.0))
-            )
+                DriveRelative(self.drivetrain, lambda: Translation2d(-self.speed, 0.0)),
+            ),
         )

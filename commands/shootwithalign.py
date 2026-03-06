@@ -31,13 +31,6 @@ class ShootWithAlign(ParallelCommandGroup):
         self.addCommands(
             Shoot(shooter, shooter_calc_module),
             DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
-            # sequence(
-            #     WaitCommand(6.0),
-            #     parallel(
-            #         GrabFuel(feeder),
-            #         ManualMovePivot.up(pivot)
-            #     )
-            # )
             sequence(
                 WaitCommand(4.0),
                 parallel(
@@ -45,8 +38,7 @@ class ShootWithAlign(ParallelCommandGroup):
                         ManualMovePivot.up(pivot).withTimeout(0.5),
                         ManualMovePivot.down(pivot).withTimeout(0.5),
                     ),
-                    GrabFuel(feeder)
-                )
+                    GrabFuel(feeder),
+                ),
             ),
-
         )

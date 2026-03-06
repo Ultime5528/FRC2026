@@ -26,25 +26,19 @@ class ResetGuide(_ResetGuide):
 class MoveGuide(MoveLinear):
     @classmethod
     def toUsed(cls, guide: Guide):
-        cmd = cls(
-            guide,
-            lambda: _move_properties.position_used,
-            Guide.State.Used
-        )
+        cmd = cls(guide, lambda: _move_properties.position_used, Guide.State.Used)
         cmd.setName(cls.__name__ + ".toUsed")
         return cmd
 
     @classmethod
     def toUnused(cls, guide: Guide):
-        cmd = cls(
-            guide,
-            lambda: _move_properties.position_unused,
-            Guide.State.Unused
-        )
+        cmd = cls(guide, lambda: _move_properties.position_unused, Guide.State.Unused)
         cmd.setName(cls.__name__ + ".toUnused")
         return cmd
 
-    def __init__(self, guide: Guide, end_position: FloatProperty, new_state: Guide.State):
+    def __init__(
+        self, guide: Guide, end_position: FloatProperty, new_state: Guide.State
+    ):
         super().__init__(
             guide,
             end_position,

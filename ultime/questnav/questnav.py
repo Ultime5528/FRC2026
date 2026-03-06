@@ -95,41 +95,26 @@ class QuestNav:
         # Get QuestNav table
         self.quest_nav_table = self.nt_instance.getTable("QuestNav")
 
-        self.response_sub = (
-            self.quest_nav_table
-             .getRawTopic("response")
-             .subscribe(
-                "proto:" + commands_pb2.ProtobufQuestNavCommandResponse.DESCRIPTOR.full_name,
-                bytes(),
-                PubSubOptions(
-                    periodic=0.05,
-                    sendAll=True,
-                    pollStorage=20
-                )
-        ))
+        self.response_sub = self.quest_nav_table.getRawTopic("response").subscribe(
+            "proto:"
+            + commands_pb2.ProtobufQuestNavCommandResponse.DESCRIPTOR.full_name,
+            bytes(),
+            PubSubOptions(periodic=0.05, sendAll=True, pollStorage=20),
+        )
 
-        self.frame_data_sub = (
-            self.quest_nav_table
-            .getRawTopic("frameData")
-            .subscribe(
-                "proto:" + data_pb2.ProtobufQuestNavFrameData.DESCRIPTOR.full_name,
-                bytes(),
-                PubSubOptions(
-                    periodic=0.01,
-                    sendAll=True,
-                    pollStorage=20
-                )
-            ))
+        self.frame_data_sub = self.quest_nav_table.getRawTopic("frameData").subscribe(
+            "proto:" + data_pb2.ProtobufQuestNavFrameData.DESCRIPTOR.full_name,
+            bytes(),
+            PubSubOptions(periodic=0.01, sendAll=True, pollStorage=20),
+        )
 
-        self.device_data_sub = (
-            self.quest_nav_table
-            .getRawTopic("deviceData")
-            .subscribe(
-                "proto:" + data_pb2.ProtobufQuestNavDeviceData.DESCRIPTOR.full_name,
-                bytes()
-            ))
+        self.device_data_sub = self.quest_nav_table.getRawTopic("deviceData").subscribe(
+            "proto:" + data_pb2.ProtobufQuestNavDeviceData.DESCRIPTOR.full_name, bytes()
+        )
 
-        self.version_sub = self.quest_nav_table.getStringTopic("version").subscribe("unknown")
+        self.version_sub = self.quest_nav_table.getStringTopic("version").subscribe(
+            "unknown"
+        )
 
         self.request_pub = self.quest_nav_table.getRawTopic("request").publish(
             "proto:" + commands_pb2.ProtobufQuestNavCommand.DESCRIPTOR.full_name
@@ -167,10 +152,8 @@ class QuestNav:
                 f"[QUESTNAV] Version on your robot {lib_version} does not match QuestNav app version {quest_nav_version}."
             )
 
-
     def getQuestNavVersion(self) -> str:
         return self.version_sub.get()
-
 
     def getAllUnreadPoseFrames(self) -> List[PoseFrame]:
         """
@@ -210,10 +193,10 @@ class QuestNav:
                 translation = pose_proto.translation
                 rot_quat = pose_proto.rotation.q
 
-                translation3d = Translation3d(translation.x, translation.y, translation.z)
-                quaternion = Quaternion(
-                    rot_quat.w, rot_quat.x, rot_quat.y, rot_quat.z
+                translation3d = Translation3d(
+                    translation.x, translation.y, translation.z
                 )
+                quaternion = Quaternion(rot_quat.w, rot_quat.x, rot_quat.y, rot_quat.z)
                 rotation = Rotation3d(quaternion)
                 pose = Pose3d(translation3d, rotation)
                 frames.append(
@@ -229,7 +212,6 @@ class QuestNav:
         self.frame_data_queue.clear()
 
         return frames
-
 
     def setPose(self, pose: Pose3d):
         """
@@ -279,7 +261,9 @@ class QuestNav:
             self.cached_pose.rotation.q.z = quat.Z()
 
             self.cached_pose_reset_payload.target_pose.CopyFrom(self.cached_pose)
-            self.cached_command.pose_reset_payload.CopyFrom(self.cached_pose_reset_payload)
+            self.cached_command.pose_reset_payload.CopyFrom(
+                self.cached_pose_reset_payload
+            )
 
             # Publish command
             serialized = self.cached_command.SerializeToString()
@@ -313,21 +297,17 @@ class QuestNav:
         self._updateDeviceData()
         return self.cached_device_data.battery_percent
 
-
     def getFrameCount(self) -> int:
         self._updateFrameData()
         return self.last_frame_data.frame_count
-
 
     def getTrackingLostCounter(self):
         self._updateDeviceData()
         return self.cached_device_data.tracking_lost_counter
 
-
     def isTracking(self) -> bool:
         self._updateFrameData()
         return self.last_frame_data.isTracking
-
 
     def isConnected(self) -> bool:
         """
@@ -371,4 +351,3 @@ class QuestNav:
                     wpilib.reportError(
                         f"[QuestNav] Command failed: {self.cached_response.error_message}"
                     )
-

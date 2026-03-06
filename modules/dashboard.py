@@ -61,7 +61,9 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Autonomous", TowerClimb.left(hardware))
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
-        putCommandOnDashboard("Autonomous", RushToMiddle.right(hardware, self.shooter_calc_module))
+        putCommandOnDashboard(
+            "Autonomous", RushToMiddle.right(hardware, self.shooter_calc_module)
+        )
         """
         Drivetrain
         """

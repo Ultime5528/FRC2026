@@ -31,9 +31,7 @@ class QuestVisionModule(Module):
         for poseFrame in self.quest_nav.getAllUnreadPoseFrames():
             if poseFrame.is_tracking:
                 pose = poseFrame.quest_pose_3d
-                pose = pose.transformBy(
-                    robot_to_quest_offset.inverse()
-                )
+                pose = pose.transformBy(robot_to_quest_offset.inverse())
                 self.estimated_pose = pose.toPose2d()
                 time_stamp = poseFrame.data_timestamp
                 yield (
@@ -55,9 +53,9 @@ class QuestVisionModule(Module):
     def logValues(self):
         self.log("x", self.estimated_pose.x)
         self.log("y", self.estimated_pose.y)
-        #self.log("z", self.estimated_pose.z)
-        #self.log("roll", self.estimated_pose.rotation().x)
-        #self.log("pitch", self.estimated_pose.rotation().y)
+        # self.log("z", self.estimated_pose.z)
+        # self.log("roll", self.estimated_pose.rotation().x)
+        # self.log("pitch", self.estimated_pose.rotation().y)
         self.log("yaw", self.estimated_pose.rotation().degrees())
         self.log("isTracking", self.quest_nav.isTracking())
         self.log("battery", self.quest_nav.getBatteryPercent())

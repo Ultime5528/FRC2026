@@ -23,4 +23,5 @@ class Shoot(Command):
         return False
 
     def end(self, interrupted: bool):
+        self.shooter.reset()
         self.shooter.stop()

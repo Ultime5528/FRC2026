@@ -19,11 +19,18 @@ from ultime.command import WaitCommand
 class RushToMiddle(SequentialCommandGroup):
     @classmethod
     def right(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
-        cmd = cls(hardware, PathPlannerPath.fromPathFile("RushToMiddleRight"), shooter_module)
+        cmd = cls(
+            hardware, PathPlannerPath.fromPathFile("RushToMiddleRight"), shooter_module
+        )
         cmd.setName(RushToMiddle.__name__ + ".right")
         return cmd
 
-    def __init__(self, hardware: HardwareModule, path: PathPlannerPath, shooter_module: ShooterCalcModule):
+    def __init__(
+        self,
+        hardware: HardwareModule,
+        path: PathPlannerPath,
+        shooter_module: ShooterCalcModule,
+    ):
         super().__init__()
         self.hardware = hardware
         self.drivetrain = hardware.drivetrain
@@ -40,19 +47,12 @@ class RushToMiddle(SequentialCommandGroup):
         self.addCommands(
             deadline(
                 FollowPathPrecise(self.drivetrain, self.path),
-                    ManualMovePivot.down(self.pivot),
-                ResetAll(
-                    self.climber,
-                    self.hugger,
-                    self.guide
-                ),
+                ManualMovePivot.down(self.pivot),
+                ResetAll(self.climber, self.hugger, self.guide),
                 sequence(
                     GrabFuel(self.feeder).withTimeout(4.0),
-                    PrepareShoot(
-                        self.shooter,
-                        self.shooter_module
-                    )
-                )
+                    PrepareShoot(self.shooter, self.shooter_module),
+                ),
             ),
             ShootWithAlign(
                 self.shooter,
@@ -60,7 +60,7 @@ class RushToMiddle(SequentialCommandGroup):
                 self.pivot,
                 self.feeder,
                 self.controller,
-                self.shooter_module
+                self.shooter_module,
             ).withTimeout(10.0),
-            TowerClimb.right(hardware)
+            TowerClimb.right(hardware),
         )

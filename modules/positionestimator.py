@@ -57,7 +57,9 @@ class PositionEstimator(Module):
 
     def _addQuestMeasurements(self):
         for (
-            pose, timestamp, std_devs
+            pose,
+            timestamp,
+            std_devs,
         ) in self.quest_nav.getAllUnreadPosesTimestampsStdDevs():
             if pose is not None:
                 self.drivetrain.addVisionMeasurement(pose, timestamp, std_devs)
