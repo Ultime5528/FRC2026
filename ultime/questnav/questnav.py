@@ -1,26 +1,31 @@
-"""
-QuestNav Python Library
+__all__ = ["QuestNav", "PoseFrame"]
 
-Python implementation of questnav-lib for FRC robots.
-
-Usage:
-    from questnav import QuestNav, PoseFrame
-
-    questnav = QuestNav()
-    frames = questnav.get_all_unread_pose_frames()
-"""
 
 import time
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Final
 
 import ntcore
+import wpilib
+from ntcore import PubSubOptions, TimestampedRaw
+from wpilib._wpilib import Timer
 from wpimath.geometry import Pose3d, Translation3d, Rotation3d, Quaternion
 
 # Import generated protobuf classes
 from .generated import commands_pb2
 from .generated import data_pb2
 from .generated import geometry3d_pb2
+
+
+def rawValueToProtobuf(raw_data: bytes, protobuf_instance):
+    try:
+        if raw_data:
+            protobuf_instance.ParseFromString(raw_data)
+            return True
+    except Exception as e:
+        wpilib.reportError(f"[QuestNav] Error processing raw value: {e}", False)
+
+    return False
 
 
 @dataclass
@@ -45,6 +50,7 @@ class PoseFrame:
 
 
 class QuestNav:
+    version_check_interval: Final = 5.0
     """
     Python implementation of the Java QuestNav class.
 
@@ -89,34 +95,82 @@ class QuestNav:
         # Get QuestNav table
         self.quest_nav_table = self.nt_instance.getTable("QuestNav")
 
-        # Use MultiSubscriber to receive all QuestNav topics
-        # Include both /QuestNav/ and QuestNav/ to handle different topic naming
-        self.multi_sub = ntcore.MultiSubscriber(
-            self.nt_instance, ["/QuestNav/", "QuestNav/"]
+        self.response_sub = (
+            self.quest_nav_table
+             .getRawTopic("response")
+             .subscribe(
+                "proto:" + commands_pb2.ProtobufQuestNavCommandResponse.DESCRIPTOR.full_name,
+                bytes(),
+                PubSubOptions(
+                    periodic=0.05,
+                    sendAll=True,
+                    pollStorage=20
+                )
+        ))
+
+        self.frame_data_sub = (
+            self.quest_nav_table
+            .getRawTopic("frameData")
+            .subscribe(
+                "proto:" + data_pb2.ProtobufQuestNavFrameData.DESCRIPTOR.full_name,
+                bytes(),
+                PubSubOptions(
+                    periodic=0.01,
+                    sendAll=True,
+                    pollStorage=20
+                )
+            ))
+
+        self.device_data_sub = (
+            self.quest_nav_table
+            .getRawTopic("deviceData")
+            .subscribe(
+                "proto:" + data_pb2.ProtobufQuestNavDeviceData.DESCRIPTOR.full_name,
+                bytes()
+            ))
+
+        self.version_sub = self.quest_nav_table.getStringTopic("version").subscribe("unknown")
+
+        self.request_pub = self.quest_nav_table.getRawTopic("request").publish(
+            "proto:" + commands_pb2.ProtobufQuestNavCommand.DESCRIPTOR.full_name
         )
 
-        # Set up listener for all QuestNav data
-        self.data_listener = ntcore.NetworkTableListenerPoller(self.nt_instance)
-        self.data_listener.addListener(self.multi_sub, ntcore.EventFlags.kValueAll)
+        self.cached_command = commands_pb2.ProtobufQuestNavCommand()
+        self.cached_pose_reset_payload = commands_pb2.ProtobufQuestNavPoseResetPayload()
+        self.cached_pose = geometry3d_pb2.ProtobufPose3d()
+        self.cached_device_data = data_pb2.ProtobufQuestNavDeviceData()
+        self.cached_frame_data = data_pb2.ProtobufQuestNavFrameData()
+        self.cached_response = commands_pb2.ProtobufQuestNavCommandResponse()
+        self.frame_data_queue: list[TimestampedRaw] = []
+        self.last_frame_data = data_pb2.ProtobufQuestNavFrameData()
 
-        # Publishers for commands (must match Quest's subscriber topic)
-        # Quest subscribes to /QuestNav/request as protobuf type
-        # We need to publish with the correct protobuf type string
-        self.command_topic = self.nt_instance.getRawTopic("/QuestNav/request")
-        self.command_pub = self.command_topic.publish(
-            "proto:questnav.protos.commands.ProtobufQuestNavCommand"
-        )
+        self.last_sent_request_id = 0
+        self.version_check_enabled = True
+        self.last_version_check_time = 0.0
 
-        # State
-        self._last_frame_timestamp = 0.0
-        self._battery_percent = 0
-        self._tracking = False
-        self._tracking_lost_counter = 0
-        self._frame_count = 0
-        self._last_command_id = 0
+    def checkVersionMatch(self) -> None:
+        if not self.version_check_enabled or not self.isConnected():
+            return
 
-        # Queues for unread frames
-        self._unread_frames: List[PoseFrame] = []
+        current_time = Timer.getTimestamp()
+
+        if current_time - self.last_version_check_time < self.version_check_interval:
+            return
+
+        self.last_version_check_time = current_time
+
+        lib_version = "2026-2.1.0"
+        quest_nav_version = self.getQuestNavVersion()
+
+        if quest_nav_version != lib_version:
+            wpilib.reportWarning(
+                f"[QUESTNAV] Version on your robot {lib_version} does not match QuestNav app version {quest_nav_version}."
+            )
+
+
+    def getQuestNavVersion(self) -> str:
+        return self.version_sub.get()
+
 
     def getAllUnreadPoseFrames(self) -> List[PoseFrame]:
         """
@@ -145,87 +199,37 @@ class QuestNav:
                         (0.1, 0.1, 0.05)  # Standard deviations
                     )
         """
-        # Process all new events
-        events = self.data_listener.readQueue()
-        current_time = time.time()
+        self.periodic()
+        self._updateFrameData()
+        frames = []
 
-        for event in events:
-            try:
-                topic_name = event.data.topic.getName()
-                value = event.data.value
-                # Get timestamp - check which attribute exists
-                if hasattr(event.data, "time"):
-                    server_timestamp = event.data.time / 1_000_000.0
-                elif hasattr(event.data, "timestamp"):
-                    server_timestamp = event.data.timestamp
-                else:
-                    server_timestamp = current_time
+        for timestamped_raw in self.frame_data_queue:
+            raw = timestamped_raw.value
+            if rawValueToProtobuf(raw, self.cached_frame_data):
+                pose_proto = self.cached_frame_data.pose3d
+                translation = pose_proto.translation
+                rot_quat = pose_proto.rotation.q
 
-                # Parse frameData
-                if "frameData" in topic_name:
-                    raw_data = value.getRaw() if hasattr(value, "getRaw") else bytes()
+                translation3d = Translation3d(translation.x, translation.y, translation.z)
+                quaternion = Quaternion(
+                    rot_quat.w, rot_quat.x, rot_quat.y, rot_quat.z
+                )
+                rotation = Rotation3d(quaternion)
+                pose = Pose3d(translation3d, rotation)
+                frames.append(
+                    PoseFrame(
+                        pose,
+                        timestamped_raw.serverTime / 1_000_000,
+                        self.cached_frame_data.timestamp,
+                        self.cached_frame_data.frame_count,
+                        self.cached_frame_data.isTracking,
+                    )
+                )
 
-                    if raw_data:
-                        frame_data = data_pb2.ProtobufQuestNavFrameData()
-                        frame_data.ParseFromString(raw_data)
+        self.frame_data_queue.clear()
 
-                        self._frame_count = frame_data.frame_count
-                        self._last_frame_timestamp = current_time
-
-                        # Extract Pose3d
-                        pose_proto = frame_data.pose3d
-                        trans = pose_proto.translation
-                        rot_quat = pose_proto.rotation.q
-
-                        translation = Translation3d(trans.x, trans.y, trans.z)
-                        quaternion = Quaternion(
-                            rot_quat.w, rot_quat.x, rot_quat.y, rot_quat.z
-                        )
-                        rotation = Rotation3d(quaternion)
-                        pose = Pose3d(translation, rotation)
-
-                        # Create PoseFrame
-                        pose_frame = PoseFrame(
-                            quest_pose_3d=pose,
-                            data_timestamp=server_timestamp,
-                            app_timestamp=frame_data.timestamp,
-                            frame_count=frame_data.frame_count,
-                        )
-
-                        self._unread_frames.append(pose_frame)
-
-                # Parse deviceData
-                elif "deviceData" in topic_name:
-                    raw_data = value.getRaw() if hasattr(value, "getRaw") else bytes()
-
-                    if raw_data:
-                        device_data = data_pb2.ProtobufQuestNavDeviceData()
-                        device_data.ParseFromString(raw_data)
-
-                        self._battery_percent = device_data.battery_percent
-                        self._tracking = device_data.currently_tracking
-                        self._tracking_lost_counter = device_data.tracking_lost_counter
-
-                # Parse command responses
-                elif "response" in topic_name:
-                    raw_data = value.getRaw() if hasattr(value, "getRaw") else bytes()
-
-                    if raw_data:
-                        response = commands_pb2.ProtobufQuestNavCommandResponse()
-                        response.ParseFromString(raw_data)
-
-                        if not response.success:
-                            print(
-                                f"QuestNav command {response.command_id} failed: {response.error_message}"
-                            )
-
-            except Exception as e:
-                print(f"QuestNav error processing data: {e}")
-
-        # Return all unread frames and clear queue
-        frames = self._unread_frames.copy()
-        self._unread_frames.clear()
         return frames
+
 
     def setPose(self, pose: Pose3d):
         """
@@ -256,63 +260,74 @@ class QuestNav:
             quest_pose = Pose3d(robot_pose).transformBy(mounting_offset)
             questnav.setPose(quest_pose)
         """
-        self._last_command_id += 1
+        self.last_sent_request_id += 1
 
         try:
             # Create command protobuf
-            command = commands_pb2.ProtobufQuestNavCommand()
-            command.type = commands_pb2.POSE_RESET
-            command.command_id = self._last_command_id
-
-            # Create pose reset payload
-            payload = commands_pb2.ProtobufQuestNavPoseResetPayload()
+            self.cached_command.type = commands_pb2.POSE_RESET
+            self.cached_command.command_id = self.last_sent_request_id
 
             # Set target pose
-            pose_proto = geometry3d_pb2.ProtobufPose3d()
-            pose_proto.translation.x = pose.translation().X()
-            pose_proto.translation.y = pose.translation().Y()
-            pose_proto.translation.z = pose.translation().Z()
+            self.cached_pose.translation.x = pose.translation().X()
+            self.cached_pose.translation.y = pose.translation().Y()
+            self.cached_pose.translation.z = pose.translation().Z()
 
             quat = pose.rotation().getQuaternion()
-            pose_proto.rotation.q.w = quat.W()
-            pose_proto.rotation.q.x = quat.X()
-            pose_proto.rotation.q.y = quat.Y()
-            pose_proto.rotation.q.z = quat.Z()
+            self.cached_pose.rotation.q.w = quat.W()
+            self.cached_pose.rotation.q.x = quat.X()
+            self.cached_pose.rotation.q.y = quat.Y()
+            self.cached_pose.rotation.q.z = quat.Z()
 
-            payload.target_pose.CopyFrom(pose_proto)
-            command.pose_reset_payload.CopyFrom(payload)
+            self.cached_pose_reset_payload.target_pose.CopyFrom(self.cached_pose)
+            self.cached_command.pose_reset_payload.CopyFrom(self.cached_pose_reset_payload)
 
             # Publish command
-            serialized = command.SerializeToString()
-            self.command_pub.set(serialized)
+            serialized = self.cached_command.SerializeToString()
+            self.request_pub.set(serialized)
 
         except Exception as e:
             print(f"QuestNav error sending pose reset: {e}")
+
+    def _updateDeviceData(self):
+        changes = self.device_data_sub.readQueue()
+
+        if changes:
+            raw = changes[-1].value
+            rawValueToProtobuf(raw, self.cached_device_data)
+
+    def _updateFrameData(self):
+        new_frame_data = self.frame_data_sub.readQueue()
+
+        if new_frame_data:
+            self.frame_data_queue += new_frame_data
+            raw = new_frame_data[-1].value
+            rawValueToProtobuf(raw, self.last_frame_data)
 
     def getBatteryPercent(self) -> Optional[int]:
         """
         Returns the Quest headset's current battery level as a percentage.
 
         Returns:
-            Battery percentage (0-100), or None if no data available
+            Battery percentage (0-100)
         """
-        return self._battery_percent if self._battery_percent > 0 else None
+        self._updateDeviceData()
+        return self.cached_device_data.battery_percent
+
+
+    def getFrameCount(self) -> int:
+        self._updateFrameData()
+        return self.last_frame_data.frame_count
+
+
+    def getTrackingLostCounter(self):
+        self._updateDeviceData()
+        return self.cached_device_data.tracking_lost_counter
+
 
     def isTracking(self) -> bool:
-        """
-        Gets the current tracking state of the Quest headset.
+        self._updateFrameData()
+        return self.last_frame_data.isTracking
 
-        Indicates whether the Quest's visual-inertial tracking system is
-        currently functioning and providing reliable pose data.
-
-        When tracking is lost, pose data becomes unreliable and should not
-        be used for robot control.
-
-        Returns:
-            True if Quest is actively tracking, False if tracking is lost
-            or no device data available
-        """
-        return self._tracking
 
     def isConnected(self) -> bool:
         """
@@ -323,55 +338,16 @@ class QuestNav:
         Returns:
             True if Quest is connected and sending data, False otherwise
         """
-        current_time = time.time()
-        return (current_time - self._last_frame_timestamp) < 0.1  # 100ms timeout
+        current = Timer.getTimestamp()
+        last_change = self.frame_data_sub.getLastChange() / 1_000_000
+        return (current - last_change) < 0.1  # 100ms timeout
 
-    def getFrameCount(self) -> Optional[int]:
-        """
-        Gets the current frame count from the Quest headset.
+    def getLatencyMs(self):
+        current = Timer.getTimestamp()
+        last_change = self.frame_data_sub.getLastChange() / 1_000_000
+        return (current - last_change) * 1000
 
-        Returns:
-            Frame count value, or None if no data available
-        """
-        return self._frame_count if self._frame_count > 0 else None
-
-    def getTrackingLostCounter(self) -> Optional[int]:
-        """
-        Gets the number of tracking lost events since Quest connected.
-
-        Returns:
-            Tracking lost counter value, or None if no data available
-        """
-        return self._tracking_lost_counter
-
-    def getLatency(self) -> float:
-        """
-        Gets the latency of the Quest to Robot connection.
-
-        Returns latency between current time and last frame data update.
-
-        Returns:
-            Latency in milliseconds
-        """
-        current_time = time.time()
-        return (current_time - self._last_frame_timestamp) * 1000.0
-
-    def get_app_timestamp(self) -> Optional[float]:
-        """
-        Returns the Quest app's uptime timestamp.
-
-        Important: For pose estimator integration, use the timestamp from
-        PoseFrame.data_timestamp instead! This provides the Quest's internal
-        timestamp for debugging only.
-
-        Returns:
-            Quest app uptime in seconds, or None if no data available
-        """
-        # This would need to be tracked from frame data
-        # For now, return None
-        return None
-
-    def command_periodic(self):
+    def periodic(self):
         """
         Processes command responses from the Quest headset.
 
@@ -387,11 +363,12 @@ class QuestNav:
                 self.questnav.command_periodic()
                 # ... other code
         """
-        # Command responses are processed in get_all_unread_pose_frames()
-        # This method is kept for API compatibility with Java questnav-lib
-        # but doesn't need to do anything extra in Python
-        pass
+        self.checkVersionMatch()
 
+        for timestamped_raw in self.response_sub.readQueue():
+            if rawValueToProtobuf(timestamped_raw.value, self.cached_response):
+                if not self.cached_response.success:
+                    wpilib.reportError(
+                        f"[QuestNav] Command failed: {self.cached_response.error_message}"
+                    )
 
-__all__ = ["QuestNav", "PoseFrame"]
-__version__ = "2025.1.0"

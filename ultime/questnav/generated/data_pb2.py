@@ -22,7 +22,7 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
-import geometry3d_pb2 as geometry3d__pb2
+from . import geometry3d_pb2 as geometry3d__pb2
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ndata.proto\x12\x14questnav.protos.data\x1a\x10geometry3d.proto\"\x82\x01\n\x19ProtobufQuestNavFrameData\x12\x13\n\x0b\x66rame_count\x18\x01 \x01(\x05\x12\x11\n\ttimestamp\x18\x02 \x01(\x01\x12)\n\x06pose3d\x18\x03 \x01(\x0b\x32\x19.wpi.proto.ProtobufPose3d\x12\x12\n\nisTracking\x18\x04 \x01(\x08\"T\n\x1aProtobufQuestNavDeviceData\x12\x1d\n\x15tracking_lost_counter\x18\x01 \x01(\x05\x12\x17\n\x0f\x62\x61ttery_percent\x18\x03 \x01(\x05\x42\x43\n%gg.questnav.questnav.protos.generated\xaa\x02\x19QuestNav.Protos.Generatedb\x06proto3')
