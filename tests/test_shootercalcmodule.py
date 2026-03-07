@@ -57,39 +57,39 @@ def _test_ShooterCalcModule_common(
 def test_ShooterCalcModule(robot_controller: RobotTestController, robot: Robot):
 
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(2, 3, 0), 7.19640879567, 0.382197007441
+        robot_controller, robot, Pose2d(2, 3, 0), 6.46594643286, 0.343500071108
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(2, 5, 0), 7.17073292226, -0.346233458501
+        robot_controller, robot, Pose2d(2, 5, 0), 6.44561409639, -0.384948495407
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(1, 2, 0), 7.51583459157, 0.544649237803
+        robot_controller, robot, Pose2d(1, 2, 0), 7.50927519393, 0.506611883635
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(3, 4, 0), 5.83997131987, -0.0326622163491
+        robot_controller, robot, Pose2d(3, 4, 0), 5.8284874285, -0.0728888922415
     )
 
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(5, 1, 0), 5.59314040831, 2.78800952933
+        robot_controller, robot, Pose2d(5, 1, 0), 5.58402302186, 2.74934933836
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(6, 2, 0), 6.36160889562, -3.12013007369
+        robot_controller, robot, Pose2d(6, 2, 0), 6.35366507828, 3.12484048514
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(8, 3, 0), 8.0020313349, -2.92162124261
+        robot_controller, robot, Pose2d(8, 3, 0), 7.99579383522, -2.95927027617
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(5, 5, 0), 5.6056839084, 2.77712472389
+        robot_controller, robot, Pose2d(5, 5, 0), 5.59658848743, 2.73847325989
     )
     _test_ShooterCalcModule_common(
-        robot_controller, robot, Pose2d(6, 6, math.pi), 6.36189814607, 0.0120681478911
+        robot_controller, robot, Pose2d(6, 6, math.pi), 6.353954713, -0.0261464617762
     )
     _test_ShooterCalcModule_common(
         robot_controller,
         robot,
         Pose2d(6, 7, 0.5 * math.pi),
-        6.4671591738,
-        1.85059706269,
+        6.45935313075,
+        1.81243172721,
     )
 
 

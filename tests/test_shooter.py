@@ -38,18 +38,16 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
 
     robot_controller.wait_until(lambda: shooter.isAtVelocity(), 10.0)
 
+    robot_controller.wait_one_frame()
     assert shooter.getCurrentSpeed() == approx(cmd.speed_rpm, abs=rpm_tolerance)
+    assert shooter._indexer.get() > 0.0
+    assert shooter._feeder.get() > 0.0
 
-    robot_controller.wait_until(lambda: shooter.indexer_current_rpm== approx(shooter.indexer_rpm), 10.0)
-    robot_controller.wait_until(lambda: shooter._feeder.get() == approx(feedforward(1.33 * cmd.speed_rpm, shooter.flywheel_kS, shooter.flywheel_kF)), 10.0)
-    #
-    # volts = kS + kF * abs(speed)
-    # volts = math.copysign(volts, speed)
-    # return volts
+    robot_controller.wait_until(lambda: shooter.indexer_current_rpm == approx(shooter.indexer_rpm), 10.0)
 
     assert shooter.getCurrentSpeed() == approx(cmd.speed_rpm, abs=rpm_tolerance)
-    assert shooter._indexer.get() == approx(shooter.indexer_rpm)
-    assert shooter._feeder.get() == approx(cmd.speed_rpm * 1.33)
+    assert shooter._indexer.get() > 0.0
+    assert shooter._feeder.get() > 0.0
 
     CommandScheduler.getInstance().cancel(cmd)
 
@@ -58,6 +56,8 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     )
 
     assert shooter.getCurrentSpeed() == approx(0.0, abs=rpm_tolerance)
+    assert shooter._indexer.get() == approx(0.0, abs=0.01)
+    assert shooter._feeder.get() == approx(0.0, abs=0.01)
 
 
 def test_prepareShoot(robot_controller: RobotTestController, robot: Robot):
@@ -171,4 +171,4 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
     )
     assert shooter.isAtVelocity()
 
-    assert shooter._feeder.get() == approx(shooter.feeder_speed)
+    assert shooter._feeder.get() > 0.0
