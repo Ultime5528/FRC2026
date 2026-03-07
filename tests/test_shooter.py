@@ -1,12 +1,13 @@
 from commands2 import CommandScheduler
 from pytest import approx
 
-from commands.shooter.manualshoot import ManualShoot, manual_shoot_properties
+from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from modules.shootercalcmodule import ShooterCalcModule
 from robot import Robot
 from subsystems.shooter import IndexerState
+from ultime.control import feedforward
 from ultime.tests import RobotTestController
 
 
@@ -18,7 +19,6 @@ def test_ports(robot: Robot):
 
 def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     shooter = robot.hardware.shooter
-    rpm_tolerance = manual_shoot_properties.speed_rpm * 0.01
 
     robot_controller.startTeleop()
 
@@ -30,17 +30,26 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     cmd.schedule()
     robot_controller.wait_one_frame()
 
+    rpm_tolerance = cmd.speed_rpm * 0.01
+
     assert cmd.isScheduled()
 
     assert shooter.getCurrentSpeed() == 0.0
 
     robot_controller.wait_until(lambda: shooter.isAtVelocity(), 10.0)
 
-    assert shooter.getCurrentSpeed() == approx(
-        manual_shoot_properties.speed_rpm, abs=rpm_tolerance
-    )
-    # assert shooter._indexer.get() == approx(shooter.indexer_current_rpm)
-    assert shooter._feeder.get() == approx(shooter.feeder_speed)
+    assert shooter.getCurrentSpeed() == approx(cmd.speed_rpm, abs=rpm_tolerance)
+
+    robot_controller.wait_until(lambda: shooter.indexer_current_rpm== approx(shooter.indexer_rpm), 10.0)
+    robot_controller.wait_until(lambda: shooter._feeder.get() == approx(feedforward(1.33 * cmd.speed_rpm, shooter.flywheel_kS, shooter.flywheel_kF)), 10.0)
+    #
+    # volts = kS + kF * abs(speed)
+    # volts = math.copysign(volts, speed)
+    # return volts
+
+    assert shooter.getCurrentSpeed() == approx(cmd.speed_rpm, abs=rpm_tolerance)
+    assert shooter._indexer.get() == approx(shooter.indexer_rpm)
+    assert shooter._feeder.get() == approx(cmd.speed_rpm * 1.33)
 
     CommandScheduler.getInstance().cancel(cmd)
 
