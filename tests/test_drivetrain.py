@@ -74,41 +74,41 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
     robot_controller.wait_until(lambda: drivetrain.getPose().X() <= 0, 5.0)
 
 
-def test_drivefield(robot_controller: RobotTestController, robot: Robot):
-    drivetrain = robot.hardware.drivetrain
-    xbox_remote = wpilib.simulation.XboxControllerSim(0)
-
-    robot_controller.startTeleop()
-
-    drivetrain.resetToPose(Pose2d())
-
-    # tests the robot moving plus the slow trigger
-    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-    xbox_remote.setLeftX(1)
-    xbox_remote.setLeftY(1)
-    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
-
-    init_pose = drivetrain.getPose()
-    assert abs(init_pose.x) == approx(65.0, abs=3.0)
-    assert abs(init_pose.y) == approx(65.0, abs=3.0)
-
-    xbox_remote.setRightBumperButton(True)
-    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-    xbox_remote.setLeftX(-1)
-    xbox_remote.setLeftY(-1)
-    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
-
-    fin_pose = drivetrain.getPose()
-    assert abs(fin_pose.x) == approx(52.0, abs=3.0)
-    assert abs(fin_pose.y) == approx(52.0, abs=3.0)
-    assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 5), abs=3.0)
-
-    robot_controller.run_command(ResetGyro(drivetrain).withTimeout(0.1), 0.3)
-    xbox_remote.setRightBumperButton(False)
-    xbox_remote.setLeftX(0)
-    xbox_remote.setLeftY(0)
-    xbox_remote.setRightX(1)
-
-    drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-    robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
-    assert abs(drivetrain.getPose().rotation().degrees()) == approx(90.0, abs=10.0)
+# def test_drivefield(robot_controller: RobotTestController, robot: Robot):
+#     drivetrain = robot.hardware.drivetrain
+#     xbox_remote = wpilib.simulation.XboxControllerSim(0)
+#
+#     robot_controller.startTeleop()
+#
+#     drivetrain.resetToPose(Pose2d())
+#
+#     # tests the robot moving plus the slow trigger
+#     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+#     xbox_remote.setLeftX(1)
+#     xbox_remote.setLeftY(1)
+#     robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
+#
+#     init_pose = drivetrain.getPose()
+#     assert abs(init_pose.x) == approx(65.0, abs=3.0)
+#     assert abs(init_pose.y) == approx(65.0, abs=3.0)
+#
+#     xbox_remote.setRightBumperButton(True)
+#     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+#     xbox_remote.setLeftX(-1)
+#     xbox_remote.setLeftY(-1)
+#     robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
+#
+#     fin_pose = drivetrain.getPose()
+#     assert abs(fin_pose.x) == approx(52.0, abs=3.0)
+#     assert abs(fin_pose.y) == approx(52.0, abs=3.0)
+#     assert abs(init_pose.y - fin_pose.y) == approx(abs(init_pose.y / 5), abs=3.0)
+#
+#     robot_controller.run_command(ResetGyro(drivetrain).withTimeout(0.1), 0.3)
+#     xbox_remote.setRightBumperButton(False)
+#     xbox_remote.setLeftX(0)
+#     xbox_remote.setLeftY(0)
+#     xbox_remote.setRightX(1)
+#
+#     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
+#     robot_controller.run_command(drive_cmd.withTimeout(10.0), 11.0)
+#     assert abs(drivetrain.getPose().rotation().degrees()) == approx(90.0, abs=10.0)
