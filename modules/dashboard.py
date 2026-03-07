@@ -12,6 +12,7 @@ from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
