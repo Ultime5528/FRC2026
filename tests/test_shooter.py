@@ -43,7 +43,9 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter._indexer.get() > 0.0
     assert shooter._feeder.get() > 0.0
 
-    robot_controller.wait_until(lambda: shooter.indexer_current_rpm == approx(shooter.indexer_rpm), 10.0)
+    robot_controller.wait_until(
+        lambda: shooter.indexer_current_rpm == approx(shooter.indexer_rpm), 10.0
+    )
 
     assert shooter.getCurrentSpeed() == approx(cmd.speed_rpm, abs=rpm_tolerance)
     assert shooter._indexer.get() > 0.0

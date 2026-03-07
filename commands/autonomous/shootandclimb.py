@@ -1,7 +1,8 @@
 from commands2 import SequentialCommandGroup
-from commands2.cmd import parallel
+from commands2.cmd import parallel, sequence
 
 from commands.autonomous.towerclimb import TowerClimb
+from commands.climber.move import MoveClimber
 from commands.resetall import ResetAll
 from commands.shootwithalign import ShootWithAlign
 from modules.hardware import HardwareModule
@@ -49,8 +50,11 @@ class ShootAndClimb(SequentialCommandGroup):
                     self.feeder,
                     self.controller,
                     self.shooter_module,
-                ).withTimeout(13.0),
-                ResetAll(self.climber, self.hugger, self.guide),
+                ).withTimeout(10.0),
+                sequence(
+                    ResetAll(self.climber, self.hugger, self.guide),
+                    MoveClimber.toReady(self.climber),
+                ),
             ),
             self.climb_command,
         )

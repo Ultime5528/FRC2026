@@ -19,7 +19,7 @@ _constraints_for_tower = PathConstraints(
     maxAngularAccelerationRpsSq=degreesToRadians(10.0),
 )
 
-_tower_position_left = 4.613
+_tower_position_left = 4.595
 _tower_position_right = 2.987
 _tower_y = 1.041
 

@@ -100,17 +100,21 @@ class Shooter(Subsystem):
         self._flywheel.setVoltage(voltage)
 
         # 1/3 valeur approx, de la vitesse pour ne pas que le ballon reste jammé
-        if average >= 0.33 * rpm:
-            self._feeder.setVoltage(
-                feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
-            )
-        else:
-            self._feeder.setVoltage(0.0)
+        # if average >= 0.33 * rpm:
+        #     self._feeder.setVoltage(
+        #         feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
+        #     )
+        # else:
+        #     self._feeder.setVoltage(0.0)
 
         if is_simulation:
             self._flywheel_last_rpm_sim = rpm
 
-    def sendFuel(self, flywheel_rpm):
+    def sendFuel(self, rpm):
+        self._feeder.setVoltage(
+            feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
+        )
+
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
             self._timer.restart()

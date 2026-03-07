@@ -82,6 +82,7 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Autonomous", ShootAndClimb.left(hardware, self.shooter_calc_module)
         )
+        putCommandOnDashboard("Autonomous", AlignToTower(hardware.drivetrain))
         """
         Drivetrain
         """
