@@ -79,6 +79,6 @@ class NewRushToMiddle(SequentialCommandGroup):
                     self.controller,
                     self.shooter_module,
                 ),
-            ).withTimeout(13.0),
+            ).withTimeout(12.0),
             self.climb_command,
         )

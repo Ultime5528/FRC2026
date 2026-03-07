@@ -7,7 +7,7 @@ from ultime.command import Command
 
 
 class AlignToTower(Command):
-    speed_side = autoproperty(-0.05)
+    speed_side = autoproperty(-0.1)
     speed_front = autoproperty(-0.1)
     time = autoproperty(0.3)
 
