@@ -1,9 +1,13 @@
+from commands2.cmd import parallel
+
+from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber, ManualMoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.grabfuel import GrabFuel
 from commands.feeder.ejectfuel import EjectFuel
 from commands.hugandclimb import HugAndClimb
+from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
@@ -36,6 +40,10 @@ class ControlModule(Module):
             DriveRelative.backwards(hardware.drivetrain)
         )
 
+        hardware.controller.leftBumper().whileTrue(
+            TowerClimb.right(hardware)
+        )
+
         """
         Copilot's panel
         """
@@ -60,14 +68,20 @@ class ControlModule(Module):
         )
 
         # Climber
-        hardware.panel_1.button(6).onTrue(MoveClimber.toReady(hardware.climber))
-
-        hardware.panel_1.button(4).onTrue(
-            HugAndClimb(hardware.climber, hardware.hugger)
+        hardware.panel_1.button(6).onTrue(
+            parallel(
+                MoveClimber.toReady(hardware.climber),
+                Unhug(hardware.hugger)
+            )
         )
 
+        # TODO Ancien bouton Reset du climber, libre pour autre chose
+        # hardware.panel_1.button(4).onTrue(
+        #     HugAndClimb(hardware.climber, hardware.hugger)
+        # )
+
         hardware.panel_1.button(3).onTrue(
-            RetractAndUnhug(hardware.climber, hardware.hugger)
+            ResetClimber.down(hardware.climber)
         )
 
         hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))

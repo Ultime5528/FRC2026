@@ -8,7 +8,9 @@ from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.controller import PPHolonomicDriveController
 from wpilib import DriverStation, SendableChooser
 
+from commands.autonomous.newrushtomiddle import NewRushToMiddle
 from modules.hardware import HardwareModule
+from modules.shootercalcmodule import ShooterCalcModule
 from ultime.command import WaitCommand
 from ultime.module import Module
 
@@ -18,7 +20,7 @@ def registerNamedCommand(command: Command):
 
 
 class AutonomousModule(Module):
-    def __init__(self, hardware: HardwareModule):
+    def __init__(self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule):
         super().__init__()
         self.hardware = proxy(hardware)
 
@@ -26,6 +28,8 @@ class AutonomousModule(Module):
 
         self.auto_chooser = SendableChooser()
         self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
+
+        self.auto_chooser.addOption("RushToMiddleRight", NewRushToMiddle.right(hardware, shooter_calc_module))
 
     def autonomousInit(self):
         self.hardware.drivetrain.swerve_odometry.resetPose(

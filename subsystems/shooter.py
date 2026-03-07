@@ -41,7 +41,7 @@ class Shooter(Subsystem):
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self._config = rev.SparkMaxConfig()
-        self._config.voltageCompensation(12.0)
+        # self._config.voltageCompensation(12.0)
         self._flywheel.configure(
             self._config,
             rev.ResetMode.kResetSafeParameters,
@@ -62,7 +62,7 @@ class Shooter(Subsystem):
 
         self._indexer_encoder = self._indexer.getEncoder()
 
-        self._velocity_filter = LinearFilter.movingAverage(25)
+        self._velocity_filter = LinearFilter.movingAverage(5)
 
         self._is_at_velocity = self.createProperty(False)
 
@@ -92,7 +92,9 @@ class Shooter(Subsystem):
         self._is_at_velocity = error >= -self.shooter_tolerance
 
         ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
+        self.log("flywheel_ff", ff)
         voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
+        self.log("flywheel_pf", voltage)
 
         voltage = min(ff, voltage)
 

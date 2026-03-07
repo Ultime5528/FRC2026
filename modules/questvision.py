@@ -23,7 +23,7 @@ class QuestVisionModule(Module):
         super().__init__()
         self.drivetrain = drivetrain
         self.quest_nav = questnav.QuestNavOld()
-        self.estimated_pose = Pose3d()
+        self.estimated_pose = Pose2d()
 
     def getAllUnreadPosesTimestampsStdDevs(
         self,
