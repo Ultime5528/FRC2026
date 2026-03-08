@@ -20,7 +20,9 @@ def registerNamedCommand(command: Command):
 
 
 class AutonomousModule(Module):
-    def __init__(self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule):
+    def __init__(
+        self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule
+    ):
         super().__init__()
         self.hardware = proxy(hardware)
 
@@ -29,7 +31,9 @@ class AutonomousModule(Module):
         self.auto_chooser = SendableChooser()
         self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
 
-        self.auto_chooser.addOption("RushToMiddleRight", NewRushToMiddle.right(hardware, shooter_calc_module))
+        self.auto_chooser.addOption(
+            "RushToMiddleRight", NewRushToMiddle.right(hardware, shooter_calc_module)
+        )
 
     def autonomousInit(self):
         self.hardware.drivetrain.swerve_odometry.resetPose(

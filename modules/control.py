@@ -40,9 +40,7 @@ class ControlModule(Module):
             DriveRelative.backwards(hardware.drivetrain)
         )
 
-        hardware.controller.leftBumper().whileTrue(
-            TowerClimb.right(hardware)
-        )
+        hardware.controller.leftBumper().whileTrue(TowerClimb.right(hardware))
 
         """
         Copilot's panel
@@ -69,10 +67,7 @@ class ControlModule(Module):
 
         # Climber
         hardware.panel_1.button(6).onTrue(
-            parallel(
-                MoveClimber.toReady(hardware.climber),
-                Unhug(hardware.hugger)
-            )
+            parallel(MoveClimber.toReady(hardware.climber), Unhug(hardware.hugger))
         )
 
         # TODO Ancien bouton Reset du climber, libre pour autre chose
@@ -80,9 +75,7 @@ class ControlModule(Module):
         #     HugAndClimb(hardware.climber, hardware.hugger)
         # )
 
-        hardware.panel_1.button(3).onTrue(
-            ResetClimber.down(hardware.climber)
-        )
+        hardware.panel_1.button(3).onTrue(ResetClimber.down(hardware.climber))
 
         hardware.panel_1.button(5).onTrue(ResetClimber.down(hardware.climber))
 

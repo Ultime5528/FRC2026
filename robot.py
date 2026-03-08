@@ -49,7 +49,9 @@ class Robot(ModuleRobot):
         self.hardware.guide.setDefaultCommand(
             CheckGuide(self.hardware.guide, self.shooter_calc_module)
         )
-        self.autonomous = self.addModule(AutonomousModule(self.hardware, self.shooter_calc_module))
+        self.autonomous = self.addModule(
+            AutonomousModule(self.hardware, self.shooter_calc_module)
+        )
 
         self.control = self.addModule(
             ControlModule(self.hardware, self.shooter_calc_module)

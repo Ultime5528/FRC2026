@@ -54,7 +54,11 @@ _to_tower_ready_left_waypoints = PathPlannerPath.waypointsFromPoses(
             (_tower_y_left + _tower_distance_from_for_first_pose),
             Rotation2d.fromDegrees(-90.0),
         ),
-        Pose2d(_tower_x, (_tower_y_left + _tower_y_threshold), Rotation2d.fromDegrees(-90.0)),
+        Pose2d(
+            _tower_x,
+            (_tower_y_left + _tower_y_threshold),
+            Rotation2d.fromDegrees(-90.0),
+        ),
     ]
 )
 
@@ -65,7 +69,11 @@ _to_tower_ready_right_waypoints = PathPlannerPath.waypointsFromPoses(
             (_tower_y_right - _tower_distance_from_for_first_pose),
             Rotation2d.fromDegrees(90.0),
         ),
-        Pose2d(_tower_x, (_tower_y_right - _tower_y_threshold), Rotation2d.fromDegrees(90.0)),
+        Pose2d(
+            _tower_x,
+            (_tower_y_right - _tower_y_threshold),
+            Rotation2d.fromDegrees(90.0),
+        ),
     ]
 )
 
