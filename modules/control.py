@@ -11,6 +11,7 @@ from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
+from commands.shooter.manualshoot import ManualShoot
 from commands.shooter.shoot import Shoot
 from commands.shootwithalign import ShootWithAlign
 from modules.hardware import HardwareModule
@@ -64,6 +65,8 @@ class ControlModule(Module):
                 shooter_calc_module,
             )
         )
+
+        hardware.panel_1.axisGreaterThan(2, 0.5).whileTrue(ManualShoot(hardware.shooter))
 
         # Climber
         hardware.panel_1.button(6).onTrue(
