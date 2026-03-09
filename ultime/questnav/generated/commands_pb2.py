@@ -3,7 +3,6 @@
 # NO CHECKED-IN PROTOBUF GENCODE
 # source: commands.proto
 # Protobuf Python Version: 6.31.1
-# @formatter:off
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool

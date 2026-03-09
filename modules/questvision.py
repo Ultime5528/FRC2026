@@ -1,5 +1,7 @@
+from typing import Generator, Tuple
+
 import wpimath
-from wpimath.geometry import Pose3d
+from wpimath.geometry import Pose3d, Pose2d
 
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
@@ -8,8 +10,8 @@ from ultime.questnav import questnav
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_quest_offset = wpimath.geometry.Transform3d(
-    wpimath.geometry.Translation3d(0.20, 0.01, 1.03),
-    wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, 0.0),
+    wpimath.geometry.Translation3d(-0.257, -0.28, 0.47),
+    wpimath.geometry.Rotation3d.fromDegrees(0.0, 0.0, 180.0),
 )
 
 
@@ -20,46 +22,37 @@ class QuestVisionModule(Module):
     def __init__(self, drivetrain: Drivetrain):
         super().__init__()
         self.drivetrain = drivetrain
-        self.questnav = questnav.QuestNav()
-        self.estimated_pose = Pose3d()
+        self.quest_nav = questnav.QuestNavOld()
+        self.estimated_pose = Pose2d()
 
-    def robotPeriodic(self) -> None:
-        super().robotPeriodic()
-        poseFrames = self.questnav.getAllUnreadPoseFrames()
+    def getAllUnreadPosesTimestampsStdDevs(
+        self,
+    ) -> Generator[tuple[Pose2d, float, Tuple[float, float, float]]]:
+        for poseFrame in self.quest_nav.getAllUnreadPoseFrames():
+            if poseFrame.is_tracking:
+                pose = poseFrame.quest_pose_3d
+                pose = pose.transformBy(robot_to_quest_offset.inverse())
+                self.estimated_pose = pose.toPose2d()
+                time_stamp = poseFrame.data_timestamp
+                yield (
+                    self.estimated_pose,
+                    time_stamp,
+                    (
+                        self.std_translation,
+                        self.std_translation,
+                        self.std_rotation,
+                    ),
+                )
 
-        for poseFrame in poseFrames:
-            self.estimated_pose = poseFrame.quest_pose_3d
-            self.estimated_pose = self.estimated_pose.transformBy(
-                robot_to_quest_offset.inverse()
-            )
-            time_stamp = poseFrame.data_timestamp
-            self.drivetrain.addVisionMeasurement(
-                self.estimated_pose.toPose2d(),
-                time_stamp,
-                [self.std_translation, self.std_translation, self.std_rotation],
-            )
+    def resetToPose(self, pose: Pose3d):
+        self.quest_nav.setPose(pose.transformBy(robot_to_quest_offset))
 
-    def getEstimatedPose(self):
-        return self.estimated_pose
+    def isConnected(self) -> bool:
+        return self.quest_nav.isConnected() and self.quest_nav.isTracking()
 
-    def reset(self, pose: Pose3d):
-        self.questnav.setPose(pose)
-
-    def initSendable(self, builder):
-        super().initSendable(builder)
-
-        def noop(x):
-            pass
-
-        builder.addFloatProperty("X", lambda: self.getEstimatedPose().x, noop)
-        builder.addFloatProperty("Y", lambda: self.getEstimatedPose().y, noop)
-        builder.addFloatProperty("Z", lambda: self.getEstimatedPose().z, noop)
-        builder.addFloatProperty(
-            "roll", lambda: self.getEstimatedPose().rotation().x, noop
-        )
-        builder.addFloatProperty(
-            "pitch", lambda: self.getEstimatedPose().rotation().y, noop
-        )
-        builder.addFloatProperty(
-            "yaw", lambda: self.getEstimatedPose().rotation().z, noop
-        )
+    def logValues(self):
+        self.log("x", self.estimated_pose.x)
+        self.log("y", self.estimated_pose.y)
+        self.log("yaw", self.estimated_pose.rotation().degrees())
+        self.log("isTracking", self.quest_nav.isTracking())
+        self.log("battery", self.quest_nav.getBatteryPercent())

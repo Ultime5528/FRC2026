@@ -56,7 +56,7 @@ class NavX(Gyro):
     def __init__(self):
         import navx
 
-        self.gyro = navx.AHRS(wpilib.SerialPort.Port.kMXP)
+        self.gyro = navx.AHRS(navx.AHRS.NavXComType.kMXP_SPI)
         super().__init__()
         gyro_sim_device = SimDeviceSim("navX-Sensor[1]")
         self._gyro_sim_angle = gyro_sim_device.getDouble("Yaw")
@@ -73,6 +73,25 @@ class NavX(Gyro):
 
     def setSimPitch(self, pitch: float):
         self._gyro_sim_pitch.set(pitch)
+
+    def calibrate(self):
+        self.gyro.reset()
+        self.gyro.zeroYaw()
+
+    def initSendable(self, builder: SendableBuilder) -> None:
+        def noop(_):
+            pass
+
+        builder.addFloatProperty("angle", self.gyro.getAngle, noop)
+        builder.addFloatProperty("fused", self.gyro.getFusedHeading, noop)
+
+        builder.addFloatProperty("roll", self.gyro.getRoll, noop)
+        builder.addFloatProperty("yaw", self.gyro.getYaw, noop)
+        builder.addFloatProperty("pitch", self.gyro.getPitch, noop)
+
+        builder.addFloatProperty("raw_x", self.gyro.getRawGyroX, noop)
+        builder.addFloatProperty("raw_y", self.gyro.getRawGyroY, noop)
+        builder.addFloatProperty("raw_z", self.gyro.getRawGyroZ, noop)
 
 
 class ADIS16448(Gyro):

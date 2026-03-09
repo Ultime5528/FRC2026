@@ -21,10 +21,10 @@ class IndexerState(Enum):
 
 class Shooter(Subsystem):
     # 12 volts max divided by max RPM
-    flywheel_kF = autoproperty(0.00222222)
+    flywheel_kF = autoproperty(0.00217039)
     flywheel_kP = autoproperty(0.0)
-    flywheel_kS = autoproperty(0.2)
-    shooter_tolerance = autoproperty(100.0)
+    flywheel_kS = autoproperty(0.119613)
+    shooter_tolerance = autoproperty(30.0)
 
     indexer_rpm = autoproperty(1400.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
@@ -35,15 +35,12 @@ class Shooter(Subsystem):
     indexer_kF = autoproperty(0.002)
     indexer_kP = autoproperty(0.001)
 
-    feeder_speed = autoproperty(0.5)
-
     def __init__(self):
         super().__init__()
         self._flywheel = rev.SparkMax(
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self._config = rev.SparkMaxConfig()
-        self._config.voltageCompensation(12.0)
         self._flywheel.configure(
             self._config,
             rev.ResetMode.kResetSafeParameters,
@@ -64,7 +61,7 @@ class Shooter(Subsystem):
 
         self._indexer_encoder = self._indexer.getEncoder()
 
-        self._velocity_filter = LinearFilter.movingAverage(25)
+        self._velocity_filter = LinearFilter.movingAverage(5)
 
         self._is_at_velocity = self.createProperty(False)
 
@@ -81,31 +78,39 @@ class Shooter(Subsystem):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
 
-    def reset(self):
-        self._velocity_filter.reset()
-        self._is_at_velocity = False
-
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
         self.log("rpm_average", average)
         self.log("rpm_target", rpm)
 
         error = average - rpm
-        self._is_at_velocity = abs(error) <= self.shooter_tolerance
+        self._is_at_velocity = error >= -self.shooter_tolerance
 
         ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
+        self.log("flywheel_ff", ff)
         voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
+        self.log("flywheel_pf", voltage)
 
         voltage = min(ff, voltage)
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
 
+        # 1/3 valeur approx, de la vitesse pour ne pas que le ballon reste jammé
+        # if average >= 0.33 * rpm:
+        #     self._feeder.setVoltage(
+        #         feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
+        #     )
+        # else:
+        #     self._feeder.setVoltage(0.0)
+
         if is_simulation:
             self._flywheel_last_rpm_sim = rpm
 
-    def sendFuel(self):
-        self._feeder.set(self.feeder_speed)
+    def sendFuel(self, rpm):
+        self._feeder.setVoltage(
+            feedforward(1.33 * rpm, self.flywheel_kS, self.flywheel_kF)
+        )
 
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
@@ -130,7 +135,6 @@ class Shooter(Subsystem):
 
     def stopFuel(self):
         self._indexer.set(0.0)
-        self._feeder.set(0.0)
         self.indexer_state = IndexerState.Off
 
     def _setIndexerRPM(self, target_rpm: float) -> None:
@@ -167,21 +171,13 @@ class Shooter(Subsystem):
         self._indexer_sim.setVelocity(
             target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
         )
-        if self._is_at_velocity and self.indexer_state == IndexerState.On:
-            self._updateIndexerSimVelocity(self.indexer_rpm)
-        elif self.indexer_state == IndexerState.Stuck:
-            self._updateIndexerSimVelocity(self.indexer_rpm_unstuck)
-
-    def _updateIndexerSimVelocity(self, target_rpm: float) -> None:
-        self._indexer_sim.setVelocity(
-            target_rpm * 0.1 + self._indexer_sim.getVelocity() * 0.9
-        )
 
     def stop(self):
         self._flywheel.stopMotor()
         self._feeder.stopMotor()
         self._indexer.stopMotor()
         self._is_at_velocity = False
+        self._velocity_filter.reset()
         self.indexer_state = IndexerState.Off
 
         if is_simulation:

@@ -7,7 +7,7 @@ from ultime.subsystem import Subsystem
 
 
 class Feeder(Subsystem):
-    speed_grab = autoproperty(-0.5)
+    speed_grab = autoproperty(-0.75)
     speed_feed = autoproperty(1.0)
 
     def __init__(self):

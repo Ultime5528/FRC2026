@@ -26,23 +26,19 @@ class ResetGuide(_ResetGuide):
 class MoveGuide(MoveLinear):
     @classmethod
     def toUsed(cls, guide: Guide):
-        cmd = cls(
-            guide,
-            lambda: _move_properties.position_used,
-        )
+        cmd = cls(guide, lambda: _move_properties.position_used, Guide.State.Used)
         cmd.setName(cls.__name__ + ".toUsed")
         return cmd
 
     @classmethod
     def toUnused(cls, guide: Guide):
-        cmd = cls(
-            guide,
-            lambda: _move_properties.position_unused,
-        )
+        cmd = cls(guide, lambda: _move_properties.position_unused, Guide.State.Unused)
         cmd.setName(cls.__name__ + ".toUnused")
         return cmd
 
-    def __init__(self, guide: Guide, end_position: FloatProperty):
+    def __init__(
+        self, guide: Guide, end_position: FloatProperty, new_state: Guide.State
+    ):
         super().__init__(
             guide,
             end_position,
@@ -50,6 +46,15 @@ class MoveGuide(MoveLinear):
             lambda: _move_properties.speed_max,
             lambda: _move_properties.accel,
         )
+        self.guide = guide
+        self.new_state = new_state
+
+    def end(self, interrupted: bool):
+        super().end(interrupted)
+        if not interrupted:
+            self.guide.state = self.new_state
+        else:
+            self.guide.state = Guide.State.Unknown
 
 
 class _PropertiesManual:
@@ -73,7 +78,7 @@ class _PropertiesMove:
     speed_max = autoproperty(0.2, subtable=MoveGuide.__name__)
     accel = autoproperty(5.0, subtable=MoveGuide.__name__)
 
-    position_unused = autoproperty(-5.0, subtable=MoveGuide.__name__)
+    position_unused = autoproperty(-8.0, subtable=MoveGuide.__name__)
     position_used = autoproperty(3.0, subtable=MoveGuide.__name__)
 
 

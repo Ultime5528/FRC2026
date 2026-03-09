@@ -9,7 +9,7 @@ from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.path import PathPlannerPath, PathConstraints
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase, DriverStation
+from wpilib import DriverStation
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
 from wpimath.kinematics import (
@@ -31,17 +31,17 @@ from ultime.switch import Switch
 
 
 class Drivetrain(Subsystem):
-    width = 0.597
-    length = 0.673
+    width = 0.676
+    length = 0.550
     p_gain_translation = 5.0
     p_gain_rotation = 5.0
     max_angular_speed = autoproperty(25.0)
     max_speed = autoproperty(5.0)
 
-    angular_offset_fl = autoproperty(-1.57)
+    angular_offset_fl = autoproperty(-1.5707963267948966)
     angular_offset_fr = autoproperty(0.0)
-    angular_offset_bl = autoproperty(3.14)
-    angular_offset_br = autoproperty(1.57)
+    angular_offset_bl = autoproperty(3.141592653589793)
+    angular_offset_br = autoproperty(1.5707963267948966)
 
     period_seconds = 0.02
 
@@ -136,7 +136,7 @@ class Drivetrain(Subsystem):
         """
         self.pathfinding_constraints = PathConstraints(
             maxVelocityMps=3.0,
-            maxAccelerationMpsSq=1.0,
+            maxAccelerationMpsSq=3.0,
             maxAngularVelocityRps=3.1415,
             maxAngularAccelerationRpsSq=3.1415,
         )
@@ -216,13 +216,13 @@ class Drivetrain(Subsystem):
         if is_simulation:
             self.sim_yaw = 0
 
-    def seesTowerLeft(self):
+    def seesTowerLeft(self) -> bool:
         return self._sees_tower_left
 
-    def seesTowerRight(self):
+    def seesTowerRight(self) -> bool:
         return self._sees_tower_right
 
-    def alignedToTower(self):
+    def alignedToTower(self) -> bool:
         return self.seesTowerLeft() and self.seesTowerRight()
 
     def driveFromStickInputs(
@@ -298,7 +298,7 @@ class Drivetrain(Subsystem):
         self._gyro.reset()
 
     def getPose(self):
-        return self._estimated_pose
+        return self.swerve_estimator.getEstimatedPosition()
 
     def setForwardFormation(self):
         """
@@ -430,6 +430,10 @@ class Drivetrain(Subsystem):
         """
         return self._chassis_speed
 
+    def isUnderSpeed(self, vx, vy, vrot):
+        speed = self.getRobotRelativeChassisSpeeds()
+        return speed.vx < vx and speed.vy < vy and speed.omega < vrot
+
     def resetToPose(self, pose: Pose2d):
         self.swerve_estimator.resetPosition(
             self._gyro_rotation2d,
@@ -450,6 +454,8 @@ class Drivetrain(Subsystem):
     ):
         self.swerve_estimator.addVisionMeasurement(pose, timestamp, std_devs)
         self.vision_pose.setPose(pose)
+        self._estimated_pose = self.swerve_estimator.getEstimatedPosition()
+        self._estimated_angle = self._estimated_pose.rotation()
 
     def getCurrentDrawAmps(self):
         return 0.0

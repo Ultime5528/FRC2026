@@ -10,7 +10,7 @@ def test_reset_all(robot_controller: RobotTestController, robot: Robot):
     pivot = robot.hardware.pivot
     guide = robot.hardware.guide
 
-    cmd = ResetAll(climber, hugger, pivot, guide)
+    cmd = ResetAll(climber, hugger, pivot)
     robot_controller.run_command(cmd, 10.0)
     robot_controller.wait_one_frame()
 

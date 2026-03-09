@@ -50,8 +50,12 @@ class AlignPreciseAfterPath(Command):
             .distance(self.goal_pose.translation())
             < self.distance_threshold
         ) and (
-            self.drivetrain.getEstimatedAngle()
+            self.drivetrain.getPose()
+            .rotation()
             .relativeTo(self.goal_pose.rotation())
             .degrees()
             < self.rotation_threshold
         )
+
+    def end(self, interrupted: bool):
+        self.drivetrain.stop()

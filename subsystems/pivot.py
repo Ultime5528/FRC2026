@@ -4,12 +4,10 @@ import rev
 from rev import (
     SparkMaxSim,
     SparkMaxConfig,
-    SparkMax,
     ResetMode,
     PersistMode,
     SparkBaseConfig,
 )
-from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
 import ports
@@ -21,7 +19,7 @@ from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(1.0)
+    speed_maintain = autoproperty(0.01)
     min_position = autoproperty(0.0)
     max_position = autoproperty(5.0)
     position_maintain_min = autoproperty(-1.0)
@@ -43,7 +41,7 @@ class Pivot(LinearSubsystem):
             should_block_max_position=False,
             should_block_min_switch=False,
             should_block_max_switch=True,
-            sim_motor_to_distance_factor=2.0,
+            sim_motor_to_distance_factor=80.0,
             sim_gravity=self.speed_maintain,
         )
         self._encoder_position: float = 0.0
@@ -73,6 +71,7 @@ class Pivot(LinearSubsystem):
 
     def readInputs(self):
         self._encoder_position = self._encoder.getPosition()
+        self._motor_current_rpm = self._encoder.getVelocity()
         self._switch_max_pressed = self._switch_max.isPressed()
         self._switch_min_pressed = self._switch_min.isPressed()
 
@@ -83,11 +82,6 @@ class Pivot(LinearSubsystem):
             self._setMotorOutput(self.speed_maintain)
         else:
             self._motor.stopMotor()
-
-    def readInputs(self):
-        self._motor_current_rpm = self._encoder.getVelocity()
-        self._switch_min_pressed = self._switch_min.isPressed()
-        self._switch_max_pressed = self._switch_max.isPressed()
 
     def stop(self):
         self._motor.stopMotor()
