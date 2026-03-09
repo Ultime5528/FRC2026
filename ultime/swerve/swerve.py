@@ -150,9 +150,8 @@ class SwerveModule:
 
         current_rotation = Rotation2d(self._turning_encoder.getPosition())
 
-        # corrected_desired_state.optimize(current_rotation)
         if (
-            abs(corrected_desired_state.angle.degrees() - current_rotation.degrees())
+            abs((corrected_desired_state.angle - current_rotation).degrees())
             > 90.0
         ):
             corrected_desired_state.speed *= -1

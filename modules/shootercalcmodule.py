@@ -192,8 +192,6 @@ class ShooterCalcModule(Module):
 
         self._computeShouldUseGuide()
 
-        # TODO Uninitialized case
-
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
         self._computeShooterRPM()
@@ -300,5 +298,5 @@ class ShooterCalcModule(Module):
         self.log("should_use_guide", self._should_use_guide)
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
-        self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
+        self.log("robot_rotation_angle", self._robot_rotation_angle.degrees())
         self.log("target_distance_xy", self.distance_xy)

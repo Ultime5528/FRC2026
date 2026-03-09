@@ -15,9 +15,7 @@ from ultime.autoproperty import autoproperty
 from ultime.command import WaitCommand
 
 
-class ShootWithAlign(ParallelCommandGroup):
-    move_pivot_delay = autoproperty(1.0)
-
+class AlignShoot(ParallelCommandGroup):
     def __init__(
         self,
         shooter: Shooter,

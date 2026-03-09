@@ -1,5 +1,5 @@
 from commands2 import SequentialCommandGroup
-from commands2.cmd import sequence, deadline
+from commands2.cmd import deadline, sequence
 from pathplannerlib.path import PathPlannerPath
 
 from commands.autonomous.towerclimb import TowerClimb
@@ -8,32 +8,54 @@ from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.shooter.prepareshoot import PrepareShoot
-from commands.shootwithalign import ShootWithAlign
+from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 
 
 class RushToMiddle(SequentialCommandGroup):
     @classmethod
-    def right(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
+    def rightTrench(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
         cmd = cls(
-            PathPlannerPath.fromPathFile("RushToMiddleRight"),
+            PathPlannerPath.fromPathFile("RushToMiddleTrenchRight"),
             TowerClimb.right(hardware),
             hardware,
             shooter_module,
         )
-        cmd.setName(RushToMiddle.__name__ + ".right")
+        cmd.setName(RushToMiddle.__name__ + ".rightTrench")
         return cmd
 
     @classmethod
-    def left(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
+    def rightBump(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
         cmd = cls(
-            PathPlannerPath.fromPathFile("RushToMiddleRight").mirrorPath(),
+            PathPlannerPath.fromPathFile("RushToMiddleBumpRight"),
+            TowerClimb.right(hardware),
+            hardware,
+            shooter_module,
+        )
+        cmd.setName(RushToMiddle.__name__ + ".rightBump")
+        return cmd
+
+    @classmethod
+    def leftTrench(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
+        cmd = cls(
+            PathPlannerPath.fromPathFile("RushToMiddleTrenchRight").mirrorPath(),
             TowerClimb.left(hardware),
             hardware,
             shooter_module,
         )
-        cmd.setName(RushToMiddle.__name__ + ".left")
+        cmd.setName(RushToMiddle.__name__ + ".leftTrench")
+        return cmd
+
+    @classmethod
+    def leftBump(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule):
+        cmd = cls(
+            PathPlannerPath.fromPathFile("RushToMiddleBumpRight").mirrorPath(),
+            TowerClimb.left(hardware),
+            hardware,
+            shooter_module,
+        )
+        cmd.setName(RushToMiddle.__name__ + ".leftBump")
         return cmd
 
     def __init__(
@@ -61,13 +83,17 @@ class RushToMiddle(SequentialCommandGroup):
                 deadline(
                     FollowPathPrecise(self.drivetrain, self.path),
                     ManualMovePivot.down(self.pivot),
-                    ResetAll(self.climber, self.hugger, self.guide),
+                    ResetAll(
+                        self.climber,
+                        self.hugger,
+                        self.guide,
+                    ),
                     sequence(
                         GrabFuel(self.feeder).withTimeout(4.0),
                         PrepareShoot(self.shooter, self.shooter_module),
                     ),
                 ),
-                ShootWithAlign(
+                AlignShoot(
                     self.shooter,
                     self.drivetrain,
                     self.pivot,
@@ -75,6 +101,6 @@ class RushToMiddle(SequentialCommandGroup):
                     self.controller,
                     self.shooter_module,
                 ),
-            ).withTimeout(13.0),
+            ).withTimeout(12.0),
             self.climb_command,
         )

@@ -12,7 +12,7 @@ from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.shoot import Shoot
-from commands.shootwithalign import ShootWithAlign
+from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
@@ -55,7 +55,7 @@ class ControlModule(Module):
 
         # Shooter
         hardware.panel_1.povDown().whileTrue(
-            ShootWithAlign(
+            AlignShoot(
                 hardware.shooter,
                 hardware.drivetrain,
                 hardware.pivot,

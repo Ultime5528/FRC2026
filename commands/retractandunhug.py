@@ -8,7 +8,6 @@ from subsystems.hugger import Hugger
 from ultime.command import ignore_requirements
 
 
-@ignore_requirements(["shooter", "hugger"])
 class RetractAndUnhug(SequentialCommandGroup):
     def __init__(
         self,

@@ -4,7 +4,7 @@ from commands2.cmd import parallel, sequence
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber
 from commands.resetall import ResetAll
-from commands.shootwithalign import ShootWithAlign
+from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 
@@ -43,7 +43,7 @@ class ShootAndClimb(SequentialCommandGroup):
 
         self.addCommands(
             parallel(
-                ShootWithAlign(
+                AlignShoot(
                     self.shooter,
                     self.drivetrain,
                     self.pivot,

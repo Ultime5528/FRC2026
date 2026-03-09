@@ -9,7 +9,7 @@ from commands.drivetrain.driverelative import DriveRelative
 from commands.hugandclimb import HugAndClimb
 from modules.hardware import HardwareModule
 from commands.drivetrain.auto.pathfindfollowpath import PathFindFollowPath
-from ultime import autopath
+from commands.autonomous import autopath
 from ultime.autoproperty import autoproperty
 
 
