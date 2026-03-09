@@ -21,10 +21,10 @@ from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(0.01)
+    speed_maintain = autoproperty(100.0)
     min_position = autoproperty(0.0)
     max_position = autoproperty(5.0)
-    position_maintain_min = autoproperty(-1.0)
+    position_maintain_min = autoproperty(3.5)
     position_maintain_max = autoproperty(6.5)
 
     position_conversion_factor = autoproperty(1.0)
@@ -83,11 +83,6 @@ class Pivot(LinearSubsystem):
             self._setMotorOutput(self.speed_maintain)
         else:
             self._motor.stopMotor()
-
-    def readInputs(self):
-        self._motor_current_rpm = self._encoder.getVelocity()
-        self._switch_min_pressed = self._switch_min.isPressed()
-        self._switch_max_pressed = self._switch_max.isPressed()
 
     def stop(self):
         self._motor.stopMotor()
