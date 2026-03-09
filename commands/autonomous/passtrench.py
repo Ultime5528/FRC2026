@@ -58,19 +58,13 @@ _trench_from_middle_zone_to_alliance_zone_waypoints = (
 """
 Path
 """
-_from_alliance_zone_to_middle_zone_path = PathPlannerPath(
-    waypoints=_trench_from_alliance_zone_to_middle_zone_waypoints,
-    constraints=_constraints_for_trench,
-    ideal_starting_state=_starting_state,
-    goal_end_state=_goal_end_state,
+_from_alliance_zone_to_middle_zone_path = PathPlannerPath.fromPathFile(
+    "AllianceToMiddle"
 )
 _from_alliance_zone_to_middle_zone_path.preventFlipping = True
 
-_from_middle_zone_to_alliance_zone_path = PathPlannerPath(
-    waypoints=_trench_from_middle_zone_to_alliance_zone_waypoints,
-    constraints=_constraints_for_trench,
-    ideal_starting_state=_starting_state,
-    goal_end_state=_goal_end_state,
+_from_middle_zone_to_alliance_zone_path = PathPlannerPath.fromPathFile(
+    "MiddleToAlliance"
 )
 _from_middle_zone_to_alliance_zone_path.preventFlipping = True
 

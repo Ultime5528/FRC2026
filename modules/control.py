@@ -66,7 +66,9 @@ class ControlModule(Module):
             )
         )
 
-        hardware.panel_1.axisGreaterThan(2, 0.5).whileTrue(ManualShoot(hardware.shooter))
+        hardware.panel_1.axisGreaterThan(2, 0.5).whileTrue(
+            ManualShoot(hardware.shooter)
+        )
 
         # Climber
         hardware.panel_1.button(6).onTrue(
