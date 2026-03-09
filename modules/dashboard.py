@@ -3,6 +3,7 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.alignshoot import AlignShoot
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
@@ -21,7 +22,6 @@ from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
-from commands.alignshoot import AlignShoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule

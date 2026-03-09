@@ -1,5 +1,4 @@
 from _pytest.python_api import approx
-from commands2 import CommandScheduler
 
 from commands.guide.move import ResetGuide, MoveGuide, _move_properties
 from robot import Robot

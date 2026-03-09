@@ -1,7 +1,6 @@
 from wpilib import DriverStation
-from wpimath.geometry import Pose2d, Rotation2d, Pose3d, Rotation3d
+from wpimath.geometry import Pose2d, Rotation2d
 
-from modules.questvision import QuestVisionModule
 from subsystems.drivetrain import Drivetrain
 from ultime.command import Command
 

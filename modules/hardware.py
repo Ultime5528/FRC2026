@@ -1,10 +1,8 @@
 import commands2
 from wpilib import PowerDistribution
 
-from commands.climber.maintainclimber import MaintainClimber
 from commands.drivetrain.drive import DriveField
 from commands.pivot.maintainpivot import MaintainPivot
-from modules.questvision import QuestVisionModule
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder

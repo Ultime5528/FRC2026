@@ -3,13 +3,13 @@ from commands2.cmd import parallel, deadline
 from pathplannerlib.path import PathPlannerPath
 from wpimath.geometry import Translation2d
 
+from commands.autonomous import autopath
 from commands.climber.move import MoveClimber
 from commands.drivetrain.aligntotower import AlignToTower
+from commands.drivetrain.auto.pathfindfollowpath import PathFindFollowPath
 from commands.drivetrain.driverelative import DriveRelative
 from commands.hugandclimb import HugAndClimb
 from modules.hardware import HardwareModule
-from commands.drivetrain.auto.pathfindfollowpath import PathFindFollowPath
-from commands.autonomous import autopath
 from ultime.autoproperty import autoproperty
 
 

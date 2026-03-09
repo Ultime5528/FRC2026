@@ -3,10 +3,8 @@ from typing import Optional
 
 import commands2
 from commands2 import Command
-from pathplannerlib.auto import NamedCommands, AutoBuilder
-from pathplannerlib.config import RobotConfig, PIDConstants
-from pathplannerlib.controller import PPHolonomicDriveController
-from wpilib import DriverStation, SendableChooser
+from pathplannerlib.auto import NamedCommands
+from wpilib import SendableChooser
 
 from commands.autonomous.rushtomiddle import RushToMiddle
 from modules.hardware import HardwareModule

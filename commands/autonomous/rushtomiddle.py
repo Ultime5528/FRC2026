@@ -2,13 +2,13 @@ from commands2 import SequentialCommandGroup
 from commands2.cmd import deadline, sequence
 from pathplannerlib.path import PathPlannerPath
 
+from commands.alignshoot import AlignShoot
 from commands.autonomous.towerclimb import TowerClimb
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.shooter.prepareshoot import PrepareShoot
-from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 

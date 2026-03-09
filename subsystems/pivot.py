@@ -4,12 +4,10 @@ import rev
 from rev import (
     SparkMaxSim,
     SparkMaxConfig,
-    SparkMax,
     ResetMode,
     PersistMode,
     SparkBaseConfig,
 )
-from wpilib import RobotBase
 from wpimath._controls._controls.plant import DCMotor
 
 import ports

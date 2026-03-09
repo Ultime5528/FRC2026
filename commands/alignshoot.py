@@ -11,7 +11,6 @@ from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder
 from subsystems.pivot import Pivot
 from subsystems.shooter import Shooter
-from ultime.autoproperty import autoproperty
 from ultime.command import WaitCommand
 
 

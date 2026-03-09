@@ -1,11 +1,8 @@
-import math
-
-from wpimath.geometry import Pose2d, Pose3d
+from wpimath.geometry import Pose3d
 
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule
 from subsystems.drivetrain import Drivetrain
-from ultime.autoproperty import autoproperty
 from ultime.module import Module
 
 

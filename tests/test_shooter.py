@@ -1,13 +1,11 @@
 from commands2 import CommandScheduler
 from pytest import approx
 
-from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
+from commands.shooter.manualshoot import ManualShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
-from modules.shootercalcmodule import ShooterCalcModule
 from robot import Robot
 from subsystems.shooter import IndexerState
-from ultime.control import feedforward
 from ultime.tests import RobotTestController
 
 

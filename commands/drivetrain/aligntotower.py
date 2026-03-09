@@ -1,6 +1,5 @@
 import wpilib
 
-from commands.drivetrain.driverelative import DriveRelative
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
 from ultime.command import Command

@@ -1,4 +1,4 @@
-from typing import Generator, List, Tuple
+from typing import Generator, Tuple
 
 import wpimath
 from wpimath.geometry import Pose3d, Pose2d
