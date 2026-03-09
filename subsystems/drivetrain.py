@@ -25,6 +25,7 @@ from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470, NavX
 from ultime.modulerobot import is_simulation
+from ultime.pathfindthenfollowpath import PathfindThenFollowPath
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
 from ultime.switch import Switch
@@ -129,6 +130,21 @@ class Drivetrain(Subsystem):
             config,
             self.shouldFlipPath,
             self,
+        )
+        AutoBuilder._pathfindThenFollowPathCommandBuilder = (
+            lambda path, constraints: PathfindThenFollowPath(
+                path,
+                constraints,
+                self.getPose,
+                self.getRobotRelativeChassisSpeeds,
+                lambda speeds, feedforwards: self.driveFromChassisSpeeds(
+                    speeds, feedforwards
+                ),
+                self.pp_holonomic_drive_controller,
+                config,
+                self.shouldFlipPath,
+                self,
+            )
         )
 
         """

@@ -8,6 +8,7 @@ from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d
 
 from commands.autonomous.newrushtomiddle import NewRushToMiddle
+from commands.autonomous.passtrench import PassTrench
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
@@ -83,6 +84,7 @@ class DashboardModule(Module):
             "Autonomous", ShootAndClimb.left(hardware, self.shooter_calc_module)
         )
         putCommandOnDashboard("Autonomous", AlignToTower(hardware.drivetrain))
+        putCommandOnDashboard("Autonomous", PassTrench(hardware.drivetrain))
         """
         Drivetrain
         """
