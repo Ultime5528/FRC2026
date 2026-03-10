@@ -6,6 +6,7 @@ from modules.autonomous import AutonomousModule
 from modules.control import ControlModule
 from modules.dashboard import DashboardModule
 from modules.hardware import HardwareModule
+from modules.led import LEDModule
 from modules.logging import LoggingModule
 from modules.positionestimator import PositionEstimator
 from modules.propertysavechecker import PropertySaveCheckerModule
@@ -49,6 +50,9 @@ class Robot(ModuleRobot):
         self.hardware.guide.setDefaultCommand(
             CheckGuide(self.hardware.guide, self.shooter_calc_module)
         )
+
+        self.led = self.addModule(LEDModule(self.hardware))
+
         self.autonomous = self.addModule(
             AutonomousModule(self.hardware, self.shooter_calc_module)
         )
