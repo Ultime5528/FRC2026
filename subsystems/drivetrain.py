@@ -168,7 +168,7 @@ class Drivetrain(Subsystem):
         self._gyro = ADIS16470()
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
-        self._gyro_angles_radians = self.createProperty(0.0)
+        self._gyro_angles_degrees = self.createProperty(0.0)
         self._gyro_rotation2d: Rotation2d = Rotation2d()
 
         self._field = wpilib.Field2d()
@@ -179,7 +179,7 @@ class Drivetrain(Subsystem):
             self.swerve_module_fr,
             self.swerve_module_bl,
             self.swerve_module_br,
-            lambda: self._gyro_angles_radians,
+            lambda: math.radians(self._gyro_angles_degrees),
         )
         wpilib.SmartDashboard.putData("SwerveDrive", swerve_drive_sendable)
 
@@ -301,11 +301,11 @@ class Drivetrain(Subsystem):
             swerve_module_states[3], ff.accelerationsMPS[3]
         )
 
-    def getGyroAngleRadians(self):
+    def getGyroAngleDegrees(self):
         """
         Wrapped between -180 and 180
         """
-        return self._gyro_angles_radians
+        return self._gyro_angles_degrees
 
     def getEstimatedAngle(self):
         return self._estimated_angle
@@ -401,7 +401,7 @@ class Drivetrain(Subsystem):
             )
         )
 
-        self._gyro_angles_radians = self._gyro.getAngle()
+        self._gyro_angles_degrees = self._gyro.getAngle()
         self._gyro_rotation2d = self._gyro.getRotation2d()
 
     def periodic(self):
