@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 import hal
 import wpilib
+from wpilib import ADIS16470_IMU
 from wpilib.simulation import SimDeviceSim
 from wpimath.geometry import Rotation2d
 from wpiutil import Sendable, SendableBuilder
@@ -124,6 +125,7 @@ class ADIS16470(Gyro):
             wpilib.ADIS16470_IMU.IMUAxis.kZ,  # kX
             wpilib.ADIS16470_IMU.IMUAxis.kX,  # kY
         )
+        self.gyro.configCalTime(ADIS16470_IMU.CalibrationTime._4s)
         super().__init__()
         self.gyro.getPitchAxis()
         gyro_sim_device = SimDeviceSim("Gyro:ADIS16470[0]")
