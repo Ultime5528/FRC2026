@@ -3,10 +3,9 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
-from commands.autonomous.newrushtomiddle import NewRushToMiddle
+from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.passtrench import PassTrench
 from commands.alignshoot import AlignShoot
-from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber

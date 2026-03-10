@@ -97,7 +97,7 @@ class PathfindingCommand(Command):
         self._speedsSupplier = speeds_supplier
         self._output = output
         self._robotConfig = robot_config
-        self._shouldFlipPath = lambda: should_flip_path and (
+        self._shouldFlipPath = lambda: should_flip_path() and (
             target_path is None or not target_path.preventFlipping
         )
 
