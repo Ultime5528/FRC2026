@@ -10,6 +10,7 @@ def mirrorPose(pose: Pose2d) -> Pose2d:
     new_translation = PathPlannerPath._mirrorTranslation(translation)
     return Pose2d(new_translation, pose.rotation())
 
+
 def isRight(pose: Pose2d) -> bool:
     is_red = DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
