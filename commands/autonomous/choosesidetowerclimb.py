@@ -11,6 +11,7 @@ class ChooseSideTowerClimb(DeferredCommand):
         super().__init__()
         self.hardware = hardware
         self.drivetrain = hardware.drivetrain
+        self.addRequirements(self.drivetrain)
 
     def createCommand(self) -> Command:
         current_pose = self.drivetrain.getPose()
