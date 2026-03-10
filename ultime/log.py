@@ -1,6 +1,6 @@
 import inspect
 import weakref
-from typing import Optional, List
+from typing import Optional
 
 from ntcore import NetworkTableInstance, PubSubOptions
 

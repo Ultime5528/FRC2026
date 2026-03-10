@@ -118,7 +118,7 @@ class ShooterCalcModule(Module):
     rpm_guide_open = autoproperty([2500.0, 2750.0, 2900.0, 3350.0, 3800.0])
     speed_guide_closed = autoproperty([6.1, 6.48, 6.8, 7.2, 7.7, 8.0, 8.3, 8.4])
     rpm_guide_closed = autoproperty(
-        [2600.0, 2850.0, 3050.0, 3225.0, 3550.0, 4050.0, 4500.0, 4700.0]
+        [2800.0, 3200.0, 3050.0, 3225.0, 3550.0, 4050.0, 4500.0, 4700.0]
     )
 
     def __init__(
@@ -191,8 +191,6 @@ class ShooterCalcModule(Module):
         self._computeTargetPosition()
 
         self._computeShouldUseGuide()
-
-        # TODO Uninitialized case
 
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
@@ -300,5 +298,5 @@ class ShooterCalcModule(Module):
         self.log("should_use_guide", self._should_use_guide)
         self.log("shooter_exit_angle", self._projectile_angle)
         self.log("projectile_speed", self._projectile_speed)
-        self.log("_robot_rotation_angle", self._robot_rotation_angle.degrees())
+        self.log("robot_rotation_angle", self._robot_rotation_angle.degrees())
         self.log("target_distance_xy", self.distance_xy)

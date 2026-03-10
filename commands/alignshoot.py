@@ -11,13 +11,10 @@ from subsystems.drivetrain import Drivetrain
 from subsystems.feeder import Feeder
 from subsystems.pivot import Pivot
 from subsystems.shooter import Shooter
-from ultime.autoproperty import autoproperty
 from ultime.command import WaitCommand
 
 
-class ShootWithAlign(ParallelCommandGroup):
-    move_pivot_delay = autoproperty(1.0)
-
+class AlignShoot(ParallelCommandGroup):
     def __init__(
         self,
         shooter: Shooter,
@@ -35,7 +32,7 @@ class ShootWithAlign(ParallelCommandGroup):
                 WaitCommand(2.0),
                 parallel(
                     repeatingSequence(
-                        ManualMovePivot.up(pivot).withTimeout(0.2),
+                        ManualMovePivot.up(pivot).withTimeout(0.25),
                         ManualMovePivot.down(pivot).withTimeout(0.2),
                     ),
                     GrabFuel(feeder),

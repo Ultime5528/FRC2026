@@ -2,14 +2,13 @@ import math
 
 import numpy
 from _pytest.python_api import approx
-from wpimath.geometry import Pose2d, Rotation2d, Translation2d, Transform2d
+from wpimath.geometry import Pose2d, Transform2d
 from wpimath.geometry import Pose3d, Rotation3d, Translation3d, Transform3d
 
 from commands.drivetrain.resetpose import ResetPose
 from modules.shootercalcmodule import (
     computeRobotRotationToAlignExact,
     computeRobotRotationToAlign,
-    computeShooterPose,
 )
 from robot import Robot
 from ultime.tests import RobotTestController

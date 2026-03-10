@@ -2,7 +2,6 @@ import math
 
 import commands2.button
 from wpilib import DriverStation
-from wpimath.geometry import Rotation2d
 
 from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.drivetrain import Drivetrain

@@ -1,18 +1,18 @@
 from commands2.cmd import parallel
 
+from commands.alignshoot import AlignShoot
 from commands.autonomous.towerclimb import TowerClimb
-from commands.climber.move import MoveClimber, ManualMoveClimber, ResetClimber
+from commands.climber.move import MoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.grabfuel import GrabFuel
-from commands.feeder.ejectfuel import EjectFuel
-from commands.hugandclimb import HugAndClimb
 from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
+from commands.shooter.manualshoot import ManualShoot
 from commands.shooter.shoot import Shoot
-from commands.shootwithalign import ShootWithAlign
+from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
@@ -55,7 +55,7 @@ class ControlModule(Module):
 
         # Shooter
         hardware.panel_1.povDown().whileTrue(
-            ShootWithAlign(
+            AlignShoot(
                 hardware.shooter,
                 hardware.drivetrain,
                 hardware.pivot,
@@ -63,6 +63,10 @@ class ControlModule(Module):
                 hardware.controller,
                 shooter_calc_module,
             )
+        )
+
+        hardware.panel_1.axisGreaterThan(2, 0.5).whileTrue(
+            ManualShoot(hardware.shooter)
         )
 
         # Climber
