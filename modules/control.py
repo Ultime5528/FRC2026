@@ -1,6 +1,7 @@
 from commands2.cmd import parallel
 
 from commands.alignshoot import AlignShoot
+from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
@@ -40,7 +41,7 @@ class ControlModule(Module):
             DriveRelative.backwards(hardware.drivetrain)
         )
 
-        hardware.controller.leftBumper().whileTrue(TowerClimb.right(hardware))
+        hardware.controller.leftBumper().whileTrue(ChooseSideTowerClimb(hardware))
 
         """
         Copilot's panel

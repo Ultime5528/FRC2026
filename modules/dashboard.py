@@ -3,6 +3,7 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
+from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.passtrench import PassTrench
 from commands.alignshoot import AlignShoot
@@ -57,6 +58,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Autonomous", TowerClimb.left(hardware))
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
+        putCommandOnDashboard("Autonomous", ChooseSideTowerClimb(hardware))
         putCommandOnDashboard(
             "Autonomous", RushToMiddle.rightTrench(hardware, self.shooter_calc_module)
         )
