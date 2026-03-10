@@ -7,6 +7,7 @@ from pathplannerlib.auto import NamedCommands
 from wpilib import SendableChooser
 
 from commands.autonomous.rushtomiddle import RushToMiddle
+from commands.autonomous.shootandclimb import ShootAndClimb
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.command import WaitCommand
@@ -31,6 +32,15 @@ class AutonomousModule(Module):
 
         self.auto_chooser.addOption(
             "RushToMiddleRight", RushToMiddle.rightTrench(hardware, shooter_calc_module)
+        )
+        self.auto_chooser.addOption(
+            "RushToMiddleLeft", RushToMiddle.leftTrench(hardware, shooter_calc_module)
+        )
+        self.auto_chooser.addOption(
+            "ShootAndClimbRight", ShootAndClimb.right(hardware, shooter_calc_module)
+        )
+        self.auto_chooser.addOption(
+            "ShootAndClimbLeft", ShootAndClimb.left(hardware, shooter_calc_module)
         )
 
     def autonomousInit(self):

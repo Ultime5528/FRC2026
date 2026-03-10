@@ -14,5 +14,5 @@ class PathFindPrecise(SequentialCommandGroup):
 
         self.addCommands(
             self.drivetrain.getPathFindingCommand(self.pose),
-            AlignPreciseAfterPath(self.drivetrain, self.pose),
+            # AlignPreciseAfterPath(self.drivetrain, self.pose),
         )

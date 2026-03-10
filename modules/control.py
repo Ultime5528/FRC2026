@@ -1,6 +1,7 @@
 from commands2.cmd import parallel
 
 from commands.alignshoot import AlignShoot
+from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
@@ -9,6 +10,10 @@ from commands.feeder.grabfuel import GrabFuel
 from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
+from commands.retractandunhug import RetractAndUnhug
+from commands.shooter.manualshoot import ManualShoot
+from commands.shooter.shoot import Shoot
+from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
@@ -36,7 +41,7 @@ class ControlModule(Module):
             DriveRelative.backwards(hardware.drivetrain)
         )
 
-        hardware.controller.leftBumper().whileTrue(TowerClimb.right(hardware))
+        hardware.controller.leftBumper().whileTrue(ChooseSideTowerClimb(hardware))
 
         """
         Copilot's panel
@@ -59,6 +64,10 @@ class ControlModule(Module):
                 hardware.controller,
                 shooter_calc_module,
             )
+        )
+
+        hardware.panel_1.axisGreaterThan(2, 0.5).whileTrue(
+            ManualShoot(hardware.shooter)
         )
 
         # Climber

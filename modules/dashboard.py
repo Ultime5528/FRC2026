@@ -3,8 +3,10 @@ import wpilib
 from commands2 import CommandScheduler
 from wpilib import SmartDashboard
 
-from commands.alignshoot import AlignShoot
+from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
 from commands.autonomous.rushtomiddle import RushToMiddle
+from commands.autonomous.passtrench import PassTrench
+from commands.alignshoot import AlignShoot
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
@@ -56,6 +58,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard("Autonomous", TowerClimb.left(hardware))
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
+        putCommandOnDashboard("Autonomous", ChooseSideTowerClimb(hardware))
         putCommandOnDashboard(
             "Autonomous", RushToMiddle.rightTrench(hardware, self.shooter_calc_module)
         )
@@ -69,6 +72,7 @@ class DashboardModule(Module):
             "Autonomous", ShootAndClimb.left(hardware, self.shooter_calc_module)
         )
         putCommandOnDashboard("Autonomous", AlignToTower(hardware.drivetrain))
+        putCommandOnDashboard("Autonomous", PassTrench(hardware.drivetrain))
         """
         Drivetrain
         """

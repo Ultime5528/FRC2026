@@ -25,6 +25,7 @@ from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
 from ultime.gyro import ADIS16470
 from ultime.modulerobot import is_simulation
+from ultime.pathfindthenfollowpath import PathfindThenFollowPath
 from ultime.subsystem import Subsystem
 from ultime.swerve.swerve import SwerveModule, SwerveDriveElasticSendable
 from ultime.switch import Switch
@@ -130,6 +131,21 @@ class Drivetrain(Subsystem):
             self.shouldFlipPath,
             self,
         )
+        AutoBuilder._pathfindThenFollowPathCommandBuilder = (
+            lambda path, constraints: PathfindThenFollowPath(
+                path,
+                constraints,
+                self.getPose,
+                self.getRobotRelativeChassisSpeeds,
+                lambda speeds, feedforwards: self.driveFromChassisSpeeds(
+                    speeds, feedforwards
+                ),
+                self.pp_holonomic_drive_controller,
+                config,
+                self.shouldFlipPath,
+                self,
+            )
+        )
 
         """
         Config used only when path finding to a pose
@@ -152,7 +168,7 @@ class Drivetrain(Subsystem):
         self._gyro = ADIS16470()
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
-        self._gyro_angles_radians = self.createProperty(0.0)
+        self._gyro_angles_degrees = self.createProperty(0.0)
         self._gyro_rotation2d: Rotation2d = Rotation2d()
 
         self._field = wpilib.Field2d()
@@ -163,7 +179,7 @@ class Drivetrain(Subsystem):
             self.swerve_module_fr,
             self.swerve_module_bl,
             self.swerve_module_br,
-            lambda: self._gyro_angles_radians,
+            lambda: math.radians(self._gyro_angles_degrees),
         )
         wpilib.SmartDashboard.putData("SwerveDrive", swerve_drive_sendable)
 
@@ -285,11 +301,11 @@ class Drivetrain(Subsystem):
             swerve_module_states[3], ff.accelerationsMPS[3]
         )
 
-    def getGyroAngleRadians(self):
+    def getGyroAngleDegrees(self):
         """
         Wrapped between -180 and 180
         """
-        return self._gyro_angles_radians
+        return self._gyro_angles_degrees
 
     def getEstimatedAngle(self):
         return self._estimated_angle
@@ -385,7 +401,7 @@ class Drivetrain(Subsystem):
             )
         )
 
-        self._gyro_angles_radians = self._gyro.getAngle()
+        self._gyro_angles_degrees = self._gyro.getAngle()
         self._gyro_rotation2d = self._gyro.getRotation2d()
 
     def periodic(self):
