@@ -19,10 +19,10 @@ from ultime.switch import Switch
 
 
 class Pivot(LinearSubsystem):
-    speed_maintain = autoproperty(0.0)
+    speed_maintain = autoproperty(0.1)
     min_position = autoproperty(0.0)
     max_position = autoproperty(5.0)
-    position_maintain_min = autoproperty(-1.0)
+    position_maintain_min = autoproperty(3.0)
     position_maintain_max = autoproperty(6.5)
 
     position_conversion_factor = autoproperty(1.0)
