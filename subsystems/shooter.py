@@ -41,7 +41,6 @@ class Shooter(Subsystem):
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self._config = rev.SparkMaxConfig()
-        # self._config.voltageCompensation(12.0)
         self._flywheel.configure(
             self._config,
             rev.ResetMode.kResetSafeParameters,
@@ -78,10 +77,6 @@ class Shooter(Subsystem):
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
-
-    def reset(self):
-        self._velocity_filter.reset()
-        self._is_at_velocity = False
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())

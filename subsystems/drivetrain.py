@@ -9,7 +9,7 @@ from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.path import PathPlannerPath, PathConstraints
 from pathplannerlib.util import DriveFeedforwards
 from rev import SparkBase
-from wpilib import RobotBase, DriverStation, SmartDashboard
+from wpilib import DriverStation
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d, Twist2d
 from wpimath.kinematics import (
@@ -23,7 +23,7 @@ from wpimath.kinematics import (
 import ports
 from ultime.alert import AlertType
 from ultime.autoproperty import autoproperty
-from ultime.gyro import ADIS16470, NavX
+from ultime.gyro import ADIS16470
 from ultime.modulerobot import is_simulation
 from ultime.pathfindthenfollowpath import PathfindThenFollowPath
 from ultime.subsystem import Subsystem
@@ -166,8 +166,6 @@ class Drivetrain(Subsystem):
         Possibilités : NavX, ADIS16448, ADIS16470, ADXRS, Empty
         """
         self._gyro = ADIS16470()
-        self._navx = NavX()
-        SmartDashboard.putData("NavX", self._navx)
         # TODO Assert _gyro is subclass of abstract class Gyro
         self.addChild("Gyro", self._gyro)
         self._gyro_angles_radians = self.createProperty(0.0)
@@ -406,8 +404,6 @@ class Drivetrain(Subsystem):
         self._gyro_angles_radians = self._gyro.getAngle()
         self._gyro_rotation2d = self._gyro.getRotation2d()
 
-        pass
-
     def periodic(self):
         swerve_positions = (
             self.swerve_module_fl.getPosition(),
@@ -443,7 +439,6 @@ class Drivetrain(Subsystem):
         chassis_rotation_speed = self._chassis_speed.omega
         self.sim_yaw += chassis_rotation_speed * self.period_seconds
         self._gyro.setSimAngle(math.degrees(self.sim_yaw))
-        pass
 
     def getRobotRelativeChassisSpeeds(self):
         """

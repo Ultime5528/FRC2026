@@ -1,4 +1,4 @@
-from typing import Generator, List, Tuple
+from typing import Generator, Tuple
 
 import wpimath
 from wpimath.geometry import Pose3d, Pose2d
@@ -53,9 +53,6 @@ class QuestVisionModule(Module):
     def logValues(self):
         self.log("x", self.estimated_pose.x)
         self.log("y", self.estimated_pose.y)
-        # self.log("z", self.estimated_pose.z)
-        # self.log("roll", self.estimated_pose.rotation().x)
-        # self.log("pitch", self.estimated_pose.rotation().y)
         self.log("yaw", self.estimated_pose.rotation().degrees())
         self.log("isTracking", self.quest_nav.isTracking())
         self.log("battery", self.quest_nav.getBatteryPercent())

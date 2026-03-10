@@ -1,12 +1,11 @@
 from commands2.cmd import parallel
 
+from commands.alignshoot import AlignShoot
 from commands.autonomous.towerclimb import TowerClimb
-from commands.climber.move import MoveClimber, ManualMoveClimber, ResetClimber
+from commands.climber.move import MoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.grabfuel import GrabFuel
-from commands.feeder.ejectfuel import EjectFuel
-from commands.hugandclimb import HugAndClimb
 from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
@@ -56,7 +55,7 @@ class ControlModule(Module):
 
         # Shooter
         hardware.panel_1.povDown().whileTrue(
-            ShootWithAlign(
+            AlignShoot(
                 hardware.shooter,
                 hardware.drivetrain,
                 hardware.pivot,

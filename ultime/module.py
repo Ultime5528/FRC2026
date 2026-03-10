@@ -1,8 +1,6 @@
 import inspect
 from functools import wraps
 
-from wpiutil import Sendable
-
 from ultime.alert import AlertCreator
 from ultime.log import Loggable
 

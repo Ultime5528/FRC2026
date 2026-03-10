@@ -1,22 +1,17 @@
-import modulefinder
-
 import commands2
 import wpilib
 from commands2 import CommandScheduler
-from pathplannerlib.path import PathPlannerPath
 from wpilib import SmartDashboard
-from wpimath.geometry import Pose2d
 
 from commands.autonomous.newrushtomiddle import NewRushToMiddle
 from commands.autonomous.passtrench import PassTrench
+from commands.alignshoot import AlignShoot
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
 from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
-from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
-from commands.drivetrain.auto.pathfindprecise import PathFindPrecise
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.ejectfuel import EjectFuel
 from commands.feeder.grabfuel import GrabFuel
@@ -29,10 +24,8 @@ from commands.resetall import ResetAll
 from commands.shooter.manualshoot import ManualShoot, ManualPrepareShoot
 from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
-from commands.shootwithalign import ShootWithAlign
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
-from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.log import Logger
 from ultime.module import Module, ModuleList
@@ -66,16 +59,10 @@ class DashboardModule(Module):
         putCommandOnDashboard("Autonomous", TowerClimb.left(hardware))
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.right(hardware, self.shooter_calc_module)
+            "Autonomous", RushToMiddle.rightTrench(hardware, self.shooter_calc_module)
         )
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.left(hardware, self.shooter_calc_module)
-        )
-        putCommandOnDashboard(
-            "Autonomous", NewRushToMiddle.right(hardware, self.shooter_calc_module)
-        )
-        putCommandOnDashboard(
-            "Autonomous", NewRushToMiddle.left(hardware, self.shooter_calc_module)
+            "Autonomous", RushToMiddle.leftTrench(hardware, self.shooter_calc_module)
         )
         putCommandOnDashboard(
             "Autonomous", ShootAndClimb.right(hardware, self.shooter_calc_module)
@@ -108,7 +95,7 @@ class DashboardModule(Module):
         )
         putCommandOnDashboard(
             "Shooter",
-            ShootWithAlign(
+            AlignShoot(
                 hardware.shooter,
                 hardware.drivetrain,
                 hardware.pivot,
