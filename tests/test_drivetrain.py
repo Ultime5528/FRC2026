@@ -1,40 +1,54 @@
+import wpilib
+from commands2 import ScheduleCommand
 from wpimath.geometry import Pose2d
 
+from commands.drivetrain.drive import DriveField
 from commands.drivetrain.driverelative import DriveRelative
+from commands.drivetrain.resetgyro import ResetGyro
+from commands.drivetrain.resetpose import ResetPose
 from robot import Robot
 from ultime.tests import RobotTestController
 
 
-# This test doesn't work now that Drivetrain.getPose() gets the intra-frame updated estimated position
+def test_ResetGyro(robot_controller: RobotTestController, robot: Robot):
 
-# def test_ResetGyro(robot_controller: RobotTestController, robot: Robot):
-#     drivetrain = robot.hardware.drivetrain
-#     xbox_remote = wpilib.simulation.XboxControllerSim(0)
-#
-#     robot_controller.startTeleop()
-#
-#     reset_cmd = ResetGyro(drivetrain)
-#     robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
-#     init_pose = drivetrain.getPose()
-#     drive_cmd = DriveField(drivetrain, robot.hardware.controller)
-#     xbox_remote.setRightX(-1)
-#     robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
-#     reset_cmd = ResetGyro(drivetrain)
-#     robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
-#     assert drivetrain.getPose().rotation() == init_pose.rotation()
+    drivetrain = robot.hardware.drivetrain
+    xbox_remote = wpilib.simulation.XboxControllerSim(0)
+
+    robot_controller.startTeleop()
+
+    reset_cmd = ResetGyro(drivetrain)
+    robot_controller.run_command(reset_cmd, 10.0)
+    init_pose = drivetrain.getPose()
+
+    xbox_remote.setRightX(-1)
+    robot_controller.wait(1.0)
+
+    # Wait a bit until the robot stops moving
+    xbox_remote.setRightX(0.0)
+    robot_controller.wait(1.0)
+
+    reset_cmd = ResetGyro(drivetrain)
+    robot_controller.run_command(reset_cmd, 10.0)
+    assert drivetrain.getPose().rotation() == init_pose.rotation()
 
 
-# This test doesn't work now that Drivetrain.getPose() gets the intra-frame updated estimated position
+def test_ResetPose(robot_controller: RobotTestController, robot: Robot):
 
-# def test_ResetPose(robot_controller: RobotTestController, robot: Robot):
-#     robot_controller.startTeleop()
-#     drivetrain = robot.hardware.drivetrain
-#
-#     drive_cmd = DriveRelative.right(drivetrain)
-#     robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
-#     reset_cmd = ResetPose(drivetrain, Pose2d())
-#     robot_controller.run_command(reset_cmd.withTimeout(0.1), 3.0)
-#     assert drivetrain.getPose() == Pose2d()
+    robot_controller.startTeleop()
+    drivetrain = robot.hardware.drivetrain
+
+    drivetrain.removeDefaultCommand()
+
+    drive_cmd = DriveRelative.right(drivetrain)
+    robot_controller.run_command(drive_cmd.withTimeout(2.0), 3.0)
+
+    # Wait a bit until the robot stops moving
+    robot_controller.wait(1.0)
+
+    reset_cmd = ResetPose(drivetrain, Pose2d())
+    robot_controller.run_command(reset_cmd, 3.0)
+    assert drivetrain.getPose() == Pose2d()
 
 
 def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
@@ -64,6 +78,12 @@ def test_drive_relative(robot_controller: RobotTestController, robot: Robot):
     right_cmd.schedule()
     robot_controller.wait_until(lambda: drivetrain.getPose().X() <= 0, 5.0)
 
+
+# The drivetrain is erratic in sim, so the tests can't possibly work for now.
+# All the test should be revised once the bug has been found: no need to use
+# abs(...), use way smaller absolute errors, some tests are nonsensical.
+# Finally, since the DriveField is the default command for the Drivetrain,
+# we shouldn't start a new one for the test.
 
 # def test_drivefield(robot_controller: RobotTestController, robot: Robot):
 #     drivetrain = robot.hardware.drivetrain
