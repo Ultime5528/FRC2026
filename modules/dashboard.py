@@ -44,7 +44,7 @@ class DashboardModule(Module):
         self._module_list = module_list
         self.shooter_calc_module = shooter_calc_module
         self.setupCopilotCommands(hardware)
-        self.setupCommands(hardware)
+        #self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)

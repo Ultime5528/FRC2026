@@ -53,13 +53,10 @@ class PositionEstimator(Module):
         self.quest_connected = self.quest_nav.isConnected()
 
     def _addQuestMeasurements(self):
-        for (
-            pose,
-            timestamp,
-            std_devs,
-        ) in self.quest_nav.getAllUnreadPosesTimestampsStdDevs():
-            if pose is not None:
-                self.drivetrain.addVisionMeasurement(pose, timestamp, std_devs)
+        poses = list(self.quest_nav.getAllUnreadPosesTimestampsStdDevs())
+        if poses:
+            pose = poses[-1]
+            self.drivetrain.addVisionMeasurement(pose[0], pose[1], pose[2])
 
     def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
         for (

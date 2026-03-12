@@ -2,6 +2,7 @@ from commands2.cmd import parallel
 
 from commands.alignshoot import AlignShoot
 from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
+from commands.autonomous.passtrench import PassTrench
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber, ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
@@ -30,6 +31,7 @@ class ControlModule(Module):
         """
         Pilot's buttons
         """
+        hardware.controller.a().whileTrue(PassTrench(hardware.drivetrain))
         hardware.controller.povLeft().whileTrue(DriveRelative.left(hardware.drivetrain))
         hardware.controller.povRight().whileTrue(
             DriveRelative.right(hardware.drivetrain)
