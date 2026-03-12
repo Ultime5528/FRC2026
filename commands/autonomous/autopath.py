@@ -21,7 +21,7 @@ _constraints_for_tower = PathConstraints(
 
 _tower_y_left = 4.595
 _tower_y_right = 2.987
-_tower_x = 1.021
+_tower_x = 1.050
 _tower_y_threshold = 0.2
 
 _tower_distance_from_for_first_pose = 0.45
