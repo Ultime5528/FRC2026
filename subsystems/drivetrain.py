@@ -494,6 +494,7 @@ class Drivetrain(Subsystem):
         )
 
     def logValues(self):
+        super().logValues()
         self.log(
             "speed_goal",
             math.hypot(self.chassis_speed_goal.vx, self.chassis_speed_goal.vy),
