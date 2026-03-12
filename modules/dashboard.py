@@ -152,7 +152,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard(
             "Group",
-            ResetAll(hardware.climber, hardware.hugger, hardware.guide),
+            ResetAll(hardware.climber, hardware.hugger),
         )
 
     def robotInit(self) -> None:

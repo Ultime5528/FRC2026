@@ -27,8 +27,8 @@ class Shooter(Subsystem):
     flywheel_kS = autoproperty(0.119613)
     shooter_tolerance = autoproperty(30.0)
 
-    indexer_rpm = autoproperty(1400.0)
-    indexer_amplitude = autoproperty(600)
+    indexer_rpm = autoproperty(2400.0)
+    indexer_amplitude = autoproperty(50.0)
     indexer_period = autoproperty(1.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
