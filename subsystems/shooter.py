@@ -130,7 +130,8 @@ class Shooter(Subsystem):
                 self.indexer_state = IndexerState.Stuck
                 self._indexer_stuck_timer.restart()
             else:
-                varying_rpm = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() % self.indexer_period)
+                amplitude = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period)
+                varying_rpm = amplitude + self.indexer_rpm
                 self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
