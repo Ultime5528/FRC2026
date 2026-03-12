@@ -71,6 +71,7 @@ class Shooter(Subsystem):
         self._indexer_stuck_timer = wpilib.Timer()
 
         self._indexer_rpm_timer = wpilib.Timer()
+        self._indexer_rpm_timer.restart()
 
         self.indexer_state = IndexerState.Off
 
