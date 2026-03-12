@@ -14,7 +14,7 @@ from ultime.autoproperty import autoproperty
 
 
 class TowerClimb(SequentialCommandGroup):
-    speed = autoproperty(0.1)
+    speed = autoproperty(0.2)
 
     @classmethod
     def left(cls, hardware: HardwareModule):
