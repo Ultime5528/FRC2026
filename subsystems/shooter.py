@@ -1,3 +1,4 @@
+import math
 from enum import Enum, auto
 
 import rev
@@ -27,6 +28,8 @@ class Shooter(Subsystem):
     shooter_tolerance = autoproperty(30.0)
 
     indexer_rpm = autoproperty(1200.0)
+    indexer_amplitude = autoproperty(800)
+    indexer_period = autoproperty(2.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
     indexer_delay_unstuck = autoproperty(2.0)
@@ -65,7 +68,9 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._timer = wpilib.Timer()
+        self._indexer_stuck_timer = wpilib.Timer()
+
+        self._indexer_rpm_timer = wpilib.Timer()
 
         self.indexer_state = IndexerState.Off
 
@@ -114,24 +119,25 @@ class Shooter(Subsystem):
 
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
-            self._timer.restart()
+            self._indexer_stuck_timer.restart()
 
         if self.indexer_state == IndexerState.On:
             if (
-                self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
+                self._indexer_stuck_timer.hasElapsed(self.indexer_delay_stuck_threshold)
                 and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
             ):
                 self.indexer_state = IndexerState.Stuck
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
             else:
-                self._setIndexerRPM(self.indexer_rpm)
+                varying_rpm = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() % self.indexer_period)
+                self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
             self._setIndexerRPM(self.indexer_rpm_unstuck)
 
-            if self._timer.hasElapsed(self.indexer_delay_unstuck):
+            if self._indexer_stuck_timer.hasElapsed(self.indexer_delay_unstuck):
                 self.indexer_state = IndexerState.On
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
 
     def stopFuel(self):
         self._indexer.set(0.0)
