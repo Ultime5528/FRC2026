@@ -40,7 +40,7 @@ class LEDModule(Module):
 
     led_number = autoproperty(100.0)
 
-    brightness_value = autoproperty(5.0)
+    brightness_value = autoproperty(100.0)
 
     def __init__(self, hardware):
         super().__init__()
@@ -107,36 +107,7 @@ class LEDModule(Module):
         self.commonTeleop(self.getAllianceColor(), self.white, 0.5)
 
     def modeEndgame(self):
-        period = 15
-        color = (self.brightness * self.getAllianceColor()).astype(int)
-        white = (self.brightness * self.white).astype(int)
-        i_values = np.arange(self.led_number)
-        y_values = ((i_values - self.time * 1.5) / period) % 1.0
-
-        pixel_value = numpy_interpolation(y_values, color, white)
-        for i, y in enumerate(pixel_value):
-            self.buffer[i].setRGB(*y)
-
-    def modeElevatorMove(self):
-        self.commonTeleop(self.orange_rgb, self.white, 3.5)
-
-    def modeClimberMove(self):
-        self.commonTeleop(self.purple, self.white, 3.0)
-
-    def modeDrop(self):
-        self.commonTeleop(self.white, self.white, 0)
-
-    def modeCoralLoaded(self):
-        self.commonTeleop(self.green_rgb, self.dark_green_rgb, 3.0)
-
-    def modeClimberReady(self):
-        self.commonTeleop(self.purple, self.purple, 0.0)
-
-    def modeClimberMoving(self):
-        self.commonTeleop(self.purple, self.white, 2.0)
-
-    def modeDropping(self):
-        self.commonTeleop(self.pink, self.white, 0.2)
+        self.commonTeleop(self.pink, self.white, 1.5)
 
     def commonTeleop(self, color1, color2, speed):
         color1 = (self.brightness * color1).astype(int)
@@ -200,12 +171,21 @@ class LEDModule(Module):
 
     def rainbow(self):
         for i in range(int(self.led_number)):
-            hue = (self.time + int(i * 180 / self.led_number)) % 180
+            hue = (int(self.time) + int(i * 180 / self.led_number)) % 180
             self.buffer[i].setHSV(
                 hue,
                 255,
                 round(255 * self.brightness),
             )
+
+    def canShoot(self):
+        self.commonTeleop(self.green_rgb, self.white, 0.5)
+
+    def cannotShoot(self):
+        self.commonTeleop(self.getAllianceColor(), self.white, 0.5)
+
+    def prepareShoot(self):
+        self.commonTeleop(self.yellow_rgb, self.white, 0.5)
 
     def robotPeriodic(self) -> None:
         start_time = getTime()
@@ -216,13 +196,66 @@ class LEDModule(Module):
         elif DriverStation.isAutonomousEnabled():  # auto
             self.modeAuto()
         elif DriverStation.isTeleopEnabled():  # teleop
-            if DriverStation.getMatchTime() > 30:
-                # TODO Les différents mode teleop / alliance shifts
-                self.modeTeleop()
-            elif DriverStation.getMatchTime() == -1.0:
-                self.rainbow()
+            game_data = DriverStation.getGameSpecificMessage()
+            alliance = DriverStation.getAlliance()
+            match_time = DriverStation.getMatchTime()
+
+            won = (
+                game_data == "B"
+                and alliance == DriverStation.Alliance.kBlue
+                or game_data == "R"
+                and DriverStation.Alliance.kRed
+            )
+
+            prepare_shoot_delay = 7
+            preshoot_delay = 3
+
+            if won:
+                if match_time > 130:
+                    self.canShoot()
+                elif match_time > 105 + prepare_shoot_delay + preshoot_delay:
+                    self.cannotShoot()
+                elif match_time > 105 + preshoot_delay:
+                    self.prepareShoot()
+                elif match_time > 80:
+                    self.canShoot()
+                elif match_time > 55 + prepare_shoot_delay + preshoot_delay:
+                    self.cannotShoot()
+                elif match_time > 55 + preshoot_delay:
+                    self.prepareShoot()
+                elif match_time > 15:
+                    self.canShoot()
+                elif match_time == -1.0:
+                    self.rainbow()
+                else:
+                    self.modeEndgame()
             else:
-                self.modeEndgame()
+                if match_time > 105:
+                    self.canShoot()
+                elif match_time > 80 + prepare_shoot_delay + preshoot_delay:
+                    self.cannotShoot()
+                elif match_time > 80 + preshoot_delay:
+                    self.prepareShoot()
+                elif match_time > 55:
+                    self.canShoot()
+                elif match_time > 30 + prepare_shoot_delay + preshoot_delay:
+                    self.cannotShoot()
+                elif match_time > 30 + preshoot_delay:
+                    self.prepareShoot()
+                elif match_time > 15:
+                    self.canShoot()
+                elif match_time == -1.0:
+                    self.rainbow()
+                else:
+                    self.modeEndgame()
+
+            # if DriverStation.getMatchTime() > 30:
+            #     # TODO Les différents mode teleop / alliance shifts
+            #     self.modeTeleop()
+            # elif DriverStation.getMatchTime() == -1.0:
+            #     self.rainbow()
+            # else:
+            #     self.modeEndgame()
 
         elif DriverStation.isDSAttached():
             if DriverStation.getBatteryVoltage() > 12:

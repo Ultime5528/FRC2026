@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import wpilib
+from wpilib.simulation import RoboRioSim, DriverStationSim
 
 from commands.guide.checkguide import CheckGuide
 from modules.autonomous import AutonomousModule
@@ -14,7 +15,7 @@ from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from modules.sysidmodule import SysIDModule
 from modules.tagvision import TagVisionModule
-from ultime.modulerobot import ModuleRobot
+from ultime.modulerobot import ModuleRobot, is_simulation
 
 
 class Robot(ModuleRobot):
@@ -70,3 +71,6 @@ class Robot(ModuleRobot):
         self.property_save_checker = self.addModule(PropertySaveCheckerModule())
 
         self.sys_id = self.addModule(SysIDModule(self.hardware.drivetrain))
+
+        if is_simulation:
+            RoboRioSim.setVInVoltage(12.5)
