@@ -6,6 +6,7 @@ from wpilib import AddressableLED, DriverStation, SmartDashboard, getTime
 from wpiutil import SendableBuilder
 
 import ports
+from modules.positionestimator import PositionEstimator
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
 from ultime.subsystem import Subsystem
@@ -42,11 +43,12 @@ class LEDModule(Module):
 
     brightness_value = autoproperty(100.0)
 
-    def __init__(self, hardware):
+    def __init__(self, hardware, estimator: PositionEstimator):
         super().__init__()
         from modules.hardware import HardwareModule
 
         self.hardware: HardwareModule = hardware
+        self.estimator = estimator
 
         self.led_strip = AddressableLED(ports.PWM.led_strip)
         self.buffer = [AddressableLED.LEDData() for _ in range(int(self.led_number))]
@@ -187,6 +189,10 @@ class LEDModule(Module):
     def prepareShoot(self):
         self.commonTeleop(self.yellow_rgb, self.white, 0.5)
 
+    def seesTags(self):
+        for i in range(len(self.buffer)):
+            self.buffer[i].setRGB(255, 255, 255)
+
     def robotPeriodic(self) -> None:
         start_time = getTime()
         self.time += 1
@@ -259,7 +265,10 @@ class LEDModule(Module):
 
         elif DriverStation.isDSAttached():
             if DriverStation.getBatteryVoltage() > 12:
-                self.modeConnected()  # connected to driver station
+                if self.estimator.tag_seen_in_frame:
+                    self.seesTags()
+                else:
+                    self.modeConnected()  # connected to driver station
             else:
                 self.modeConnectedLowBattery()  # has low voltage
 

@@ -52,7 +52,7 @@ class Robot(ModuleRobot):
             CheckGuide(self.hardware.guide, self.shooter_calc_module)
         )
 
-        self.led = self.addModule(LEDModule(self.hardware))
+        self.led = self.addModule(LEDModule(self.hardware, self.position_estimator))
 
         self.autonomous = self.addModule(
             AutonomousModule(self.hardware, self.shooter_calc_module)
