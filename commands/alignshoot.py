@@ -29,11 +29,12 @@ class AlignShoot(ParallelCommandGroup):
             Shoot(shooter, shooter_calc_module),
             DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
             sequence(
-                WaitCommand(2.0),
+                WaitCommand(2.5),
                 parallel(
                     repeatingSequence(
                         ManualMovePivot.up(pivot).withTimeout(0.3),
                         ManualMovePivot.down(pivot).withTimeout(0.3),
+                        WaitCommand(0.4),
                     ),
                     GrabFuel(feeder),
                 ),
