@@ -82,10 +82,7 @@ class RushToMiddle(SequentialCommandGroup):
                 deadline(
                     FollowPathPrecise(self.drivetrain, self.path),
                     ManualMovePivot.down(self.pivot),
-                    ResetAll(
-                        self.climber,
-                        self.hugger
-                    ),
+                    ResetAll(self.climber, self.hugger),
                     sequence(
                         GrabFuel(self.feeder).withTimeout(4.0),
                         PrepareShoot(self.shooter, self.shooter_module),
