@@ -99,6 +99,6 @@ class RushToMiddle(SequentialCommandGroup):
                     self.controller,
                     self.shooter_module,
                 ),
-            ).withTimeout(12.0),
+            ).withTimeout(12.5),
             self.climb_command,
         )
