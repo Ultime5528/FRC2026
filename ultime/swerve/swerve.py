@@ -88,13 +88,14 @@ class SwerveModule:
             self._turning_motor.getBusVoltage() * self._turning_motor.getAppliedOutput()
         )
 
+        angle = Rotation2d(self._turn_raw_angle_radians - self._chassis_angular_offset)
         self._module_state = SwerveModuleState(
             self._drive_velocity_meters_per_sec,
-            Rotation2d(self._turn_raw_angle_radians - self._chassis_angular_offset),
+            angle,
         )
         self._module_position = SwerveModulePosition(
             self._drive_position_meters,
-            Rotation2d(self._turn_raw_angle_radians - self._chassis_angular_offset),
+            angle,
         )
 
     def setDriveVoltage(self, voltage: float):
