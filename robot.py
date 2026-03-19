@@ -55,7 +55,9 @@ class Robot(ModuleRobot):
 
         self.game_specific = self.addModule(GameSpecifics())
 
-        self.led = self.addModule(LEDModule(self.hardware, self.position_estimator, self.game_specific))
+        self.led = self.addModule(
+            LEDModule(self.hardware, self.position_estimator, self.game_specific)
+        )
 
         self.autonomous = self.addModule(
             AutonomousModule(self.hardware, self.shooter_calc_module)

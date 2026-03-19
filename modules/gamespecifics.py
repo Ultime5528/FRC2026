@@ -41,11 +41,11 @@ class GameSpecifics(Module):
         self.game_specific_message = DriverStation.getGameSpecificMessage()
         self.alliance = DriverStation.getAlliance()
         self.won_auto = (
-                self.game_specific_message == "B"
-                and self.alliance == DriverStation.Alliance.kBlue
-                or self.game_specific_message == "R"
-                and DriverStation.Alliance.kRed
-            )
+            self.game_specific_message == "B"
+            and self.alliance == DriverStation.Alliance.kBlue
+            or self.game_specific_message == "R"
+            and DriverStation.Alliance.kRed
+        )
 
     def teleopPeriodic(self) -> None:
         self.game_time_sec = DriverStation.getMatchTime()
@@ -58,13 +58,18 @@ class GameSpecifics(Module):
         if self.won_auto:
             if self.game_time_sec > 130:
                 self.state = self.State.Shoot
-            elif self.game_time_sec > 105 + self.prepare_shoot_delay + self.preshoot_delay:
+            elif (
+                self.game_time_sec
+                > 105 + self.prepare_shoot_delay + self.preshoot_delay
+            ):
                 self.state = self.State.CannotShoot
             elif self.game_time_sec > 105 + self.preshoot_delay:
                 self.state = self.State.PrepareShoot
             elif self.game_time_sec > 80:
                 self.state = self.State.Shoot
-            elif self.game_time_sec > 55 + self.prepare_shoot_delay + self.preshoot_delay:
+            elif (
+                self.game_time_sec > 55 + self.prepare_shoot_delay + self.preshoot_delay
+            ):
                 self.state = self.State.CannotShoot
             elif self.game_time_sec > 55 + self.preshoot_delay:
                 self.state = self.State.PrepareShoot
@@ -77,13 +82,17 @@ class GameSpecifics(Module):
         else:
             if self.game_time_sec > 105:
                 self.state = self.State.Shoot
-            elif self.game_time_sec > 80 + self.prepare_shoot_delay + self.preshoot_delay:
+            elif (
+                self.game_time_sec > 80 + self.prepare_shoot_delay + self.preshoot_delay
+            ):
                 self.state = self.State.CannotShoot
             elif self.game_time_sec > 80 + self.preshoot_delay:
                 self.state = self.State.PrepareShoot
             elif self.game_time_sec > 55:
                 self.state = self.State.Shoot
-            elif self.game_time_sec > 30 + self.prepare_shoot_delay + self.preshoot_delay:
+            elif (
+                self.game_time_sec > 30 + self.prepare_shoot_delay + self.preshoot_delay
+            ):
                 self.state = self.State.CannotShoot
             elif self.game_time_sec > 30 + self.preshoot_delay:
                 self.state = self.State.PrepareShoot

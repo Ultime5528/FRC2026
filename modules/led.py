@@ -44,7 +44,9 @@ class LEDModule(Module):
 
     brightness_value = autoproperty(100.0)
 
-    def __init__(self, hardware, estimator: PositionEstimator, game_specific: GameSpecifics):
+    def __init__(
+        self, hardware, estimator: PositionEstimator, game_specific: GameSpecifics
+    ):
         super().__init__()
         from modules.hardware import HardwareModule
 

@@ -92,6 +92,4 @@ class ControlModule(Module):
 
         # ResetAll
 
-        hardware.panel_1.button(1).onTrue(
-            ResetAll(hardware.climber, hardware.hugger)
-        )
+        hardware.panel_1.button(1).onTrue(ResetAll(hardware.climber, hardware.hugger))

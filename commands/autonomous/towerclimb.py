@@ -46,6 +46,6 @@ class TowerClimb(SequentialCommandGroup):
             deadline(
                 HugAndClimb(self.climber, self.hugger),
                 DriveRelative(self.drivetrain, lambda: Translation2d(-self.speed, 0.0)),
-                ManualMovePivot.up(self.pivot)
+                ManualMovePivot.up(self.pivot),
             ),
         )
