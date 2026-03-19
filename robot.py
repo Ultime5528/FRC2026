@@ -6,6 +6,7 @@ from commands.guide.checkguide import CheckGuide
 from modules.autonomous import AutonomousModule
 from modules.control import ControlModule
 from modules.dashboard import DashboardModule
+from modules.gamespecifics import GameSpecifics
 from modules.hardware import HardwareModule
 from modules.led import LEDModule
 from modules.logging import LoggingModule
@@ -52,7 +53,9 @@ class Robot(ModuleRobot):
             CheckGuide(self.hardware.guide, self.shooter_calc_module)
         )
 
-        self.led = self.addModule(LEDModule(self.hardware, self.position_estimator))
+        self.game_specific = self.addModule(GameSpecifics())
+
+        self.led = self.addModule(LEDModule(self.hardware, self.position_estimator, self.game_specific))
 
         self.autonomous = self.addModule(
             AutonomousModule(self.hardware, self.shooter_calc_module)
