@@ -32,7 +32,7 @@ class GameSpecifics(Module):
         self.timer = wpilib.Timer()
         self.state = self.State.Unknown
 
-        self.message = self.createProperty("NONE")
+        self.message = self.createProperty("🦀")
 
     def teleopInit(self) -> None:
         self.timer.restart()
@@ -95,17 +95,17 @@ class GameSpecifics(Module):
                 self.state = self.State.EndGame
 
         if self.game_time_sec > 130:
-            self.message = "RETRACT CLIMBER"
+            self.message = "RETRACT CLIMBER 💥"
         elif self.state == self.State.Shoot:
-            self.message = "SHOOT"
+            self.message = "SHOOT 👩‍🍳"
         elif self.state == self.State.PrepareShoot:
-            self.message = "PREPARE"
+            self.message = "PREPARE 🍽"
         elif self.state == self.State.CannotShoot:
-            self.message = "PICK UP BALLS"
+            self.message = "PICK UP BALLS 🧲"
         elif self.state == self.State.EndGame:
-            self.message = "CLIMB"
+            self.message = "CLIMB ⛏⛰"
         elif self.state == self.State.Unknown:
-            self.message = "???"
+            self.message = "🦀"
 
     def logValues(self):
         self.log("State", str(self.state))
