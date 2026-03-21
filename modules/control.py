@@ -72,7 +72,7 @@ class ControlModule(Module):
 
         # Climber
         hardware.panel_1.button(6).onTrue(
-            parallel(MoveClimber.toReady(hardware.climber), Unhug(hardware.hugger))
+            RetractAndUnhug(hardware.climber, hardware.hugger)
         )
 
         # TODO Ancien bouton Reset du climber, libre pour autre chose
