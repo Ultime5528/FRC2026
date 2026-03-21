@@ -9,10 +9,12 @@ from ultime.autoproperty import autoproperty
 
 class CheckGuide(Command):
 
-    speed = autoproperty(0.15)
-    position_tolerance = autoproperty(0.05)
+    speed_fast = autoproperty(0.15)
+    speed_slow = autoproperty(0.05)
+    position_tolerance_far = autoproperty(1.5)
+    position_tolerance_close = autoproperty(0.5)
     position_unused = autoproperty(-8.0)
-    position_used = autoproperty(3.0)
+    position_used = autoproperty(5.0)
 
     def __init__(self, guide: Guide, shooter_calc_module: ShooterCalcModule):
         super().__init__()
@@ -24,15 +26,26 @@ class CheckGuide(Command):
         if not self.guide.hasReset():
             ResetGuide.down(self.guide).schedule()
         else:
-            encoder_position = self.guide.getEncoderPosition()
+            encoder_position = self.guide.getPosition()
             desired_position = self.getDesiredPosition()
+            error = abs(encoder_position - desired_position)
+            speed = 0.0
 
-            if encoder_position == approx(desired_position, lambda: self.position_tolerance):
-                self.guide.setSpeed(0.0)
-            elif encoder_position > desired_position:
-                self.guide.setSpeed(-self.speed)
+            if error < self.position_tolerance_close:
+                speed = 0.0
+            elif error < self.position_tolerance_far:
+                if encoder_position > desired_position:
+                    speed = -self.speed_slow
+                else:
+                    speed = self.speed_slow
             else:
-                self.guide.setSpeed(self.speed)
+                if encoder_position > desired_position:
+                    speed = -self.speed_fast
+                else:
+                    speed = self.speed_fast
+
+            self.guide.setSpeed(speed)
+
 
     def getDesiredPosition(self) -> float:
         if self.shooter_calc_module.shouldUseGuide():
