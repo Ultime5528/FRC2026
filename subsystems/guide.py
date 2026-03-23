@@ -86,4 +86,5 @@ class Guide(LinearSubsystem):
         return self._motor.get()
 
     def logValues(self):
+        super().logValues()
         self.log("State", str(self.state))

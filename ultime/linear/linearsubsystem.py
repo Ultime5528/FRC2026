@@ -37,6 +37,7 @@ class LinearSubsystem(Subsystem):
         self._sim_gravity = sim_gravity
 
     def logValues(self):
+        super().logValues()
         self.log("position", self.getPosition())
         self.log("encoder_position", self.getEncoderPosition())
         self.log("min_switch_pressed", self.isSwitchMinPressed())

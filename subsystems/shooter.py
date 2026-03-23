@@ -1,3 +1,4 @@
+import math
 from enum import Enum, auto
 
 import rev
@@ -24,9 +25,11 @@ class Shooter(Subsystem):
     flywheel_kF = autoproperty(0.00217039)
     flywheel_kP = autoproperty(0.0)
     flywheel_kS = autoproperty(0.119613)
-    shooter_tolerance = autoproperty(30.0)
+    shooter_tolerance = autoproperty(150.0)
 
-    indexer_rpm = autoproperty(1200.0)
+    indexer_rpm = autoproperty(5000.0)
+    indexer_amplitude = autoproperty(50.0)
+    indexer_period = autoproperty(1.0)
     indexer_rpm_stuck_threshold = autoproperty(50.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
     indexer_delay_unstuck = autoproperty(2.0)
@@ -65,7 +68,10 @@ class Shooter(Subsystem):
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._timer = wpilib.Timer()
+        self._indexer_stuck_timer = wpilib.Timer()
+
+        self._indexer_rpm_timer = wpilib.Timer()
+        self._indexer_rpm_timer.restart()
 
         self.indexer_state = IndexerState.Off
 
@@ -77,6 +83,7 @@ class Shooter(Subsystem):
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
+        self.log("indexer_voltage", (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()))
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
@@ -114,24 +121,26 @@ class Shooter(Subsystem):
 
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
-            self._timer.restart()
+            self._indexer_stuck_timer.restart()
 
         if self.indexer_state == IndexerState.On:
             if (
-                self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
+                self._indexer_stuck_timer.hasElapsed(self.indexer_delay_stuck_threshold)
                 and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
             ):
                 self.indexer_state = IndexerState.Stuck
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
             else:
-                self._setIndexerRPM(self.indexer_rpm)
+                amplitude = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period)
+                varying_rpm = amplitude + self.indexer_rpm
+                self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
             self._setIndexerRPM(self.indexer_rpm_unstuck)
 
-            if self._timer.hasElapsed(self.indexer_delay_unstuck):
+            if self._indexer_stuck_timer.hasElapsed(self.indexer_delay_unstuck):
                 self.indexer_state = IndexerState.On
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
 
     def stopFuel(self):
         self._indexer.set(0.0)

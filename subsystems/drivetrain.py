@@ -60,10 +60,10 @@ class Drivetrain(Subsystem):
         self._sees_tower_right = self.createProperty(False)
 
         # Swerve Module motor positions
-        self.motor_fl_loc = Translation2d(self.width / 2, self.length / 2)
-        self.motor_fr_loc = Translation2d(self.width / 2, -self.length / 2)
-        self.motor_bl_loc = Translation2d(-self.width / 2, self.length / 2)
-        self.motor_br_loc = Translation2d(-self.width / 2, -self.length / 2)
+        self.motor_fl_loc = Translation2d(self.length / 2, self.width / 2)
+        self.motor_fr_loc = Translation2d(self.length / 2, -self.width / 2)
+        self.motor_bl_loc = Translation2d(-self.length / 2, self.width / 2)
+        self.motor_br_loc = Translation2d(-self.length / 2, -self.width / 2)
 
         self.swerve_module_fl = SwerveModule(
             ports.CAN.drivetrain_motor_driving_fl,
@@ -494,6 +494,7 @@ class Drivetrain(Subsystem):
         )
 
     def logValues(self):
+        super().logValues()
         self.log(
             "speed_goal",
             math.hypot(self.chassis_speed_goal.vx, self.chassis_speed_goal.vy),

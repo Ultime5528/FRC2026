@@ -130,7 +130,7 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter.isAtVelocity()
 
     robot_controller.wait_until(
-        lambda: shooter._timer.hasElapsed(shooter.indexer_delay_stuck_threshold),
+        lambda: shooter._indexer_stuck_timer.hasElapsed(shooter.indexer_delay_stuck_threshold),
         10.0,
     )
 
