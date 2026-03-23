@@ -28,15 +28,15 @@ class AlignShoot(ParallelCommandGroup):
         self.addCommands(
             Shoot(shooter, shooter_calc_module),
             DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
+            GrabFuel(feeder),
             sequence(
-                WaitCommand(2.5),
+                WaitCommand(2.0),
                 parallel(
                     repeatingSequence(
                         ManualMovePivot.up(pivot).withTimeout(0.3),
                         ManualMovePivot.down(pivot).withTimeout(0.3),
                         WaitCommand(0.4),
                     ),
-                    GrabFuel(feeder),
                 ),
             ),
         )

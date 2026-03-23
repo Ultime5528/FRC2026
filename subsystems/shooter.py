@@ -25,7 +25,7 @@ class Shooter(Subsystem):
     flywheel_kF = autoproperty(0.00217039)
     flywheel_kP = autoproperty(0.0)
     flywheel_kS = autoproperty(0.119613)
-    shooter_tolerance = autoproperty(30.0)
+    shooter_tolerance = autoproperty(150.0)
 
     indexer_rpm = autoproperty(5000.0)
     indexer_amplitude = autoproperty(50.0)
@@ -83,6 +83,7 @@ class Shooter(Subsystem):
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
+        self.log("indexer_voltage", (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()))
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
