@@ -44,6 +44,7 @@ class Shooter(Subsystem):
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self._config = rev.SparkMaxConfig()
+        self._config.disableVoltageCompensation()
         self._flywheel.configure(
             self._config,
             rev.ResetMode.kResetSafeParameters,
@@ -84,6 +85,7 @@ class Shooter(Subsystem):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
         self.log("indexer_voltage", (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()))
+        self.log("flywheel_current_voltage", (self._flywheel.getBusVoltage() * self._flywheel.getAppliedOutput()))
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
@@ -133,7 +135,8 @@ class Shooter(Subsystem):
             else:
                 amplitude = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period)
                 varying_rpm = amplitude + self.indexer_rpm
-                self._setIndexerRPM(varying_rpm)
+                self._indexer.setVoltage(12.0)
+                #self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
             self._setIndexerRPM(self.indexer_rpm_unstuck)

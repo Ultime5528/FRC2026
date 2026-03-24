@@ -4,7 +4,7 @@ from typing import Optional
 import commands2
 from commands2 import Command
 from pathplannerlib.auto import NamedCommands
-from wpilib import SendableChooser
+from wpilib import SendableChooser, DriverStation
 
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
@@ -60,4 +60,5 @@ class AutonomousModule(Module):
             self.auto_command.cancel()
 
     def teleopInit(self) -> None:
-        self.retract_and_unhug.schedule()
+        if DriverStation.isFMSAttached():
+            self.retract_and_unhug.schedule()

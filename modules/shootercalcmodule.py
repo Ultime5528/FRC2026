@@ -113,12 +113,12 @@ class ShooterCalcModule(Module):
     long_distance_treshold = autoproperty(2.5)
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
-    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, -1.0))
+    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, 3.0))
     rpm_guide_open = autoproperty([2550.0, 2750.0, 2850.0, 2875.0, 2925.0])
     speed_guide_open = autoproperty([5.42, 5.7, 6.0, 6.3, 6.68])
-    speed_guide_closed = autoproperty([6.1, 6.4])
+    speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6])
     rpm_guide_closed = autoproperty(
-        [2875.0, 3025.0]
+        [2875.0, 3025.0, 3250.0, 3500.0, 3750.0, 4060.0]
     )
 
     def __init__(
