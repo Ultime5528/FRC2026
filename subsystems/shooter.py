@@ -23,8 +23,9 @@ class IndexerState(Enum):
 class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     flywheel_kF = autoproperty(0.00217039)
-    flywheel_kP = autoproperty(0.0)
-    flywheel_kS = autoproperty(0.119613)
+    flywheel_kP = autoproperty(0.003)
+    flywheel_max_added_voltage = autoproperty(2.0)
+    flywheel_kS = autoproperty(0.0)
     shooter_tolerance = autoproperty(150.0)
 
     indexer_rpm = autoproperty(5000.0)
@@ -65,7 +66,7 @@ class Shooter(Subsystem):
 
         self._indexer_encoder = self._indexer.getEncoder()
 
-        self._velocity_filter = LinearFilter.movingAverage(5)
+        self._velocity_filter = LinearFilter.movingAverage(1)
 
         self._is_at_velocity = self.createProperty(False)
 
@@ -104,9 +105,10 @@ class Shooter(Subsystem):
         ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
         self.log("flywheel_ff", ff)
         voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
+        voltage = min(voltage, (ff+self.flywheel_max_added_voltage))
         self.log("flywheel_pf", voltage)
 
-        voltage = min(ff, voltage)
+        voltage = max(ff, voltage)
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
