@@ -84,8 +84,14 @@ class Shooter(Subsystem):
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
-        self.log("indexer_voltage", (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()))
-        self.log("flywheel_current_voltage", (self._flywheel.getBusVoltage() * self._flywheel.getAppliedOutput()))
+        self.log(
+            "indexer_voltage",
+            (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()),
+        )
+        self.log(
+            "flywheel_current_voltage",
+            (self._flywheel.getBusVoltage() * self._flywheel.getAppliedOutput()),
+        )
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
@@ -133,10 +139,12 @@ class Shooter(Subsystem):
                 self.indexer_state = IndexerState.Stuck
                 self._indexer_stuck_timer.restart()
             else:
-                amplitude = self.indexer_amplitude * math.sin(self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period)
+                amplitude = self.indexer_amplitude * math.sin(
+                    self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period
+                )
                 varying_rpm = amplitude + self.indexer_rpm
                 self._indexer.setVoltage(12.0)
-                #self._setIndexerRPM(varying_rpm)
+                # self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
             self._setIndexerRPM(self.indexer_rpm_unstuck)

@@ -46,7 +46,6 @@ class CheckGuide(Command):
 
             self.guide.setSpeed(speed)
 
-
     def getDesiredPosition(self) -> float:
         if self.shooter_calc_module.shouldUseGuide():
             return self.position_used
