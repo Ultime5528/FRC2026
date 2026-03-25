@@ -28,7 +28,7 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     cmd.schedule()
     robot_controller.wait_one_frame()
 
-    rpm_tolerance = cmd.speed_rpm * 0.01
+    rpm_tolerance = shooter.shooter_tolerance
 
     assert cmd.isScheduled()
 

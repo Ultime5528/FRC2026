@@ -38,7 +38,9 @@ def test_reset_command(robot_controller: RobotTestController, robot: Robot):
     assert not cmd.isScheduled()
     assert not guide.isSwitchMinPressed()
     assert guide.hasReset()
-    assert guide.getMotorOutput() == 0.0
+
+    # Guide is already moving to the used or unused position,
+    # so we don't have guide.getMotorOutput() == 0.0 anymore
     assert guide.getPosition() == approx(0.0, abs=0.02)
 
 

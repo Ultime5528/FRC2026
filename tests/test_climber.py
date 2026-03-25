@@ -50,6 +50,8 @@ def test_reset_climber(robot_controller: RobotTestController, robot: Robot):
     assert not climber.isSwitchMinPressed()
     assert climber.getPosition() == approx(0.0, abs=0.02)
     assert climber.hasReset()
+
+    robot_controller.wait_one_frame()
     assert climber.getMotorOutput() == approx(climber.speed_maintain, abs=0.01)
 
 
