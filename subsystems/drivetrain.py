@@ -171,9 +171,6 @@ class Drivetrain(Subsystem):
         self._gyro_angles_degrees = self.createProperty(0.0)
         self._gyro_rotation2d: Rotation2d = Rotation2d()
 
-        self._field = wpilib.Field2d()
-        wpilib.SmartDashboard.putData("Field", self._field)
-
         swerve_drive_sendable = SwerveDriveElasticSendable(
             self.swerve_module_fl,
             self.swerve_module_fr,
@@ -203,6 +200,8 @@ class Drivetrain(Subsystem):
             Pose2d(0, 0, 0),
         )
 
+        # We should use SwerveDrive4PoseEstimator3d at some point, but it is too risky
+        # before the Montreal competition
         self.swerve_estimator = SwerveDrive4PoseEstimator(
             self.swerve_drive_kinematics,
             self._gyro_rotation2d,
@@ -214,9 +213,6 @@ class Drivetrain(Subsystem):
             ),
             Pose2d(0, 0, 0),
         )
-
-        self.vision_pose = self._field.getObject("Vision Pose")
-        self.odometry_pose = self._field.getObject("Odometry Pose")
 
         """
         Alerts
@@ -416,9 +412,6 @@ class Drivetrain(Subsystem):
         self.swerve_estimator.update(self._gyro_rotation2d, swerve_positions)
         self.swerve_odometry.update(self._gyro_rotation2d, swerve_positions)
 
-        self.odometry_pose.setPose(self.swerve_odometry.getPose())
-        self._field.setRobotPose(self.swerve_estimator.getEstimatedPosition())
-
         for location, swerve_module in self.swerve_modules.items():
             if (
                 swerve_module._driving_motor.hasActiveFault()
@@ -462,14 +455,13 @@ class Drivetrain(Subsystem):
             pose,
         )
 
-    def addVisionMeasurement(
+    def addPoseMeasurement(
         self,
         pose: wpimath.geometry.Pose2d,
         timestamp: float,
         std_devs: tuple[float, float, float],
     ):
         self.swerve_estimator.addVisionMeasurement(pose, timestamp, std_devs)
-        self.vision_pose.setPose(pose)
         self._estimated_pose = self.swerve_estimator.getEstimatedPosition()
         self._estimated_angle = self._estimated_pose.rotation()
 

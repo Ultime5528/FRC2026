@@ -16,8 +16,8 @@ robot_to_quest_offset = wpimath.geometry.Transform3d(
 
 
 class QuestVisionModule(Module):
-    std_translation = autoproperty(0.03)
-    std_rotation = autoproperty(0.1)
+    std_translation = autoproperty(0.01)
+    std_rotation = autoproperty(0.02)
 
     def __init__(self, drivetrain: Drivetrain):
         super().__init__()
