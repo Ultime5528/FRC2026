@@ -63,7 +63,9 @@ class PositionEstimator(Module):
         self._field.setRobotPose(self.drivetrain.getPose())
         self._odometry_pose.setPose(self.drivetrain.swerve_odometry.getPose())
 
-        if self.tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(self.reset_pose_delay):
+        if self.tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
+            self.reset_pose_delay
+        ):
             estimated_pose = self.drivetrain.getPose()
             if self.quest_connected:
                 self.quest_nav.resetToPose(Pose3d(estimated_pose))
@@ -74,7 +76,9 @@ class PositionEstimator(Module):
         poses_and_stddevs = list(self.quest_nav.getAllUnreadPosesTimestampsStdDevs())
         if poses_and_stddevs:
             pose_and_stddevs = poses_and_stddevs[-1]
-            self.drivetrain.addPoseMeasurement(pose_and_stddevs[0], pose_and_stddevs[1], pose_and_stddevs[2])
+            self.drivetrain.addPoseMeasurement(
+                pose_and_stddevs[0], pose_and_stddevs[1], pose_and_stddevs[2]
+            )
             self._quest_pose.setPose(pose_and_stddevs[0])
 
     def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
@@ -103,4 +107,3 @@ class PositionEstimator(Module):
                     )
 
                     self._vision_pose.setPose(pose2d)
-

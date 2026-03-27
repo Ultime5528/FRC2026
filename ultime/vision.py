@@ -3,7 +3,6 @@ from enum import Enum, auto
 from typing import List, Generator
 from typing import Optional
 
-import numpy
 from photonlibpy import PhotonPoseEstimator, EstimatedRobotPose
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.targeting import PhotonTrackedTarget, PhotonPipelineResult
@@ -119,7 +118,9 @@ class AbsoluteVision(Vision):
                 continue
             else:
                 num_tags += 1
-                distance = tag_pose.translation().distance(estimated_pose.estimatedPose.translation())
+                distance = tag_pose.translation().distance(
+                    estimated_pose.estimatedPose.translation()
+                )
                 max_distance = max(max_distance, distance)
 
         max_accurate_distance = 4.0
@@ -133,8 +134,13 @@ class AbsoluteVision(Vision):
             if max_distance < min_accurate_distance:
                 std_devs = min_std_devs
             else:
-                lerp_factor = (max_distance - min_accurate_distance)/ (max_accurate_distance - min_accurate_distance)
-                std_devs = [min_std_devs[i] + lerp_factor * (max_std_devs[i] - min_std_devs[i]) for i in range(0,3)]
+                lerp_factor = (max_distance - min_accurate_distance) / (
+                    max_accurate_distance - min_accurate_distance
+                )
+                std_devs = [
+                    min_std_devs[i] + lerp_factor * (max_std_devs[i] - min_std_devs[i])
+                    for i in range(0, 3)
+                ]
 
         return std_devs
 
