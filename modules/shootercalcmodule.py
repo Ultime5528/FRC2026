@@ -116,8 +116,8 @@ class ShooterCalcModule(Module):
     shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, 3.0))
     rpm_guide_open = autoproperty([2550.0, 2750.0, 2850.0, 2875.0, 2925.0])
     speed_guide_open = autoproperty([5.42, 5.7, 6.0, 6.3, 6.68])
-    speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6])
-    rpm_guide_closed = autoproperty([2875.0, 3025.0, 3250.0, 3500.0, 3750.0, 4060.0])
+    speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6, 7.9, 8.2, 8.6])
+    rpm_guide_closed = autoproperty([2875.0, 3025.0, 3175.0, 3325.0, 3500.0, 3725.0, 4010.0, 4310.0, 4650.0])
 
     def __init__(
         self,
