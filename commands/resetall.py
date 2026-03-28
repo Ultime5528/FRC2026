@@ -1,7 +1,7 @@
 from commands2 import ParallelCommandGroup
 
 from commands.climber.move import ResetClimber
-from commands.drivetrain.ResetOdometryAndQuest import ResetOdometryAndQuest
+from commands.drivetrain.resetodometryandquest import ResetOdometryAndQuest
 from commands.hugger.unhug import Unhug
 from subsystems.climber import Climber
 from subsystems.drivetrain import Drivetrain

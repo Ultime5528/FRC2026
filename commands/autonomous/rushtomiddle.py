@@ -4,7 +4,7 @@ from pathplannerlib.path import PathPlannerPath
 
 from commands.alignshoot import AlignShoot
 from commands.autonomous.towerclimb import TowerClimb
-from commands.drivetrain.ResetOdometryAndQuest import ResetOdometryAndQuest
+from commands.drivetrain.resetodometryandquest import ResetOdometryAndQuest
 from commands.drivetrain.auto.followpathprecise import FollowPathPrecise
 from commands.feeder.grabfuel import GrabFuel
 from commands.pivot.move import ManualMovePivot

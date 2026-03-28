@@ -4,7 +4,7 @@ from commands2.cmd import parallel, sequence
 from commands.alignshoot import AlignShoot
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import MoveClimber
-from commands.drivetrain.ResetOdometryAndQuest import ResetOdometryAndQuest
+from commands.drivetrain.resetodometryandquest import ResetOdometryAndQuest
 from commands.resetall import ResetAll
 from modules.hardware import HardwareModule
 from modules.positionestimator import PositionEstimator

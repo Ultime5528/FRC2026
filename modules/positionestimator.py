@@ -63,16 +63,15 @@ class PositionEstimator(Module):
         if self.is_camera_back_connected:
             self._addCameraMeasurements(self.camera_back)
 
-        if self.is_initial_pose_reset_done:
-            if self.is_tag_seen and self.is_quest_connected:
-                self._addQuestMeasurements()
+        if self.is_initial_pose_reset_done and self.is_tag_seen and self.is_quest_connected:
+            self._addQuestMeasurements()
 
         self.is_tag_seen = self.is_tag_seen or self.is_tag_seen_in_frame
 
         self._field.setRobotPose(self.drivetrain.getPose())
         self._odometry_pose.setPose(self.drivetrain.swerve_odometry.getPose())
 
-        if self.is_initial_pose_reset_done and self.is_tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
+        if self.is_tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
             self.reset_pose_delay
         ):
             estimated_pose = self.drivetrain.getPose()
@@ -82,13 +81,10 @@ class PositionEstimator(Module):
             self.reset_pose_timer.restart()
 
     def _addQuestMeasurements(self):
-        poses_and_stddevs = list(self.quest_nav.getAllUnreadPosesTimestampsStdDevs())
-        if poses_and_stddevs:
-            pose_and_stddevs = poses_and_stddevs[-1]
-            self.drivetrain.addPoseMeasurement(
-                pose_and_stddevs[0], pose_and_stddevs[1], pose_and_stddevs[2]
-            )
-            self._quest_pose.setPose(pose_and_stddevs[0])
+        pose = self.quest_nav.getLastPoseTimeStampStdDevs()
+        if pose:
+            self.drivetrain.addPoseMeasurement(pose[0], pose[1], pose[2])
+            self._quest_pose.setPose(pose[0])
 
     def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
         for (
