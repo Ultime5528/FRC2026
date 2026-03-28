@@ -30,12 +30,12 @@ class AlignShoot(ParallelCommandGroup):
             DriveAlign(drivetrain, shooter_calc_module, xbox_remote),
             GrabFuel(feeder),
             sequence(
-                WaitCommand(2.0),
+                WaitCommand(1.5),
                 parallel(
                     repeatingSequence(
-                        ManualMovePivot.up(pivot).withTimeout(0.4),
+                        ManualMovePivot.up(pivot).withTimeout(0.5),
                         ManualMovePivot.down(pivot).withTimeout(0.2),
-                        WaitCommand(0.4),
+                        WaitCommand(0.3),
                     ),
                 ),
             ),

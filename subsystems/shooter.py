@@ -31,7 +31,7 @@ class Shooter(Subsystem):
     indexer_rpm = autoproperty(5000.0)
     indexer_amplitude = autoproperty(50.0)
     indexer_period = autoproperty(1.0)
-    indexer_rpm_stuck_threshold = autoproperty(50.0)
+    indexer_rpm_stuck_threshold = autoproperty(500.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
     indexer_delay_unstuck = autoproperty(2.0)
     indexer_delay_stuck_threshold = autoproperty(1.0)
