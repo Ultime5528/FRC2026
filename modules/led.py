@@ -265,7 +265,7 @@ class LEDModule(Module):
 
         elif DriverStation.isDSAttached():
             if DriverStation.getBatteryVoltage() > 12:
-                if self.estimator.tag_seen_in_frame:
+                if self.estimator.is_tag_seen_in_frame:
                     self.seesTags()
                 else:
                     self.modeConnected()  # connected to driver station
