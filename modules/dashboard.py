@@ -10,6 +10,7 @@ from commands.alignshoot import AlignShoot
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.drivetrain.ResetOdometryAndQuest import ResetOdometryAndQuest
 from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
@@ -26,6 +27,8 @@ from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
+from modules.positionestimator import PositionEstimator
+from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.log import Logger
 from ultime.module import Module, ModuleList
@@ -38,11 +41,15 @@ class DashboardModule(Module):
         autonomous: AutonomousModule,
         module_list: ModuleList,
         shooter_calc_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
     ):
         super().__init__()
         self._hardware = hardware
         self._module_list = module_list
         self.shooter_calc_module = shooter_calc_module
+        self.quest_nav = quest_nav
+        self.position_estimator = position_estimator
         self.setupCopilotCommands(hardware)
         # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain))
@@ -83,6 +90,7 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
+        putCommandOnDashboard("Drivetrain", ResetOdometryAndQuest(hardware.drivetrain, hardware.quest, position_estimator))
 
         """
         Shooter

@@ -28,7 +28,9 @@ class PositionEstimator(Module):
         self.is_tag_seen = self.createProperty(False)
         self.is_tag_seen_in_frame = self.createProperty(False)
         self.is_tag_accurate_in_frame = self.createProperty(False)
-        
+
+        self.is_initial_pose_reset_done = self.createProperty(False)
+
         self.rejection_threshold_z = self.createProperty(-0.1)
 
         self.reset_pose_timer = wpilib.Timer()
@@ -41,6 +43,12 @@ class PositionEstimator(Module):
         self._vision_pose = self._field.getObject("Vision Pose")
         self._odometry_pose = self._field.getObject("Odometry Pose")
 
+    def robotInit(self) -> None:
+        self.is_tag_seen = False
+        self.is_tag_seen_in_frame = False
+        self.is_tag_accurate_in_frame = False
+        self.is_initial_pose_reset_done = False
+
     def robotPeriodic(self) -> None:
         self.is_tag_seen_in_frame = False
         self.is_tag_accurate_in_frame = False
@@ -49,21 +57,22 @@ class PositionEstimator(Module):
         self.is_camera_back_connected = self.camera_back.isConnected()
         self.is_quest_connected = self.quest_nav.isConnected()
 
-        if self.is_tag_seen and self.is_quest_connected:
-            self._addQuestMeasurements()
-
         if self.is_camera_front_connected:
             self._addCameraMeasurements(self.camera_front)
 
         if self.is_camera_back_connected:
             self._addCameraMeasurements(self.camera_back)
 
+        if self.is_initial_pose_reset_done:
+            if self.is_tag_seen and self.is_quest_connected:
+                self._addQuestMeasurements()
+
         self.is_tag_seen = self.is_tag_seen or self.is_tag_seen_in_frame
 
         self._field.setRobotPose(self.drivetrain.getPose())
         self._odometry_pose.setPose(self.drivetrain.swerve_odometry.getPose())
 
-        if self.is_tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
+        if self.is_initial_pose_reset_done and self.is_tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
             self.reset_pose_delay
         ):
             estimated_pose = self.drivetrain.getPose()

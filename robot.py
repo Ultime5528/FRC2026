@@ -29,7 +29,7 @@ class Robot(ModuleRobot):
 
         self.hardware = self.addModule(HardwareModule())
 
-        self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+        self.quest_nav = self.addModule(QuestVisionModule(self.hardware.drivetrain))
         self.camera_front = self.addModule(
             TagVisionModule.front(self.hardware.drivetrain)
         )
@@ -39,7 +39,7 @@ class Robot(ModuleRobot):
         self.position_estimator = self.addModule(
             PositionEstimator(
                 self.hardware.drivetrain,
-                self.quest_vision,
+                self.quest_nav,
                 self.camera_front,
                 self.camera_back,
             )
@@ -55,7 +55,7 @@ class Robot(ModuleRobot):
         self.led = self.addModule(LEDModule(self.hardware, self.position_estimator))
 
         self.autonomous = self.addModule(
-            AutonomousModule(self.hardware, self.shooter_calc_module)
+            AutonomousModule(self.hardware, self.shooter_calc_module, self.quest_nav, self.position_estimator)
         )
 
         self.control = self.addModule(
@@ -64,7 +64,7 @@ class Robot(ModuleRobot):
 
         self.dashboard = self.addModule(
             DashboardModule(
-                self.hardware, self.autonomous, self.modules, self.shooter_calc_module
+                self.hardware, self.autonomous, self.modules, self.shooter_calc_module, self.quest_nav, self.position_estimator
             )
         )
         self.logging = self.addModule(LoggingModule())

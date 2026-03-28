@@ -10,9 +10,12 @@ from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.retractandunhug import RetractAndUnhug
 from modules.hardware import HardwareModule
+from modules.positionestimator import PositionEstimator
+from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.command import WaitCommand
 from ultime.module import Module
+from ultime.questnav.questnav import QuestNav
 
 
 def registerNamedCommand(command: Command):
@@ -21,7 +24,7 @@ def registerNamedCommand(command: Command):
 
 class AutonomousModule(Module):
     def __init__(
-        self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule
+        self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator
     ):
         super().__init__()
         self.hardware = proxy(hardware)
@@ -32,16 +35,16 @@ class AutonomousModule(Module):
         self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
 
         self.auto_chooser.addOption(
-            "RushToMiddleRight", RushToMiddle.rightTrench(hardware, shooter_calc_module)
+            "RushToMiddleRight", RushToMiddle.rightTrench(hardware, shooter_calc_module, quest_nav, position_estimator)
         )
         self.auto_chooser.addOption(
-            "RushToMiddleLeft", RushToMiddle.leftTrench(hardware, shooter_calc_module)
+            "RushToMiddleLeft", RushToMiddle.leftTrench(hardware, shooter_calc_module, quest_nav, position_estimator)
         )
         self.auto_chooser.addOption(
-            "ShootAndClimbRight", ShootAndClimb.right(hardware, shooter_calc_module)
+            "ShootAndClimbRight", ShootAndClimb.right(hardware, shooter_calc_module, quest_nav, position_estimator)
         )
         self.auto_chooser.addOption(
-            "ShootAndClimbLeft", ShootAndClimb.left(hardware, shooter_calc_module)
+            "ShootAndClimbLeft", ShootAndClimb.left(hardware, shooter_calc_module, quest_nav, position_estimator)
         )
 
         self.retract_and_unhug = RetractAndUnhug(hardware.climber, hardware.hugger)
