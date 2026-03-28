@@ -1,4 +1,4 @@
-from typing import Generator, Tuple
+from typing import Generator, Tuple, Optional
 
 import wpimath
 from wpimath.geometry import Pose3d, Pose2d
@@ -6,7 +6,7 @@ from wpimath.geometry import Pose3d, Pose2d
 from subsystems.drivetrain import Drivetrain
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
-from ultime.questnav import questnav
+from ultime.questnav import questnav, quickquestnav
 
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_quest_offset = wpimath.geometry.Transform3d(
@@ -22,8 +22,30 @@ class QuestVisionModule(Module):
     def __init__(self, drivetrain: Drivetrain):
         super().__init__()
         self.drivetrain = drivetrain
-        self.quest_nav = questnav.QuestNavOld()
+        self.quest_nav = quickquestnav.QuestNav()
         self.estimated_pose = Pose2d()
+
+    def robotPeriodic(self) -> None:
+        self.quest_nav.periodic()
+
+    def getLastPoseTimeStampStdDevs(
+        self,
+    ) -> Optional[tuple[Pose2d, float, Tuple[float, float, float]]]:
+        poseFrame = self.quest_nav.getLastPoseFrame()[0]
+        if poseFrame.is_tracking:
+            pose = poseFrame.quest_pose_3d
+            pose = pose.transformBy(robot_to_quest_offset.inverse())
+            self.estimated_pose = pose.toPose2d()
+            time_stamp = poseFrame.data_timestamp
+            return (
+                self.estimated_pose,
+                time_stamp,
+                (
+                    self.std_translation,
+                    self.std_translation,
+                    self.std_rotation,
+                ),
+            )
 
     def getAllUnreadPosesTimestampsStdDevs(
         self,
