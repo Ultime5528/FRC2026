@@ -1,6 +1,7 @@
 import commands2
 from wpilib import PowerDistribution
 
+from commands.climber.maintainclimber import MaintainClimber
 from commands.drivetrain.drive import DriveField
 from commands.pivot.maintainpivot import MaintainPivot
 from subsystems.climber import Climber
@@ -27,6 +28,7 @@ class HardwareModule(Module):
         self.drivetrain.setDefaultCommand(DriveField(self.drivetrain, self.controller))
 
         self.climber = self.addSubsystem(Climber())
+        self.climber.setDefaultCommand(MaintainClimber(self.climber))
         self.hugger = self.addSubsystem(Hugger())
         self.guide = self.addSubsystem(Guide())
         self.shooter = self.addSubsystem(Shooter())

@@ -1,6 +1,10 @@
 import math
 from math import hypot
+from typing import Callable, Union
 
+import commands2.cmd as cmd
+from commands2 import Command, Subsystem, SequentialCommandGroup, DeferredCommand
+from hal import report, tResourceType
 from pathplannerlib.commands import FollowPathCommand
 from pathplannerlib.config import RobotConfig
 from pathplannerlib.controller import PathFollowingController
@@ -15,14 +19,9 @@ from pathplannerlib.pathfinding import Pathfinding
 from pathplannerlib.telemetry import PPLibTelemetry
 from pathplannerlib.trajectory import PathPlannerTrajectory
 from pathplannerlib.util import DriveFeedforwards, FlippingUtil, floatLerp
+from wpilib import Timer
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
-from wpilib import Timer
-from commands2 import Command, Subsystem, SequentialCommandGroup, DeferredCommand
-import commands2.cmd as cmd
-from typing import Callable, Union
-
-from hal import report, tResourceType
 
 
 class PathfindingCommand(Command):

@@ -4,10 +4,11 @@ from typing import Optional
 import commands2
 from commands2 import Command
 from pathplannerlib.auto import NamedCommands
-from wpilib import SendableChooser
+from wpilib import SendableChooser, DriverStation
 
 from commands.autonomous.rushtomiddle import RushToMiddle
 from commands.autonomous.shootandclimb import ShootAndClimb
+from commands.retractandunhug import RetractAndUnhug
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.command import WaitCommand
@@ -43,6 +44,8 @@ class AutonomousModule(Module):
             "ShootAndClimbLeft", ShootAndClimb.left(hardware, shooter_calc_module)
         )
 
+        self.retract_and_unhug = RetractAndUnhug(hardware.climber, hardware.hugger)
+
     def autonomousInit(self):
         self.hardware.drivetrain.swerve_odometry.resetPose(
             self.hardware.drivetrain.getPose()
@@ -55,3 +58,7 @@ class AutonomousModule(Module):
     def autonomousExit(self):
         if self.auto_command:
             self.auto_command.cancel()
+
+    def teleopInit(self) -> None:
+        if DriverStation.isFMSAttached():
+            self.retract_and_unhug.schedule()

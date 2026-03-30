@@ -1,19 +1,14 @@
-from commands2.cmd import parallel
-
 from commands.alignshoot import AlignShoot
 from commands.autonomous.choosesidetowerclimb import ChooseSideTowerClimb
-from commands.autonomous.towerclimb import TowerClimb
-from commands.climber.move import MoveClimber, ResetClimber
+from commands.autonomous.passtrench import PassTrench
+from commands.climber.move import ResetClimber
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.feeder.grabfuel import GrabFuel
-from commands.hugger.unhug import Unhug
 from commands.pivot.move import ManualMovePivot
 from commands.resetall import ResetAll
 from commands.retractandunhug import RetractAndUnhug
 from commands.shooter.manualshoot import ManualShoot
-from commands.shooter.shoot import Shoot
-from commands.alignshoot import AlignShoot
 from modules.hardware import HardwareModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.module import Module
@@ -30,6 +25,7 @@ class ControlModule(Module):
         """
         Pilot's buttons
         """
+        hardware.controller.a().whileTrue(PassTrench(hardware.drivetrain))
         hardware.controller.povLeft().whileTrue(DriveRelative.left(hardware.drivetrain))
         hardware.controller.povRight().whileTrue(
             DriveRelative.right(hardware.drivetrain)
@@ -72,7 +68,7 @@ class ControlModule(Module):
 
         # Climber
         hardware.panel_1.button(6).onTrue(
-            parallel(MoveClimber.toReady(hardware.climber), Unhug(hardware.hugger))
+            RetractAndUnhug(hardware.climber, hardware.hugger)
         )
 
         # TODO Ancien bouton Reset du climber, libre pour autre chose
@@ -90,6 +86,4 @@ class ControlModule(Module):
 
         # ResetAll
 
-        hardware.panel_1.button(1).onTrue(
-            ResetAll(hardware.climber, hardware.hugger, hardware.guide)
-        )
+        hardware.panel_1.button(1).onTrue(ResetAll(hardware.climber, hardware.hugger))

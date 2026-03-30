@@ -34,7 +34,6 @@ class ShootAndClimb(SequentialCommandGroup):
         self.drivetrain = hardware.drivetrain
         self.climber = hardware.climber
         self.hugger = hardware.hugger
-        self.guide = hardware.guide
         self.pivot = hardware.pivot
         self.feeder = hardware.feeder
         self.shooter = hardware.shooter
@@ -52,7 +51,7 @@ class ShootAndClimb(SequentialCommandGroup):
                     self.shooter_module,
                 ).withTimeout(10.0),
                 sequence(
-                    ResetAll(self.climber, self.hugger, self.guide),
+                    ResetAll(self.climber, self.hugger),
                     MoveClimber.toReady(self.climber),
                 ),
             ),

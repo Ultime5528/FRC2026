@@ -9,12 +9,13 @@ from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.auto.pathfindfollowpath import PathFindFollowPath
 from commands.drivetrain.driverelative import DriveRelative
 from commands.hugandclimb import HugAndClimb
+from commands.pivot.move import ManualMovePivot
 from modules.hardware import HardwareModule
 from ultime.autoproperty import autoproperty
 
 
 class TowerClimb(SequentialCommandGroup):
-    speed = autoproperty(0.1)
+    speed = autoproperty(0.2)
 
     @classmethod
     def left(cls, hardware: HardwareModule):
@@ -33,6 +34,7 @@ class TowerClimb(SequentialCommandGroup):
         self.drivetrain = hardware.drivetrain
         self.climber = hardware.climber
         self.hugger = hardware.hugger
+        self.pivot = hardware.pivot
         self.path = path
 
         self.addCommands(
@@ -44,5 +46,6 @@ class TowerClimb(SequentialCommandGroup):
             deadline(
                 HugAndClimb(self.climber, self.hugger),
                 DriveRelative(self.drivetrain, lambda: Translation2d(-self.speed, 0.0)),
+                ManualMovePivot.up(self.pivot),
             ),
         )
