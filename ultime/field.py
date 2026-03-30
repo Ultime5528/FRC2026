@@ -1,4 +1,3 @@
-import wpilib
 from pathplannerlib.path import PathPlannerPath
 from pathplannerlib.util import FlippingUtil
 from wpilib import DriverStation

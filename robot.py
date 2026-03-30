@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import wpilib
-from wpilib.simulation import RoboRioSim, DriverStationSim
+from wpilib.simulation import RoboRioSim
 
 from commands.guide.checkguide import CheckGuide
 from modules.autonomous import AutonomousModule

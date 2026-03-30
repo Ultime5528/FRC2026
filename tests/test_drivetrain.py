@@ -1,8 +1,6 @@
 import wpilib
-from commands2 import ScheduleCommand
 from wpimath.geometry import Pose2d
 
-from commands.drivetrain.drive import DriveField
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
 from commands.drivetrain.resetpose import ResetPose

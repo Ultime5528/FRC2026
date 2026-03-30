@@ -3,14 +3,11 @@ from typing import Union, Tuple, List, Callable
 
 import numpy as np
 from wpilib import AddressableLED, DriverStation, SmartDashboard, getTime
-from wpiutil import SendableBuilder
 
 import ports
 from modules.positionestimator import PositionEstimator
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
-from ultime.subsystem import Subsystem
-from ultime.timethis import tt
 
 
 def interpolate(t, color1, color2):

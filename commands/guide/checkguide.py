@@ -1,7 +1,6 @@
-from pytest import approx
 from commands2 import Command
 
-from commands.guide.move import MoveGuide, ResetGuide
+from commands.guide.move import ResetGuide
 from modules.shootercalcmodule import ShooterCalcModule
 from subsystems.guide import Guide
 from ultime.autoproperty import autoproperty

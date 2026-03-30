@@ -105,7 +105,7 @@ class Shooter(Subsystem):
         ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
         self.log("flywheel_ff", ff)
         voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
-        voltage = min(voltage, (ff+self.flywheel_max_added_voltage))
+        voltage = min(voltage, (ff + self.flywheel_max_added_voltage))
         self.log("flywheel_pf", voltage)
 
         voltage = max(ff, voltage)

@@ -1,4 +1,4 @@
-from commands2 import SequentialCommandGroup, ParallelCommandGroup
+from commands2 import ParallelCommandGroup
 
 from commands.climber.move import MoveClimber
 from commands.hugger.unhug import Unhug
