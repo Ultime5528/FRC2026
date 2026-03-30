@@ -4,10 +4,13 @@ from wpimath.geometry import Pose3d
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule
 from subsystems.drivetrain import Drivetrain
+from ultime.autoproperty import autoproperty
 from ultime.module import Module
 
 
 class PositionEstimator(Module):
+    std_dev_position = autoproperty(0.1)
+    std_dev_rotation = autoproperty(0.1)
     def __init__(
         self,
         drivetrain: Drivetrain,
@@ -42,12 +45,14 @@ class PositionEstimator(Module):
         self._quest_pose = self._field.getObject("Quest Pose")
         self._vision_pose = self._field.getObject("Vision Pose")
         self._odometry_pose = self._field.getObject("Odometry Pose")
+        self._taget_pose = self._field.getObject("Target Pose")
 
     def robotInit(self) -> None:
         self.is_tag_seen = False
         self.is_tag_seen_in_frame = False
         self.is_tag_accurate_in_frame = False
         self.is_initial_pose_reset_done = False
+        self.reset_pose_timer.restart()
 
     def robotPeriodic(self) -> None:
         self.is_tag_seen_in_frame = False
@@ -77,8 +82,9 @@ class PositionEstimator(Module):
             estimated_pose = self.drivetrain.getPose()
             if self.is_quest_connected:
                 self.quest_nav.resetToPose(Pose3d(estimated_pose))
-            self.drivetrain.resetToPose(estimated_pose)
+            self.drivetrain.swerve_odometry.resetPose(estimated_pose)
             self.reset_pose_timer.restart()
+            self.is_initial_pose_reset_done = True
 
     def _addQuestMeasurements(self):
         pose = self.quest_nav.getLastPoseTimeStampStdDevs()
@@ -100,7 +106,7 @@ class PositionEstimator(Module):
 
                     self.is_tag_seen_in_frame = True
 
-                    if std_devs[0] < 0.02 and std_devs[1] < 0.02 and std_devs[2] < 0.04:
+                    if std_devs[0] < self.std_dev_position and std_devs[1] < self.std_dev_position and std_devs[2] < self.std_dev_rotation:
                         self.is_tag_accurate_in_frame = True
 
                     pose2d = pose.toPose2d()

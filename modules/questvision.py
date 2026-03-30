@@ -31,7 +31,10 @@ class QuestVisionModule(Module):
     def getLastPoseTimeStampStdDevs(
         self,
     ) -> Optional[tuple[Pose2d, float, Tuple[float, float, float]]]:
-        poseFrame = self.quest_nav.getLastPoseFrame()[0]
+        poseFrameList = self.quest_nav.getLastPoseFrame()
+        if not poseFrameList:
+            return None
+        poseFrame = poseFrameList[0]
         if poseFrame.is_tracking:
             pose = poseFrame.quest_pose_3d
             pose = pose.transformBy(robot_to_quest_offset.inverse())

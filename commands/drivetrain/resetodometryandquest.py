@@ -1,4 +1,4 @@
-from wpimath.geometry import Pose2d
+from wpimath.geometry import Pose2d, Pose3d
 
 from modules.positionestimator import PositionEstimator
 from modules.questvision import QuestVisionModule
@@ -16,8 +16,8 @@ class ResetOdometryAndQuest(Command):
 
     def initialize(self):
         pose = self.drivetrain.getPose()
-        self.drivetrain.resetToPose(pose)
-        self.quest_nav.resetToPose(pose)
+        self.drivetrain.swerve_odometry.resetPose(pose)
+        self.quest_nav.resetToPose(Pose3d(pose))
         self.positionEstimator.is_initial_pose_reset_done = True
 
     def isFinished(self) -> bool:

@@ -46,7 +46,7 @@ class Robot(ModuleRobot):
         )
 
         self.shooter_calc_module = self.addModule(
-            ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
+            ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide, self.position_estimator)
         )
         self.hardware.guide.setDefaultCommand(
             CheckGuide(self.hardware.guide, self.shooter_calc_module)

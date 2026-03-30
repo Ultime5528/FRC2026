@@ -151,7 +151,8 @@ class QuestNav:
         self._updateFrameData()
 
         frame = []
-
+        if not self.frame_data_queue:
+            return frame
         timestamped_raw = self.frame_data_queue[-1]
         raw = timestamped_raw.value
         if rawValueToProtobuf(raw, self.cached_frame_data):

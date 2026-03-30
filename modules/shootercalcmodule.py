@@ -9,7 +9,9 @@ from wpimath.geometry import (
     Pose2d,
     Rotation2d,
 )
+from wpimath.kinematics import ChassisSpeeds
 
+from modules.positionestimator import PositionEstimator
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
 from ultime.autoproperty import autoproperty
@@ -123,6 +125,7 @@ class ShooterCalcModule(Module):
         self,
         drivetrain: Drivetrain,
         guide: Guide,
+        position_estimator: PositionEstimator,
     ):
         super().__init__()
         self._drivetrain = drivetrain
@@ -148,6 +151,9 @@ class ShooterCalcModule(Module):
         self._projectile_angle = 0.0
         self._projectile_speed = 0.0
         self.distance_xy = 0.0
+
+        self.position_estimator = position_estimator
+
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
         return self._robot_rotation_angle
@@ -192,6 +198,7 @@ class ShooterCalcModule(Module):
 
         self._computeShooterExitAngle()
         self._computeProjectileSpeed()
+        self._computeMovingTarget()
         self._computeShooterRPM()
         self._computeAngleToAlignWithTarget()
 
@@ -212,6 +219,15 @@ class ShooterCalcModule(Module):
             self._target_position = self.team_hub_position
         else:
             self._target_position = self._getZonePosition()
+
+    def _computeMovingTarget(self) -> None:
+        horizontal_speed = math.cos(self._projectile_angle) * self._projectile_speed
+        time_to_target = self.distance_xy / horizontal_speed
+        robot_speed = ChassisSpeeds.fromRobotRelativeSpeeds(self._drivetrain.getRobotRelativeChassisSpeeds(), self._drivetrain.getEstimatedAngle())
+        translation = Translation3d(robot_speed.vx * time_to_target, robot_speed.vy * time_to_target, 0)
+        self._target_position += -translation
+
+        self.position_estimator._taget_pose.setPose(Pose2d(self._target_position.toTranslation2d(), Rotation2d()))
 
     def _getZonePosition(self) -> Translation3d:
         if self._robot_pose.y < 4.034663:
