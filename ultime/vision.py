@@ -129,7 +129,7 @@ class AbsoluteVision(Vision):
 
             min_accurate_distance = 1.0
             min_std_devs = (0.01, 0.01, 0.02)
-            max_std_devs = (0.1, 0.1, 0.2)
+            max_std_devs = (0.05, 0.05, 0.1)
 
             if max_distance < min_accurate_distance:
                 std_devs = min_std_devs

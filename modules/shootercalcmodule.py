@@ -146,6 +146,7 @@ class ShooterCalcModule(Module):
         self._robot_pose = Pose2d()
         self._shooter_pose = Pose3d()
         self._target_position = Translation3d()
+        self._target_position_fixe = Translation3d()
         self._is_in_our_zone = False
         self._should_use_guide = False
         self._projectile_angle = 0.0
@@ -194,6 +195,10 @@ class ShooterCalcModule(Module):
         self._computeIsInOurZone()
         self._computeTargetPosition()
 
+        self._all_compute()
+        self._all_compute()
+
+    def _all_compute(self):
         self._computeShouldUseGuide()
 
         self._computeShooterExitAngle()
@@ -216,16 +221,18 @@ class ShooterCalcModule(Module):
 
     def _computeTargetPosition(self) -> None:
         if self._is_in_our_zone:
-            self._target_position = self.team_hub_position
+            self._target_position_fixe = self.team_hub_position
         else:
-            self._target_position = self._getZonePosition()
+            self._target_position_fixe = self._getZonePosition()
 
     def _computeMovingTarget(self) -> None:
         horizontal_speed = math.cos(self._projectile_angle) * self._projectile_speed
         time_to_target = self.distance_xy / horizontal_speed
         robot_speed = ChassisSpeeds.fromRobotRelativeSpeeds(self._drivetrain.getRobotRelativeChassisSpeeds(), self._drivetrain.getEstimatedAngle())
         translation = Translation3d(robot_speed.vx * time_to_target, robot_speed.vy * time_to_target, 0)
-        self._target_position += -translation
+
+
+        self._target_position = self._target_position_fixe - translation
 
         self.position_estimator._taget_pose.setPose(Pose2d(self._target_position.toTranslation2d(), Rotation2d()))
 

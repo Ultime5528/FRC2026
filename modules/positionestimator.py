@@ -35,6 +35,7 @@ class PositionEstimator(Module):
         self.is_initial_pose_reset_done = self.createProperty(False)
 
         self.rejection_threshold_z = self.createProperty(-0.1)
+        self.good_estimated_pose = Pose3d()
 
         self.reset_pose_timer = wpilib.Timer()
         self.reset_pose_delay = self.createProperty(5.0)
@@ -79,12 +80,12 @@ class PositionEstimator(Module):
         if self.is_tag_accurate_in_frame and self.reset_pose_timer.hasElapsed(
             self.reset_pose_delay
         ):
-            estimated_pose = self.drivetrain.getPose()
-            if self.is_quest_connected:
-                self.quest_nav.resetToPose(Pose3d(estimated_pose))
-            self.drivetrain.swerve_odometry.resetPose(estimated_pose)
-            self.reset_pose_timer.restart()
-            self.is_initial_pose_reset_done = True
+            if self.good_estimated_pose:
+                if self.is_quest_connected:
+                    self.quest_nav.resetToPose(self.good_estimated_pose)
+                self.drivetrain.swerve_odometry.resetPose(self.good_estimated_pose.toPose2d())
+                self.reset_pose_timer.restart()
+                self.is_initial_pose_reset_done = True
 
     def _addQuestMeasurements(self):
         pose = self.quest_nav.getLastPoseTimeStampStdDevs()
@@ -108,6 +109,9 @@ class PositionEstimator(Module):
 
                     if std_devs[0] < self.std_dev_position and std_devs[1] < self.std_dev_position and std_devs[2] < self.std_dev_rotation:
                         self.is_tag_accurate_in_frame = True
+                        self.good_estimated_pose = pose
+                    else:
+                        self.good_estimated_pose = None
 
                     pose2d = pose.toPose2d()
 
