@@ -17,16 +17,19 @@ class PositionEstimator(Module):
         quest_nav: QuestVisionModule,
         camera_front: TagVisionModule,
         camera_back: TagVisionModule,
+        camera_second_back: TagVisionModule,
     ):
         super().__init__()
         self.drivetrain = drivetrain
         self.quest_nav = quest_nav
         self.camera_front = camera_front
         self.camera_back = camera_back
+        self.camera_second_back = camera_second_back
 
         self.is_quest_connected = self.createProperty(False)
         self.is_camera_front_connected = self.createProperty(False)
         self.is_camera_back_connected = self.createProperty(False)
+        self.is_camera_second_back_connected = self.createProperty(False)
 
         self.is_tag_seen = self.createProperty(False)
         self.is_tag_seen_in_frame = self.createProperty(False)
@@ -61,6 +64,7 @@ class PositionEstimator(Module):
 
         self.is_camera_front_connected = self.camera_front.isConnected()
         self.is_camera_back_connected = self.camera_back.isConnected()
+        self.is_camera_second_back_connected = self.camera_second_back.isConnected()
         self.is_quest_connected = self.quest_nav.isConnected()
 
         if self.is_camera_front_connected:
@@ -68,6 +72,9 @@ class PositionEstimator(Module):
 
         if self.is_camera_back_connected:
             self._addCameraMeasurements(self.camera_back)
+
+        if self.is_camera_second_back_connected:
+            self._addCameraMeasurements(self.camera_second_back)
 
         if self.is_initial_pose_reset_done and self.is_tag_seen and self.is_quest_connected:
             self._addQuestMeasurements()

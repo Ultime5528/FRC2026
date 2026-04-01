@@ -31,6 +31,7 @@ class Robot(ModuleRobot):
         self.hardware = self.addModule(HardwareModule())
 
         self.quest_nav = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+        self.camera_second_back = self.addModule(TagVisionModule.secondBack(self.hardware.drivetrain))
         self.camera_front = self.addModule(
             TagVisionModule.front(self.hardware.drivetrain)
         )
@@ -43,6 +44,7 @@ class Robot(ModuleRobot):
                 self.quest_nav,
                 self.camera_front,
                 self.camera_back,
+                self.camera_second_back,
             )
         )
 
