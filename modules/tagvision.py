@@ -16,7 +16,7 @@ robot_to_camera_back_offset = wpimath.geometry.Transform3d(
 )
 
 robot_to_camera_second_back_offset = wpimath.geometry.Transform3d(
-    wpimath.geometry.Translation3d(-0.340, -0.25, 0.43),
+    wpimath.geometry.Translation3d(-0.340, -0.205, 0.43),
     wpimath.geometry.Rotation3d.fromDegrees(0.5, -17.5, 135.0),
 )
 
