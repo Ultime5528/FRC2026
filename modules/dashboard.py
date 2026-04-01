@@ -51,7 +51,7 @@ class DashboardModule(Module):
         self.quest_nav = quest_nav
         self.position_estimator = position_estimator
         self.setupCopilotCommands(hardware)
-        #self.setupCommands(hardware)
+        # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)

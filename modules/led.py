@@ -6,6 +6,7 @@ from wpilib import AddressableLED, DriverStation, SmartDashboard, getTime
 from wpiutil import SendableBuilder
 
 import ports
+from modules.gamespecifics import GameSpecifics
 from modules.positionestimator import PositionEstimator
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
@@ -43,12 +44,15 @@ class LEDModule(Module):
 
     brightness_value = autoproperty(100.0)
 
-    def __init__(self, hardware, estimator: PositionEstimator):
+    def __init__(
+        self, hardware, estimator: PositionEstimator, game_specific: GameSpecifics
+    ):
         super().__init__()
         from modules.hardware import HardwareModule
 
         self.hardware: HardwareModule = hardware
         self.estimator = estimator
+        self.game_specific = game_specific
 
         self.led_strip = AddressableLED(ports.PWM.led_strip)
         self.buffer = [AddressableLED.LEDData() for _ in range(int(self.led_number))]
@@ -202,66 +206,16 @@ class LEDModule(Module):
         elif DriverStation.isAutonomousEnabled():  # auto
             self.modeAuto()
         elif DriverStation.isTeleopEnabled():  # teleop
-            game_data = DriverStation.getGameSpecificMessage()
-            alliance = DriverStation.getAlliance()
-            match_time = DriverStation.getMatchTime()
-
-            won = (
-                game_data == "B"
-                and alliance == DriverStation.Alliance.kBlue
-                or game_data == "R"
-                and DriverStation.Alliance.kRed
-            )
-
-            prepare_shoot_delay = 7
-            preshoot_delay = 3
-
-            if won:
-                if match_time > 130:
-                    self.canShoot()
-                elif match_time > 105 + prepare_shoot_delay + preshoot_delay:
-                    self.cannotShoot()
-                elif match_time > 105 + preshoot_delay:
-                    self.prepareShoot()
-                elif match_time > 80:
-                    self.canShoot()
-                elif match_time > 55 + prepare_shoot_delay + preshoot_delay:
-                    self.cannotShoot()
-                elif match_time > 55 + preshoot_delay:
-                    self.prepareShoot()
-                elif match_time > 15:
-                    self.canShoot()
-                elif match_time == -1.0:
-                    self.rainbow()
-                else:
-                    self.modeEndgame()
+            if self.game_specific.state == self.game_specific.State.Shoot:
+                self.canShoot()
+            elif self.game_specific.state == self.game_specific.State.PrepareShoot:
+                self.prepareShoot()
+            elif self.game_specific.state == self.game_specific.State.PrepareShoot:
+                self.cannotShoot()
+            elif self.game_specific.state == self.game_specific.State.Unknown:
+                self.rainbow()
             else:
-                if match_time > 105:
-                    self.canShoot()
-                elif match_time > 80 + prepare_shoot_delay + preshoot_delay:
-                    self.cannotShoot()
-                elif match_time > 80 + preshoot_delay:
-                    self.prepareShoot()
-                elif match_time > 55:
-                    self.canShoot()
-                elif match_time > 30 + prepare_shoot_delay + preshoot_delay:
-                    self.cannotShoot()
-                elif match_time > 30 + preshoot_delay:
-                    self.prepareShoot()
-                elif match_time > 15:
-                    self.canShoot()
-                elif match_time == -1.0:
-                    self.rainbow()
-                else:
-                    self.modeEndgame()
-
-            # if DriverStation.getMatchTime() > 30:
-            #     # TODO Les différents mode teleop / alliance shifts
-            #     self.modeTeleop()
-            # elif DriverStation.getMatchTime() == -1.0:
-            #     self.rainbow()
-            # else:
-            #     self.modeEndgame()
+                self.modeEndgame()
 
         elif DriverStation.isDSAttached():
             if DriverStation.getBatteryVoltage() > 12:
