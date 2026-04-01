@@ -11,6 +11,7 @@ from ultime.module import Module
 class PositionEstimator(Module):
     std_dev_position = autoproperty(0.1)
     std_dev_rotation = autoproperty(0.1)
+
     def __init__(
         self,
         drivetrain: Drivetrain,
@@ -76,7 +77,11 @@ class PositionEstimator(Module):
         if self.is_camera_second_back_connected:
             self._addCameraMeasurements(self.camera_second_back)
 
-        if self.is_initial_pose_reset_done and self.is_tag_seen and self.is_quest_connected:
+        if (
+            self.is_initial_pose_reset_done
+            and self.is_tag_seen
+            and self.is_quest_connected
+        ):
             self._addQuestMeasurements()
 
         self.is_tag_seen = self.is_tag_seen or self.is_tag_seen_in_frame
@@ -90,7 +95,9 @@ class PositionEstimator(Module):
             if self.good_estimated_pose:
                 if self.is_quest_connected:
                     self.quest_nav.resetToPose(self.good_estimated_pose)
-                self.drivetrain.swerve_odometry.resetPose(self.good_estimated_pose.toPose2d())
+                self.drivetrain.swerve_odometry.resetPose(
+                    self.good_estimated_pose.toPose2d()
+                )
                 self.reset_pose_timer.restart()
                 self.is_initial_pose_reset_done = True
 
@@ -114,7 +121,11 @@ class PositionEstimator(Module):
 
                     self.is_tag_seen_in_frame = True
 
-                    if std_devs[0] < self.std_dev_position and std_devs[1] < self.std_dev_position and std_devs[2] < self.std_dev_rotation:
+                    if (
+                        std_devs[0] < self.std_dev_position
+                        and std_devs[1] < self.std_dev_position
+                        and std_devs[2] < self.std_dev_rotation
+                    ):
                         self.is_tag_accurate_in_frame = True
                         self.good_estimated_pose = pose
                     else:

@@ -17,7 +17,8 @@ robot_to_camera_back_offset = wpimath.geometry.Transform3d(
 
 robot_to_camera_second_back_offset = wpimath.geometry.Transform3d(
     wpimath.geometry.Translation3d(-0.340, -0.25, 0.43),
-    wpimath.geometry.Rotation3d.fromDegrees(0.5, -17.5, 135.0))
+    wpimath.geometry.Rotation3d.fromDegrees(0.5, -17.5, 135.0),
+)
 
 camera_front_name = "FrontCamera"
 camera_back_name = "BackCamera"
@@ -37,7 +38,9 @@ class TagVisionModule(AbsoluteVision):
 
     @classmethod
     def secondBack(cls, drivetrain: Drivetrain):
-        return cls(camera_second_back_name, robot_to_camera_second_back_offset, drivetrain)
+        return cls(
+            camera_second_back_name, robot_to_camera_second_back_offset, drivetrain
+        )
 
     def __init__(self, name: str, transform: Transform3d, drivetrain: Drivetrain):
         super().__init__(camera_name=name, camera_offset=transform)

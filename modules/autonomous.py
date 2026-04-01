@@ -24,7 +24,11 @@ def registerNamedCommand(command: Command):
 
 class AutonomousModule(Module):
     def __init__(
-        self, hardware: HardwareModule, shooter_calc_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator
+        self,
+        hardware: HardwareModule,
+        shooter_calc_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
     ):
         super().__init__()
         self.hardware = proxy(hardware)
@@ -35,16 +39,28 @@ class AutonomousModule(Module):
         self.auto_chooser.setDefaultOption("Nothing", WaitCommand(0.0))
 
         self.auto_chooser.addOption(
-            "RushToMiddleRight", RushToMiddle.rightTrench(hardware, shooter_calc_module, quest_nav, position_estimator)
+            "RushToMiddleRight",
+            RushToMiddle.rightTrench(
+                hardware, shooter_calc_module, quest_nav, position_estimator
+            ),
         )
         self.auto_chooser.addOption(
-            "RushToMiddleLeft", RushToMiddle.leftTrench(hardware, shooter_calc_module, quest_nav, position_estimator)
+            "RushToMiddleLeft",
+            RushToMiddle.leftTrench(
+                hardware, shooter_calc_module, quest_nav, position_estimator
+            ),
         )
         self.auto_chooser.addOption(
-            "ShootAndClimbRight", ShootAndClimb.right(hardware, shooter_calc_module, quest_nav, position_estimator)
+            "ShootAndClimbRight",
+            ShootAndClimb.right(
+                hardware, shooter_calc_module, quest_nav, position_estimator
+            ),
         )
         self.auto_chooser.addOption(
-            "ShootAndClimbLeft", ShootAndClimb.left(hardware, shooter_calc_module, quest_nav, position_estimator)
+            "ShootAndClimbLeft",
+            ShootAndClimb.left(
+                hardware, shooter_calc_module, quest_nav, position_estimator
+            ),
         )
 
         self.retract_and_unhug = RetractAndUnhug(hardware.climber, hardware.hugger)

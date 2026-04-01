@@ -119,7 +119,9 @@ class ShooterCalcModule(Module):
     rpm_guide_open = autoproperty([2550.0, 2750.0, 2850.0, 2875.0, 2925.0])
     speed_guide_open = autoproperty([5.42, 5.7, 6.0, 6.3, 6.68])
     speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6, 7.9, 8.2, 8.6])
-    rpm_guide_closed = autoproperty([2875.0, 3025.0, 3175.0, 3325.0, 3500.0, 3725.0, 4010.0, 4310.0, 4650.0])
+    rpm_guide_closed = autoproperty(
+        [2875.0, 3025.0, 3175.0, 3325.0, 3500.0, 3725.0, 4010.0, 4310.0, 4650.0]
+    )
 
     def __init__(
         self,
@@ -154,7 +156,6 @@ class ShooterCalcModule(Module):
         self.distance_xy = 0.0
 
         self.position_estimator = position_estimator
-
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
         return self._robot_rotation_angle
@@ -228,13 +229,19 @@ class ShooterCalcModule(Module):
     def _computeMovingTarget(self) -> None:
         horizontal_speed = math.cos(self._projectile_angle) * self._projectile_speed
         time_to_target = self.distance_xy / horizontal_speed
-        robot_speed = ChassisSpeeds.fromRobotRelativeSpeeds(self._drivetrain.getRobotRelativeChassisSpeeds(), self._drivetrain.getEstimatedAngle())
-        translation = Translation3d(robot_speed.vx * time_to_target, robot_speed.vy * time_to_target, 0)
-
+        robot_speed = ChassisSpeeds.fromRobotRelativeSpeeds(
+            self._drivetrain.getRobotRelativeChassisSpeeds(),
+            self._drivetrain.getEstimatedAngle(),
+        )
+        translation = Translation3d(
+            robot_speed.vx * time_to_target, robot_speed.vy * time_to_target, 0
+        )
 
         self._target_position = self._target_position_fixe - translation
 
-        self.position_estimator._taget_pose.setPose(Pose2d(self._target_position.toTranslation2d(), Rotation2d()))
+        self.position_estimator._taget_pose.setPose(
+            Pose2d(self._target_position.toTranslation2d(), Rotation2d())
+        )
 
     def _getZonePosition(self) -> Translation3d:
         if self._robot_pose.y < 4.034663:

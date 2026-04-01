@@ -67,16 +67,40 @@ class DashboardModule(Module):
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
         putCommandOnDashboard("Autonomous", ChooseSideTowerClimb(hardware))
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.rightTrench(hardware, self.shooter_calc_module, self.quest_nav, self.position_estimator)
+            "Autonomous",
+            RushToMiddle.rightTrench(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.leftTrench(hardware, self.shooter_calc_module, self.quest_nav, self.position_estimator)
+            "Autonomous",
+            RushToMiddle.leftTrench(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", ShootAndClimb.right(hardware, self.shooter_calc_module, self.quest_nav, self.position_estimator)
+            "Autonomous",
+            ShootAndClimb.right(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", ShootAndClimb.left(hardware, self.shooter_calc_module, self.quest_nav, self.position_estimator)
+            "Autonomous",
+            ShootAndClimb.left(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard("Autonomous", AlignToTower(hardware.drivetrain))
         putCommandOnDashboard("Autonomous", PassTrench(hardware.drivetrain))
@@ -90,7 +114,12 @@ class DashboardModule(Module):
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
         )
-        putCommandOnDashboard("Drivetrain", ResetOdometryAndQuest(hardware.drivetrain, self.quest_nav, self.position_estimator))
+        putCommandOnDashboard(
+            "Drivetrain",
+            ResetOdometryAndQuest(
+                hardware.drivetrain, self.quest_nav, self.position_estimator
+            ),
+        )
 
         """
         Shooter

@@ -19,53 +19,77 @@ from ultime.questnav.questnav import QuestNav
 
 class RushToMiddle(SequentialCommandGroup):
     @classmethod
-    def rightTrench(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator):
+    def rightTrench(
+        cls,
+        hardware: HardwareModule,
+        shooter_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
+    ):
         cmd = cls(
             PathPlannerPath.fromPathFile("RushToMiddleTrenchRight"),
             TowerClimb.right(hardware),
             hardware,
             shooter_module,
             quest_nav,
-            position_estimator
+            position_estimator,
         )
         cmd.setName(RushToMiddle.__name__ + ".rightTrench")
         return cmd
 
     @classmethod
-    def rightBump(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator):
+    def rightBump(
+        cls,
+        hardware: HardwareModule,
+        shooter_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
+    ):
         cmd = cls(
             PathPlannerPath.fromPathFile("RushToMiddleBumpRight"),
             TowerClimb.right(hardware),
             hardware,
             shooter_module,
             quest_nav,
-            position_estimator
+            position_estimator,
         )
         cmd.setName(RushToMiddle.__name__ + ".rightBump")
         return cmd
 
     @classmethod
-    def leftTrench(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator):
+    def leftTrench(
+        cls,
+        hardware: HardwareModule,
+        shooter_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
+    ):
         cmd = cls(
             PathPlannerPath.fromPathFile("RushToMiddleTrenchRight").mirrorPath(),
             TowerClimb.left(hardware),
             hardware,
             shooter_module,
             quest_nav,
-            position_estimator
+            position_estimator,
         )
         cmd.setName(RushToMiddle.__name__ + ".leftTrench")
         return cmd
 
     @classmethod
-    def leftBump(cls, hardware: HardwareModule, shooter_module: ShooterCalcModule, quest_nav: QuestVisionModule, position_estimator: PositionEstimator):
+    def leftBump(
+        cls,
+        hardware: HardwareModule,
+        shooter_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
+    ):
         cmd = cls(
             PathPlannerPath.fromPathFile("RushToMiddleBumpRight").mirrorPath(),
             TowerClimb.left(hardware),
             hardware,
             shooter_module,
             quest_nav,
-            position_estimator
+            position_estimator,
         )
         cmd.setName(RushToMiddle.__name__ + ".leftBump")
         return cmd
@@ -95,7 +119,9 @@ class RushToMiddle(SequentialCommandGroup):
 
         self.addCommands(
             sequence(
-                    ResetOdometryAndQuest(self.drivetrain, self.quest_nav, self.position_estimator),
+                ResetOdometryAndQuest(
+                    self.drivetrain, self.quest_nav, self.position_estimator
+                ),
                 deadline(
                     FollowPathPrecise(self.drivetrain, self.path),
                     ManualMovePivot.down(self.pivot),

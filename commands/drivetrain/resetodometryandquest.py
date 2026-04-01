@@ -7,7 +7,12 @@ from ultime.command import Command
 
 
 class ResetOdometryAndQuest(Command):
-    def __init__(self, drivetrain: Drivetrain, quest_nav: QuestVisionModule, positionEstimator: PositionEstimator):
+    def __init__(
+        self,
+        drivetrain: Drivetrain,
+        quest_nav: QuestVisionModule,
+        positionEstimator: PositionEstimator,
+    ):
         super().__init__()
         self.drivetrain = drivetrain
         self.quest_nav = quest_nav
