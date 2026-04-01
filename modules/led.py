@@ -40,7 +40,7 @@ class LEDModule(Module):
     purple = np.array([128, 0, 128])
     pink = np.array([255, 105, 180])
 
-    led_number = autoproperty(100.0)
+    led_number = autoproperty(320.0)
 
     brightness_value = autoproperty(100.0)
 
