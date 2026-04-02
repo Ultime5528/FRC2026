@@ -139,6 +139,6 @@ class RushToMiddle(SequentialCommandGroup):
                     self.controller,
                     self.shooter_module,
                 ),
-            ).withTimeout(14.0),
+            ).withTimeout(13.5),
             self.climb_command,
         )
