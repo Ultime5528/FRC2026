@@ -42,7 +42,7 @@ class LEDModule(Module):
 
     led_number = autoproperty(320.0)
 
-    brightness_value = autoproperty(100.0)
+    brightness_value = autoproperty(10.0)
 
     def __init__(
         self, hardware, estimator: PositionEstimator, game_specific: GameSpecifics

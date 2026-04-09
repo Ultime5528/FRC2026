@@ -34,7 +34,7 @@ class AlignShoot(ParallelCommandGroup):
                 parallel(
                     repeatingSequence(
                         ManualMovePivot.up(pivot).withTimeout(0.5),
-                        ManualMovePivot.down(pivot).withTimeout(0.3),
+                        ManualMovePivot.down(pivot).withTimeout(0.5),
                         WaitCommand(0.3),
                     ),
                 ),
