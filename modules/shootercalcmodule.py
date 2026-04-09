@@ -228,6 +228,8 @@ class ShooterCalcModule(Module):
 
     def _computeMovingTarget(self) -> None:
         horizontal_speed = math.cos(self._projectile_angle) * self._projectile_speed
+        if abs(horizontal_speed) < 1.0e-6:
+            return
         time_to_target = self.distance_xy / horizontal_speed
         robot_speed = ChassisSpeeds.fromRobotRelativeSpeeds(
             self._drivetrain.getRobotRelativeChassisSpeeds(),

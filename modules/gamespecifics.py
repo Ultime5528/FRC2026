@@ -1,3 +1,4 @@
+import math
 from enum import Enum, auto
 
 import wpilib
@@ -47,8 +48,20 @@ class GameSpecifics(Module):
             and DriverStation.Alliance.kRed
         )
 
+    def computeShiftTimeLeft(self):
+        if self.game_time_sec > 130:
+            self.shift_time_left = self.game_time_sec - 130
+        elif self.game_time_sec > 30:
+            self.shift_time_left = (self.game_time_sec - 30)%25
+        else:
+            self.shift_time_left = self.game_time_sec
+
+        self.shift_time_left = math.floor(self.shift_time_left)
+
     def teleopPeriodic(self) -> None:
         self.game_time_sec = DriverStation.getMatchTime()
+
+        self.computeShiftTimeLeft()
 
         if not self.timer.hasElapsed(5.0):
             self.whoWon()
