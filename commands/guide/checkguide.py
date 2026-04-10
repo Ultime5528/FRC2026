@@ -26,6 +26,7 @@ class CheckGuide(Command):
         if not self.guide.hasReset():
             ResetGuide.down(self.guide).schedule()
         else:
+            self.guide._should_reset_min = False
             encoder_position = self.guide.getPosition()
             desired_position = self.getDesiredPosition()
             error = abs(encoder_position - desired_position)

@@ -184,6 +184,10 @@ class LEDModule(Module):
                 round(255 * self.brightness),
             )
 
+    def isShooting(self):
+        for i in range(int(self.led_number)):
+            self.buffer[i].setRGB(0, 0, 0)
+
     def canShoot(self):
         self.commonTeleop(self.green_rgb, self.white, 0.5)
 
@@ -206,7 +210,9 @@ class LEDModule(Module):
         elif DriverStation.isAutonomousEnabled():  # auto
             self.modeAuto()
         elif DriverStation.isTeleopEnabled():  # teleop
-            if self.game_specific.state == self.game_specific.State.Shoot:
+            if self.hardware.shooter._flywheel.getAppliedOutput() > 0.0:
+                self.isShooting()
+            elif self.game_specific.state == self.game_specific.State.Shoot:
                 self.canShoot()
             elif self.game_specific.state == self.game_specific.State.PrepareShoot:
                 self.prepareShoot()
