@@ -199,7 +199,7 @@ class LEDModule(Module):
 
     def seesTags(self):
         for i in range(len(self.buffer)):
-            self.buffer[i].setRGB(255, 255, 255)
+            self.buffer[i].setRGB(0, 255, 0)
 
     def robotPeriodic(self) -> None:
         start_time = getTime()

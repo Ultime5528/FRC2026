@@ -4,6 +4,7 @@ from wpimath.geometry import Pose3d
 from modules.questvision import QuestVisionModule
 from modules.tagvision import TagVisionModule
 from subsystems.drivetrain import Drivetrain
+from subsystems.shooter import Shooter
 from ultime.autoproperty import autoproperty
 from ultime.module import Module
 
@@ -15,6 +16,7 @@ class PositionEstimator(Module):
     def __init__(
         self,
         drivetrain: Drivetrain,
+        shooter: Shooter,
         quest_nav: QuestVisionModule,
         camera_front: TagVisionModule,
         camera_back: TagVisionModule,
@@ -22,6 +24,7 @@ class PositionEstimator(Module):
     ):
         super().__init__()
         self.drivetrain = drivetrain
+        self.shooter = shooter
         self.quest_nav = quest_nav
         self.camera_front = camera_front
         self.camera_back = camera_back
@@ -69,13 +72,15 @@ class PositionEstimator(Module):
         self.is_quest_connected = self.quest_nav.isConnected()
 
         if self.is_camera_front_connected:
-            self._addCameraMeasurements(self.camera_front)
+            self._addCameraMeasurements(self.camera_front, True)
+
+        is_shooting = self.shooter._flywheel.getAppliedOutput() > 0.0
 
         if self.is_camera_back_connected:
-            self._addCameraMeasurements(self.camera_back)
+            self._addCameraMeasurements(self.camera_back, not is_shooting)
 
         if self.is_camera_second_back_connected:
-            self._addCameraMeasurements(self.camera_second_back)
+            self._addCameraMeasurements(self.camera_second_back, not is_shooting)
 
         if (
             self.is_initial_pose_reset_done
@@ -107,13 +112,13 @@ class PositionEstimator(Module):
             self.drivetrain.addPoseMeasurement(pose[0], pose[1], pose[2])
             self._quest_pose.setPose(pose[0])
 
-    def _addCameraMeasurements(self, tag_vision_module: TagVisionModule):
+    def _addCameraMeasurements(self, tag_vision_module: TagVisionModule, should_use):
         for (
             estimation,
             std_devs,
         ) in tag_vision_module.getAllUnreadEstimatedPosesWithStdDevs():
 
-            if estimation and len(estimation.targetsUsed) >= 2:
+            if estimation and len(estimation.targetsUsed) >= 2 and should_use:
                 pose = estimation.estimatedPose
                 time = estimation.timestampSeconds
 

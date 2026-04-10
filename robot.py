@@ -43,6 +43,7 @@ class Robot(ModuleRobot):
         self.position_estimator = self.addModule(
             PositionEstimator(
                 self.hardware.drivetrain,
+                self.hardware.shooter,
                 self.quest_nav,
                 self.camera_front,
                 self.camera_back,
