@@ -118,7 +118,7 @@ class ShooterCalcModule(Module):
     speed_guide_open = autoproperty([5.42, 5.7, 6.0, 6.3, 6.68])
     speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6, 7.9, 8.2, 8.6])
     rpm_guide_closed = autoproperty(
-        [2875.0, 3025.0, 3175.0, 3325.0, 3500.0, 3725.0, 4010.0, 4310.0, 4650.0]
+        [2925.0, 3075.0, 3225.0, 3375.0, 3575.0, 3800.0, 4085.0, 4385.0, 4725.0]
     )
 
     def __init__(
