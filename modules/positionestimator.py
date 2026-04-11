@@ -1,4 +1,5 @@
 import wpilib
+from wpilib._wpilib import FieldObject2d
 from wpimath.geometry import Pose3d
 
 from modules.questvision import QuestVisionModule
@@ -39,6 +40,10 @@ class PositionEstimator(Module):
         self.is_tag_seen_in_frame = self.createProperty(False)
         self.is_tag_accurate_in_frame = self.createProperty(False)
 
+        self.tags_count_in_frame_front = self.createProperty(0)
+        self.tags_count_in_frame_back = self.createProperty(0)
+        self.tags_count_in_frame_back_second = self.createProperty(0)
+
         self.is_initial_pose_reset_done = self.createProperty(False)
 
         self.rejection_threshold_z = self.createProperty(-0.1)
@@ -51,7 +56,9 @@ class PositionEstimator(Module):
         wpilib.SmartDashboard.putData("Field", self._field)
 
         self._quest_pose = self._field.getObject("Quest Pose")
-        self._vision_pose = self._field.getObject("Vision Pose")
+        self._vision_pose_front = self._field.getObject("Vision Pose Front")
+        self._vision_pose_back = self._field.getObject("Vision Pose Back Right")
+        self._vision_pose_second_back = self._field.getObject("Vision Pose Back Left")
         self._odometry_pose = self._field.getObject("Odometry Pose")
         self._taget_pose = self._field.getObject("Target Pose")
 
@@ -72,15 +79,21 @@ class PositionEstimator(Module):
         self.is_quest_connected = self.quest_nav.isConnected()
 
         if self.is_camera_front_connected:
-            self._addCameraMeasurements(self.camera_front, True)
+            self.tags_count_in_frame_front = self._addCameraMeasurements(self.camera_front, True, self._vision_pose_front)
+        else:
+            self.tags_count_in_frame_front = 0
 
         is_shooting = self.shooter._flywheel.getAppliedOutput() > 0.0
 
         if self.is_camera_back_connected:
-            self._addCameraMeasurements(self.camera_back, not is_shooting)
+            self.tags_count_in_frame_back = self._addCameraMeasurements(self.camera_back, not is_shooting, self._vision_pose_back)
+        else:
+            self.tags_count_in_frame_back = 0
 
         if self.is_camera_second_back_connected:
-            self._addCameraMeasurements(self.camera_second_back, not is_shooting)
+            self.tags_count_in_frame_back_second = self._addCameraMeasurements(self.camera_second_back, not is_shooting, self._vision_pose_second_back)
+        else:
+            self.tags_count_in_frame_back_second = 0
 
         if (
             self.is_initial_pose_reset_done
@@ -112,7 +125,10 @@ class PositionEstimator(Module):
             self.drivetrain.addPoseMeasurement(pose[0], pose[1], pose[2])
             self._quest_pose.setPose(pose[0])
 
-    def _addCameraMeasurements(self, tag_vision_module: TagVisionModule, should_use):
+    def _addCameraMeasurements(self, tag_vision_module: TagVisionModule, should_use : bool, vision_pose : FieldObject2d) -> int:
+
+        tags_count_in_frame = 0
+
         for (
             estimation,
             std_devs,
@@ -125,6 +141,7 @@ class PositionEstimator(Module):
                 if pose.translation().z > self.rejection_threshold_z:
 
                     self.is_tag_seen_in_frame = True
+                    tags_count_in_frame = len(estimation.targetsUsed)
 
                     if (
                         std_devs[0] < self.std_dev_position
@@ -144,4 +161,6 @@ class PositionEstimator(Module):
                         std_devs,
                     )
 
-                    self._vision_pose.setPose(pose2d)
+                    vision_pose.setPose(pose2d)
+
+        return tags_count_in_frame
