@@ -52,7 +52,7 @@ class GameSpecifics(Module):
         if self.game_time_sec > 130:
             self.shift_time_left = self.game_time_sec - 130
         elif self.game_time_sec > 30:
-            self.shift_time_left = (self.game_time_sec - 30)%25
+            self.shift_time_left = (self.game_time_sec - 30) % 25
         else:
             self.shift_time_left = self.game_time_sec
 

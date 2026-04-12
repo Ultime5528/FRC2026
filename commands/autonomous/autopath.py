@@ -21,7 +21,7 @@ _constraints_for_tower = PathConstraints(
 
 _tower_y_left = 4.5
 _tower_y_right = 2.983
-_tower_x = 1.060 # 1.063 , 1.059
+_tower_x = 1.060  # 1.063 , 1.059
 _tower_y_threshold = 0.2
 
 # flipped : measured
