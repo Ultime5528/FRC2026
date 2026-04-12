@@ -10,6 +10,7 @@ from commands.alignshoot import AlignShoot
 from commands.autonomous.shootandclimb import ShootAndClimb
 from commands.autonomous.towerclimb import TowerClimb
 from commands.climber.move import ManualMoveClimber, ResetClimber, MoveClimber
+from commands.drivetrain.resetodometryandquest import ResetOdometryAndQuest
 from commands.drivetrain.aligntotower import AlignToTower
 from commands.drivetrain.driverelative import DriveRelative
 from commands.drivetrain.resetgyro import ResetGyro
@@ -26,6 +27,8 @@ from commands.shooter.prepareshoot import PrepareShoot
 from commands.shooter.shoot import Shoot
 from modules.autonomous import AutonomousModule
 from modules.hardware import HardwareModule
+from modules.positionestimator import PositionEstimator
+from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from ultime.log import Logger
 from ultime.module import Module, ModuleList
@@ -38,13 +41,17 @@ class DashboardModule(Module):
         autonomous: AutonomousModule,
         module_list: ModuleList,
         shooter_calc_module: ShooterCalcModule,
+        quest_nav: QuestVisionModule,
+        position_estimator: PositionEstimator,
     ):
         super().__init__()
         self._hardware = hardware
         self._module_list = module_list
         self.shooter_calc_module = shooter_calc_module
+        self.quest_nav = quest_nav
+        self.position_estimator = position_estimator
         self.setupCopilotCommands(hardware)
-        self.setupCommands(hardware)
+        # self.setupCommands(hardware)
         putCommandOnDashboard("Drivetrain", ResetGyro(hardware.drivetrain))
 
         SmartDashboard.putData("AutoChooser", autonomous.auto_chooser)
@@ -52,7 +59,7 @@ class DashboardModule(Module):
     def setupCopilotCommands(self, hardware: HardwareModule):
         pass
 
-    def setupCommands(self, hardware):
+    def setupCommands(self, hardware: HardwareModule):
         """
         Autonomous
         """
@@ -60,16 +67,40 @@ class DashboardModule(Module):
         putCommandOnDashboard("Autonomous", TowerClimb.right(hardware))
         putCommandOnDashboard("Autonomous", ChooseSideTowerClimb(hardware))
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.rightTrench(hardware, self.shooter_calc_module)
+            "Autonomous",
+            RushToMiddle.rightTrench(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", RushToMiddle.leftTrench(hardware, self.shooter_calc_module)
+            "Autonomous",
+            RushToMiddle.leftTrench(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", ShootAndClimb.right(hardware, self.shooter_calc_module)
+            "Autonomous",
+            ShootAndClimb.right(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard(
-            "Autonomous", ShootAndClimb.left(hardware, self.shooter_calc_module)
+            "Autonomous",
+            ShootAndClimb.left(
+                hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            ),
         )
         putCommandOnDashboard("Autonomous", AlignToTower(hardware.drivetrain))
         putCommandOnDashboard("Autonomous", PassTrench(hardware.drivetrain))
@@ -82,6 +113,12 @@ class DashboardModule(Module):
         putCommandOnDashboard("Drivetrain", DriveRelative.forwards(hardware.drivetrain))
         putCommandOnDashboard(
             "Drivetrain", DriveRelative.backwards(hardware.drivetrain)
+        )
+        putCommandOnDashboard(
+            "Drivetrain",
+            ResetOdometryAndQuest(
+                hardware.drivetrain, self.quest_nav, self.position_estimator
+            ),
         )
 
         """
@@ -152,7 +189,7 @@ class DashboardModule(Module):
         """
         putCommandOnDashboard(
             "Group",
-            ResetAll(hardware.climber, hardware.hugger, hardware.guide),
+            ResetAll(hardware.climber, hardware.hugger),
         )
 
     def robotInit(self) -> None:

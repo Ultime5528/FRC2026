@@ -1,3 +1,4 @@
+import math
 from enum import Enum, auto
 
 import rev
@@ -22,12 +23,15 @@ class IndexerState(Enum):
 class Shooter(Subsystem):
     # 12 volts max divided by max RPM
     flywheel_kF = autoproperty(0.00217039)
-    flywheel_kP = autoproperty(0.0)
-    flywheel_kS = autoproperty(0.119613)
-    shooter_tolerance = autoproperty(30.0)
+    flywheel_kP = autoproperty(0.003)
+    flywheel_max_added_voltage = autoproperty(2.0)
+    flywheel_kS = autoproperty(0.0)
+    shooter_tolerance = autoproperty(150.0)
 
-    indexer_rpm = autoproperty(1200.0)
-    indexer_rpm_stuck_threshold = autoproperty(50.0)
+    indexer_rpm = autoproperty(5000.0)
+    indexer_amplitude = autoproperty(50.0)
+    indexer_period = autoproperty(1.0)
+    indexer_rpm_stuck_threshold = autoproperty(500.0)
     indexer_rpm_unstuck = autoproperty(-200.0)
     indexer_delay_unstuck = autoproperty(2.0)
     indexer_delay_stuck_threshold = autoproperty(1.0)
@@ -41,6 +45,7 @@ class Shooter(Subsystem):
             ports.CAN.shooter_flywheel, rev.SparkMax.MotorType.kBrushless
         )
         self._config = rev.SparkMaxConfig()
+        self._config.disableVoltageCompensation()
         self._flywheel.configure(
             self._config,
             rev.ResetMode.kResetSafeParameters,
@@ -61,11 +66,14 @@ class Shooter(Subsystem):
 
         self._indexer_encoder = self._indexer.getEncoder()
 
-        self._velocity_filter = LinearFilter.movingAverage(5)
+        self._velocity_filter = LinearFilter.movingAverage(1)
 
         self._is_at_velocity = self.createProperty(False)
 
-        self._timer = wpilib.Timer()
+        self._indexer_stuck_timer = wpilib.Timer()
+
+        self._indexer_rpm_timer = wpilib.Timer()
+        self._indexer_rpm_timer.restart()
 
         self.indexer_state = IndexerState.Off
 
@@ -77,6 +85,14 @@ class Shooter(Subsystem):
     def logValues(self):
         super().logValues()
         self.log("indexer_state", str(self.indexer_state))
+        self.log(
+            "indexer_voltage",
+            (self._indexer.getBusVoltage() * self._indexer.getAppliedOutput()),
+        )
+        self.log(
+            "flywheel_current_voltage",
+            (self._flywheel.getBusVoltage() * self._flywheel.getAppliedOutput()),
+        )
 
     def shoot(self, rpm):
         average = self._velocity_filter.calculate(self.getCurrentSpeed())
@@ -89,9 +105,10 @@ class Shooter(Subsystem):
         ff = feedforward(rpm, self.flywheel_kS, self.flywheel_kF)
         self.log("flywheel_ff", ff)
         voltage = pf(average, rpm, self.flywheel_kS, self.flywheel_kF, self.flywheel_kP)
+        voltage = min(voltage, (ff + self.flywheel_max_added_voltage))
         self.log("flywheel_pf", voltage)
 
-        voltage = min(ff, voltage)
+        voltage = max(ff, voltage)
 
         self.log("flywheel_voltage", voltage)
         self._flywheel.setVoltage(voltage)
@@ -114,24 +131,29 @@ class Shooter(Subsystem):
 
         if self.indexer_state == IndexerState.Off:
             self.indexer_state = IndexerState.On
-            self._timer.restart()
+            self._indexer_stuck_timer.restart()
 
         if self.indexer_state == IndexerState.On:
             if (
-                self._timer.hasElapsed(self.indexer_delay_stuck_threshold)
+                self._indexer_stuck_timer.hasElapsed(self.indexer_delay_stuck_threshold)
                 and self.indexer_current_rpm < self.indexer_rpm_stuck_threshold
             ):
                 self.indexer_state = IndexerState.Stuck
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
             else:
-                self._setIndexerRPM(self.indexer_rpm)
+                amplitude = self.indexer_amplitude * math.sin(
+                    self._indexer_rpm_timer.get() * 2 * math.pi / self.indexer_period
+                )
+                varying_rpm = amplitude + self.indexer_rpm
+                self._indexer.setVoltage(12.0)
+                # self._setIndexerRPM(varying_rpm)
 
         if self.indexer_state == IndexerState.Stuck:
             self._setIndexerRPM(self.indexer_rpm_unstuck)
 
-            if self._timer.hasElapsed(self.indexer_delay_unstuck):
+            if self._indexer_stuck_timer.hasElapsed(self.indexer_delay_unstuck):
                 self.indexer_state = IndexerState.On
-                self._timer.restart()
+                self._indexer_stuck_timer.restart()
 
     def stopFuel(self):
         self._indexer.set(0.0)

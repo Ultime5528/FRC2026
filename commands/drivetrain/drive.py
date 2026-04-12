@@ -35,10 +35,11 @@ class DriveField(Command):
         xbox_remote: commands2.button.CommandXboxController,
     ):
         super().__init__()
-        self.rot: float = 0.0
-        self.actual_rot: float = 0.0
+        self.rot = Rotation2d()
+        self.actual_rot = Rotation2d()
         self.addRequirements(drivetrain)
         self.xbox_remote = xbox_remote
+        self.hid = xbox_remote.getHID()
         self.drivetrain = drivetrain
 
     def initialize(self):
@@ -64,10 +65,10 @@ class DriveField(Command):
             if is_red:
                 self.rot = Rotation2d.fromDegrees(180 + self.rot.degrees())
 
-        if self.xbox_remote.leftBumper():
-            self.actual_rot = self.rot + Rotation2d.fromDegrees(180.0)
-        else:
-            self.actual_rot = self.rot
+        # if self.xbox_remote.leftBumper():
+        #     self.actual_rot = self.rot + Rotation2d.fromDegrees(180.0)
+        # else:
+        self.actual_rot = self.rot
 
         rot_speed = (
             (self.actual_rot - self.drivetrain.getPose().rotation()).degrees()
@@ -79,7 +80,7 @@ class DriveField(Command):
             x_speed *= -1
             y_speed *= -1
 
-        if self.xbox_remote.rightBumper():
+        if self.hid.getRightBumper():
             x_speed *= self.slow_speed_multiplier
             y_speed *= self.slow_speed_multiplier
             rot_speed *= self.slow_speed_multiplier

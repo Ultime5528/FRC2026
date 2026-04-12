@@ -8,15 +8,21 @@ from ultime.vision import AbsoluteVision, VisionMode
 ### Offset of the camera relative to the middle of the robot. In robot Coordinate system
 robot_to_camera_front_offset = wpimath.geometry.Transform3d(
     wpimath.geometry.Translation3d(0.08, -0.005, 0.525),
-    wpimath.geometry.Rotation3d.fromDegrees(179, -16.5, 1.9),
+    wpimath.geometry.Rotation3d.fromDegrees(180.0, -16.5, 1.9),
 )
 robot_to_camera_back_offset = wpimath.geometry.Transform3d(
     wpimath.geometry.Translation3d(-0.340, -0.35, 0.43),
     wpimath.geometry.Rotation3d.fromDegrees(0.5, -17.5, -135.0),
 )
 
+robot_to_camera_second_back_offset = wpimath.geometry.Transform3d(
+    wpimath.geometry.Translation3d(-0.340, -0.205, 0.43),
+    wpimath.geometry.Rotation3d.fromDegrees(0.5, -17.5, 135.0),
+)
+
 camera_front_name = "FrontCamera"
 camera_back_name = "BackCamera"
+camera_second_back_name = "SecondBackCamera"
 
 
 class TagVisionModule(AbsoluteVision):
@@ -29,6 +35,12 @@ class TagVisionModule(AbsoluteVision):
     @classmethod
     def back(cls, drivetrain: Drivetrain):
         return cls(camera_back_name, robot_to_camera_back_offset, drivetrain)
+
+    @classmethod
+    def secondBack(cls, drivetrain: Drivetrain):
+        return cls(
+            camera_second_back_name, robot_to_camera_second_back_offset, drivetrain
+        )
 
     def __init__(self, name: str, transform: Transform3d, drivetrain: Drivetrain):
         super().__init__(camera_name=name, camera_offset=transform)

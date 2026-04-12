@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 import wpilib
+from wpilib.simulation import RoboRioSim, DriverStationSim
 
 from commands.guide.checkguide import CheckGuide
 from modules.autonomous import AutonomousModule
 from modules.control import ControlModule
 from modules.dashboard import DashboardModule
+from modules.gamespecifics import GameSpecifics
 from modules.hardware import HardwareModule
+from modules.led import LEDModule
 from modules.logging import LoggingModule
 from modules.positionestimator import PositionEstimator
 from modules.propertysavechecker import PropertySaveCheckerModule
@@ -13,7 +16,7 @@ from modules.questvision import QuestVisionModule
 from modules.shootercalcmodule import ShooterCalcModule
 from modules.sysidmodule import SysIDModule
 from modules.tagvision import TagVisionModule
-from ultime.modulerobot import ModuleRobot
+from ultime.modulerobot import ModuleRobot, is_simulation
 
 
 class Robot(ModuleRobot):
@@ -27,7 +30,10 @@ class Robot(ModuleRobot):
 
         self.hardware = self.addModule(HardwareModule())
 
-        self.quest_vision = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+        self.quest_nav = self.addModule(QuestVisionModule(self.hardware.drivetrain))
+        self.camera_second_back = self.addModule(
+            TagVisionModule.secondBack(self.hardware.drivetrain)
+        )
         self.camera_front = self.addModule(
             TagVisionModule.front(self.hardware.drivetrain)
         )
@@ -37,20 +43,36 @@ class Robot(ModuleRobot):
         self.position_estimator = self.addModule(
             PositionEstimator(
                 self.hardware.drivetrain,
-                self.quest_vision,
+                self.hardware.shooter,
+                self.quest_nav,
                 self.camera_front,
                 self.camera_back,
+                self.camera_second_back,
             )
         )
 
         self.shooter_calc_module = self.addModule(
-            ShooterCalcModule(self.hardware.drivetrain, self.hardware.guide)
+            ShooterCalcModule(
+                self.hardware.drivetrain, self.hardware.guide, self.position_estimator
+            )
         )
         self.hardware.guide.setDefaultCommand(
             CheckGuide(self.hardware.guide, self.shooter_calc_module)
         )
+
+        self.game_specific = self.addModule(GameSpecifics())
+
+        self.led = self.addModule(
+            LEDModule(self.hardware, self.position_estimator, self.game_specific)
+        )
+
         self.autonomous = self.addModule(
-            AutonomousModule(self.hardware, self.shooter_calc_module)
+            AutonomousModule(
+                self.hardware,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
+            )
         )
 
         self.control = self.addModule(
@@ -59,10 +81,18 @@ class Robot(ModuleRobot):
 
         self.dashboard = self.addModule(
             DashboardModule(
-                self.hardware, self.autonomous, self.modules, self.shooter_calc_module
+                self.hardware,
+                self.autonomous,
+                self.modules,
+                self.shooter_calc_module,
+                self.quest_nav,
+                self.position_estimator,
             )
         )
         self.logging = self.addModule(LoggingModule())
         self.property_save_checker = self.addModule(PropertySaveCheckerModule())
 
         self.sys_id = self.addModule(SysIDModule(self.hardware.drivetrain))
+
+        if is_simulation:
+            RoboRioSim.setVInVoltage(12.5)

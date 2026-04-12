@@ -71,7 +71,6 @@ class AbsoluteVision(Vision):
             camera_offset,
         )
         self.estimated_pose: EstimatedRobotPose = None
-        self.std_devs = [4, 4, 8]
 
     def getEstimatedPose(
         self, frame: PhotonPipelineResult
@@ -89,6 +88,9 @@ class AbsoluteVision(Vision):
     def getAllUnreadEstimatedPosesWithStdDevs(
         self,
     ) -> Generator[tuple[EstimatedRobotPose, tuple[float, float, float]]]:
+
+        # Should we use only the last value?
+        # Are we losing the information that estimated_pose are not all in the same frame?
         for frame in self._cam.getAllUnreadResults():
             estimated_pose = self.getEstimatedPose(frame)
             std_devs = self.getEstimationStdDevs(
@@ -99,46 +101,48 @@ class AbsoluteVision(Vision):
     def getEstimationStdDevs(
         self, estimated_pose: EstimatedRobotPose, targets: List[PhotonTrackedTarget]
     ) -> tuple[float, float, float]:
+
+        std_devs = (sys.float_info.max, sys.float_info.max, sys.float_info.max)
+
         if estimated_pose is None:
-            self.std_devs = [4.0, 4.0, 8.0]
-        else:
-            self.std_devs = [4.0, 4.0, 8.0]
-            num_tags = 0
-            av_dist = 0
+            return std_devs
 
-            for target in targets:
-                tag_pose = self.camera_pose_estimator.fieldTags.getTagPose(
-                    target.getFiducialId()
-                )
-                if tag_pose is None:
-                    continue
-                else:
-                    num_tags += 1
-                    av_dist += (
-                        tag_pose.toPose2d()
-                        .translation()
-                        .distance(estimated_pose.estimatedPose.toPose2d().translation())
-                    )
+        num_tags = 0
+        max_distance = 0.0
 
-            if num_tags == 0:
-                self.std_devs = [4.0, 4.0, 8.0]
+        for target in targets:
+            tag_pose = self.camera_pose_estimator.fieldTags.getTagPose(
+                target.getFiducialId()
+            )
+            if tag_pose is None:
+                continue
             else:
-                av_dist /= num_tags
+                num_tags += 1
+                distance = tag_pose.translation().distance(
+                    estimated_pose.estimatedPose.translation()
+                )
+                max_distance = max(max_distance, distance)
 
-                if num_tags > 1:
-                    self.std_devs = [0.5, 0.5, 1.0]
+        max_accurate_distance = 4.0
 
-                if num_tags == 1 and av_dist > 4:
-                    self.std_devs = [
-                        sys.float_info.max,
-                        sys.float_info.max,
-                        sys.float_info.max,
-                    ]
-                else:
-                    self.std_devs = [
-                        val * (1 + (av_dist * av_dist / 30)) for val in self.std_devs
-                    ]
-        return self.std_devs
+        if num_tags > 0 and max_distance < max_accurate_distance:
+
+            min_accurate_distance = 1.0
+            min_std_devs = (0.01, 0.01, 0.02)
+            max_std_devs = (0.05, 0.05, 0.1)
+
+            if max_distance < min_accurate_distance:
+                std_devs = min_std_devs
+            else:
+                lerp_factor = (max_distance - min_accurate_distance) / (
+                    max_accurate_distance - min_accurate_distance
+                )
+                std_devs = [
+                    min_std_devs[i] + lerp_factor * (max_std_devs[i] - min_std_devs[i])
+                    for i in range(0, 3)
+                ]
+
+        return std_devs
 
     def getUsedTagIDs(self) -> list[int]:
         if self.estimated_pose:

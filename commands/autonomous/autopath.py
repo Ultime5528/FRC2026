@@ -19,10 +19,15 @@ _constraints_for_tower = PathConstraints(
     maxAngularAccelerationRpsSq=degreesToRadians(10.0),
 )
 
-_tower_y_left = 4.595
-_tower_y_right = 2.987
-_tower_x = 1.021
+_tower_y_left = 4.5
+_tower_y_right = 2.983
+_tower_x = 1.060  # 1.063 , 1.059
 _tower_y_threshold = 0.2
+
+# flipped : measured
+# y_left 3.57 : 3.57
+# y_right 5.087 : 5.095
+# x : 15.48 : 15.465, 15.496
 
 _tower_distance_from_for_first_pose = 0.45
 _tower_initial_velocity = 0.4

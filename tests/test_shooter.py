@@ -28,7 +28,7 @@ def test_ManualShoot(robot_controller: RobotTestController, robot: Robot):
     cmd.schedule()
     robot_controller.wait_one_frame()
 
-    rpm_tolerance = cmd.speed_rpm * 0.01
+    rpm_tolerance = shooter.shooter_tolerance
 
     assert cmd.isScheduled()
 
@@ -130,7 +130,9 @@ def test_shoot(robot_controller: RobotTestController, robot: Robot):
     assert shooter.isAtVelocity()
 
     robot_controller.wait_until(
-        lambda: shooter._timer.hasElapsed(shooter.indexer_delay_stuck_threshold),
+        lambda: shooter._indexer_stuck_timer.hasElapsed(
+            shooter.indexer_delay_stuck_threshold
+        ),
         10.0,
     )
 

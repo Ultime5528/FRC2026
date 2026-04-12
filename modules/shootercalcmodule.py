@@ -9,7 +9,7 @@ from wpimath.geometry import (
     Pose2d,
     Rotation2d,
 )
-
+from modules.positionestimator import PositionEstimator
 from subsystems.drivetrain import Drivetrain
 from subsystems.guide import Guide
 from ultime.autoproperty import autoproperty
@@ -113,18 +113,19 @@ class ShooterCalcModule(Module):
     long_distance_treshold = autoproperty(2.5)
     red_hub = Translation3d(11.915394, 4.034536, 1.510284)
     blue_hub = Translation3d(4.625594, 4.034536, 1.510284)
-    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, -3.0))
-    speed_guide_open = autoproperty([5.45, 6.3, 6.67, 6.8, 7.2])
-    rpm_guide_open = autoproperty([2500.0, 2750.0, 2900.0, 3350.0, 3800.0])
-    speed_guide_closed = autoproperty([6.1, 6.48, 6.8, 7.2, 7.7, 8.0, 8.3, 8.4])
+    shooter_offset = Transform3d(-0.14, 0.245, 0.5, Rotation3d.fromDegrees(0, 0, 3.0))
+    rpm_guide_open = autoproperty([2550.0, 2750.0, 2850.0, 2875.0, 2925.0])
+    speed_guide_open = autoproperty([5.42, 5.7, 6.0, 6.3, 6.68])
+    speed_guide_closed = autoproperty([6.1, 6.4, 6.7, 7.0, 7.3, 7.6, 7.9, 8.2, 8.6])
     rpm_guide_closed = autoproperty(
-        [2800.0, 3200.0, 3400.0, 3575.0, 3900.0, 4400.0, 4850.0, 5050.0]
+        [2925.0, 3075.0, 3225.0, 3375.0, 3575.0, 3800.0, 4085.0, 4385.0, 4725.0]
     )
 
     def __init__(
         self,
         drivetrain: Drivetrain,
         guide: Guide,
+        position_estimator: PositionEstimator,
     ):
         super().__init__()
         self._drivetrain = drivetrain
@@ -150,6 +151,8 @@ class ShooterCalcModule(Module):
         self._projectile_angle = 0.0
         self._projectile_speed = 0.0
         self.distance_xy = 0.0
+
+        self.position_estimator = position_estimator
 
     def getRotationToAlignWithTarget(self) -> Rotation2d:
         return self._robot_rotation_angle
@@ -214,6 +217,10 @@ class ShooterCalcModule(Module):
             self._target_position = self.team_hub_position
         else:
             self._target_position = self._getZonePosition()
+
+        self.position_estimator._taget_pose.setPose(
+            Pose2d(self._target_position.toTranslation2d(), Rotation2d())
+        )
 
     def _getZonePosition(self) -> Translation3d:
         if self._robot_pose.y < 4.034663:

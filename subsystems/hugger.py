@@ -6,9 +6,9 @@ from ultime.subsystem import Subsystem
 
 
 class Hugger(Subsystem):
-    position_hug_left = autoproperty(0.43)
+    position_hug_left = autoproperty(0.46)
     position_unhug_left = autoproperty(0.06)
-    position_hug_right = autoproperty(0.05)
+    position_hug_right = autoproperty(0.02)
     position_unhug_right = autoproperty(0.47)
     delay_hug = autoproperty(0.5)
 

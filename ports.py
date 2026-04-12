@@ -40,6 +40,7 @@ class PWM(Immutable):
     guide_servo = 5
     hugger_servo_left = 9
     hugger_servo_right = 8
+    led_strip = 0
 
 
 class DIO(Immutable):
